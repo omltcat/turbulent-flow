@@ -2,6 +2,7 @@
 
 \usepackage{tabularx}
 \usepackage{booktabs}
+\usepackage[round]{natbib}
 
 \title{Problem Statement and Goals\\\progname}
 
@@ -22,35 +23,62 @@
 \toprule
 \textbf{Date} & \textbf{Developer(s)} & \textbf{Change}\\
 \midrule
-Date1 & Name(s) & Description of changes\\
-Date2 & Name(s) & Description of changes\\
-... & ... & ...\\
+2024-01-19 & Phil Du & Initial commit\\
+
 \bottomrule
 \end{tabularx}
 \end{table}
 
+\section{Audience and Background}
+It is assumed that the readers of this and future documents in this project has a basic understanding of fluid dynamics, especially laminar/turbulent flow and CFD. If not, please read the following subsection. Otherwise, skip to the Problem Statement section.
+
+\subsection{Fluid Dynamics Background Information}
+
+Fluid dynamics is the study of how fluids, like water and air, move. There are two main types of flow:
+\begin{itemize}
+    \item \textbf{Laminar flow}: the fluid flows smoothly, like water in a calm river.
+    \item \textbf{Turbulent flow}: the fluid flows chaotically, like after a waterfall. Turbulent flow consists of many circular swirls, known as \textbf{eddies}.
+\end{itemize}
+\href{https://www.jousefmurad.com/content/images/size/w1000/2022/11/laminar_turbulent_flow.jpeg}{This image shows the difference between laminar and turbulent flow with eddies.}
+\textbf{Computational Fluid Dynamics (CFD)} is the simulation of these fluid movements using computers. It is useful in both research and engineering, such as aiding the design of airplanes, buildings, etc. 
+
+\textit{The above subsection is inspired by asking ChatGPT 4.0: ``Write a very short explanation on fluid dynamics, laminar/turbulent flow and CFD. The reader does not have any background knowledge on fluids."}
+
 \section{Problem Statement}
 
-\wss{You should check your problem statement with the
-\href{https://github.com/smiths/capTemplate/blob/main/docs/Checklists/ProbState-Checklist.pdf}
-{problem statement checklist}.}
-\wss{You can change the section headings, as long as you include the required information.}
-
 \subsection{Problem}
+When using CFD to simulate turbulent flow, the typical method is to start with a laminar flow upstream, and let it develop into turbulent flow downstream. However, this method is computationally expensive, as it need to simulate over a long region and can take significant computing time for the flow to develop into the desired state. 
+
+These limitations can potentially be amended if CFD can start with an artificially made turbulent flow. \citet{PolettoEtAl2013} proposed a method to generate synthetic eddies. Nikita Holyev is also working on computing the correct profiles for the synthetic eddies that would mimic real turbulent flows.
+
 
 \subsection{Inputs and Outputs}
 
-\wss{Characterize the problem in terms of ``high level'' inputs and outputs.  
-Use abstraction so that you can avoid details.}
+\subsubsection{Inputs}
+A profile of synthetic eddies, which may include their number, size and strength, etc. At current stage, these will be arbitrarily chosen by the user.
+
+\subsubsection{Outputs}
+A 3D velocity field containing the generated synthetic eddies.
 
 \subsection{Stakeholders}
+\begin{itemize}
+    \item Researchers, such as Nikita Holyev, who are working on the theories of synthetic turbulent flow.
+    \item Ultimately, CFD software users who want to simulate turbulent flow with less computational cost.
+\end{itemize}
 
 \subsection{Environment}
+The final product will be a piece of standalone software that can be called by other CFD software via applicable APIs. It should run on any (usually x86) computer that is capable of running CFD.
 
-\wss{Hardware and software}
-
+\newpage
 \section{Goals}
+To generate 3D velocity fields consist of synthetic eddies, mimicking turbulent flows, and to be used as initial conditions by turbulent CFD simulations.
+
+For the scope of CAS 741, this software will generate any velocity fields based on user inputs, regardless of whether these inputs lead to physically realistic turbulent flow velocity fields. 
 
 \section{Stretch Goals}
+To be integrated into the workflow of widely used CFD software, such as Ansys Fluent or CFX. 
+
+\bibliographystyle {plainnat}
+\bibliography{../../refs/References}
 
 \end{document}
