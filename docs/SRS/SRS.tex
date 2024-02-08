@@ -826,7 +826,7 @@ on.
 }
 % #8 Referenced by
 {
-  \tref{VFF}, \iref{velocitySum} 
+  \tref{VFF}
 }
 % #9 Preconditions
 {
@@ -1069,7 +1069,6 @@ identified in Sections~\ref{sec_theoretical} and~\ref{sec_gendef}.
   &$\mathbf{u}'(\mathbf{x},t) = \sqrt{\frac{1}{N}}\sum_{k=1}^{N}\frac{q_\sigma(|\mathbf{r}^k|)}{|\mathbf{r}^k|^3}\mathbf{r}^k\times\alpha^k$ (\si{\second}) is the velocity fluctuation (\si[per-mode=symbol]{\metre\per\second}).\\
   &$\textbf{r}^k(\mathbf{x},t) = \frac{\textbf{x}-\textbf{x}^k}{\sigma^k}$ is the normalize radial vector to each eddy center (\si{\metre}).\\
   &$\textbf{x}^k(t) = \textbf{x}^k_0 + \mathbf{u_\text{avg}}t$ is the center of each eddy at a given time (\si{\metre}).\\
-  &$q_\sigma(|\mathbf{r}^k|)$ is the shape function (need more info).\\
   \\
   &The above model gives the sum of velocity field from the average velocity and all the eddy fluctuations over time. However, it does not yet have a mechanism to destroy eddies as they move out of the flow field and generate new ones to replaced the destroyed ones. The will be done with programming logics.
   \\
@@ -1349,7 +1348,7 @@ the assumptions.
 \tref{VFF}          &X& &X& & \\ \hline
 \ddref{radial}      & & & &X& \\ \hline
 \ddref{center}      & & & & & \\ \hline
-\iref{velocitySum}  &X&X&X&X& \\ \hline
+\iref{velocitySum}  & &X&X&X& \\ \hline
 \end{tabular}
 \caption{Traceability Matrix Showing the Connections Between Items of Different Sections}
 \label{Table:trace}
