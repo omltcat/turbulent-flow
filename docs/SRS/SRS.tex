@@ -428,14 +428,14 @@ The intended readers of this document are expected to have an undergraduate leve
 %   graduate course on advanced quantum mechanics?}
 
 \subsection{Organization of Document}
-The Introduction section is an intro to this document itself, including reader characteristics and necessary brief background knowledge needed to understand the scope of this project. The General System Description section provides a high-level view of what the user need to know to utilize this software. Detailed problem description and the theoretical behind the software are presented in Specific System Description, followed by Requirements of the software.
+The Introduction section is an intro to this document itself, including reader characteristics and necessary brief background knowledge needed to understand the scope of this project. The General System Description section (\ref{Sec_GSD}) provides a high-level view of what the user need to know to utilize this software. Detailed problem description and the theoretical behind the software are presented in Specific System Description (\ref{Sec_SSD}), followed by Requirements of the software (\ref{Sec_req}). Not all the requirements will be satisfied in the first version of the software. The development will gradually implement features as detailed in Development Plan (\ref{Sec_plan}).
 
 % \plt{This section provides a roadmap of the SRS document.  It will help the
 %   reader orient themselves.  It will provide direction that will help them
 %   select which sections they want to read, and in what order.  This section will
 %   be similar between project.}
 
-\section{General System Description}
+\section{General System Description} \label{Sec_GSD}
 
 This section provides general information about the system.  It identifies the
 interfaces between the system and its environment, describes the user
@@ -545,7 +545,7 @@ Certain CFD software may require the use of specific programming languages for a
 %   abstraction is relaxed here.  However, system constraints should only be
 %   included if they are truly required.}
 
-\section{Specific System Description}
+\section{Specific System Description} \label{Sec_SSD}
 
 This section first presents the problem description, which gives a high-level
 view of the problem to be solved.  This is followed by the solution characteristics
@@ -1169,7 +1169,7 @@ A correct solution must exhibit a zero-sum velocity fluctuation across the entir
 %   validation.  Those topics will be addressed in the Verification and Validation
 %   plan.}
 
-\section{Requirements}
+\section{Requirements} \label{Sec_req}
 
 % \plt{The requirements refine the goal statement.  They will make heavy use of
 %   references to the instance models.}
@@ -1402,7 +1402,7 @@ the assumptions.
 % 	\end{center}
 % \end{figure}
 
-\section{Development Plan}
+\section{Development Plan} \label{Sec_plan}
 
 The first step would be to implement \rref{R_anyEddy} given any user provided eddy profiles, and ensure \rref{R_zeroSum} divergence-free field generation. At this point, the software allows the user to manually query the velocity field at any point within the velocity field (\rref{R_inputs}). 
 
