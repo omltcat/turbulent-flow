@@ -53,8 +53,8 @@ urlcolor=cyan          % color of external links
 \begin{tabularx}{\textwidth}{p{3cm}p{2cm}X}
 \toprule {\bf Date} & {\bf Version} & {\bf Notes}\\
 \midrule
-Date 1 & 1.0 & Notes\\
-Date 2 & 1.1 & Notes\\
+2024-03-18 & 1.0 & Initial MIS\\
+% Date 2 & 1.1 & Notes\\
 \bottomrule
 \end{tabularx}
 
@@ -62,9 +62,9 @@ Date 2 & 1.1 & Notes\\
 
 \section{Symbols, Abbreviations and Acronyms}
 
-See SRS Documentation at \wss{give url}
+See SRS Documentation at \href{https://github.com/omltcat/turbulent-flow/blob/main/docs/SRS/SRS.pdf}{GitHub repo}
 
-\wss{Also add any additional symbols, abbreviations or acronyms}
+% \wss{Also add any additional symbols, abbreviations or acronyms}
 
 \newpage
 
@@ -76,17 +76,18 @@ See SRS Documentation at \wss{give url}
 
 \section{Introduction}
 
-The following document details the Module Interface Specifications for
-\wss{Fill in your project name and description}
+The following document details the Module Interface Specifications for \progname{}, a software to artificially generate flow field that mimics turbulent flow, which can be use as starting point for CFD simulation.
+% \wss{Fill in your project name and description}
 
 Complementary documents include the System Requirement Specifications
 and Module Guide.  The full documentation and implementation can be
-found at \url{...}.  \wss{provide the url for your repo}
+found at \href{https://github.com/omltcat/turbulent-flow/blob/main/docs/SRS/SRS.pdf}{SRS}, \href{https://github.com/omltcat/turbulent-flow/blob/main/docs/Design/SoftArchitecture/MG.pdf}{MG}.  
+% \wss{provide the url for your repo}
 
 \section{Notation}
 
-\wss{You should describe your notation.  You can use what is below as
-  a starting point.}
+% \wss{You should describe your notation.  You can use what is below as
+  % a starting point.}
 
 The structure of the MIS for modules comes from \citet{HoffmanAndStrooper1995},
 with the addition that template modules have been adapted from
@@ -108,6 +109,7 @@ character & char & a single symbol or digit\\
 integer & $\mathbb{Z}$ & a number without a fractional component in (-$\infty$, $\infty$) \\
 natural number & $\mathbb{N}$ & a number without a fractional component in [1, $\infty$) \\
 real & $\mathbb{R}$ & any number in (-$\infty$, $\infty$)\\
+string & str & an array of char\\
 \bottomrule
 \end{tabular} 
 \end{center}
@@ -125,28 +127,29 @@ described by giving their type signature followed by their specification.
 The following table is taken directly from the Module Guide document for this project.
 
 \begin{table}[h!]
-\centering
-\begin{tabular}{p{0.3\textwidth} p{0.6\textwidth}}
-\toprule
-\textbf{Level 1} & \textbf{Level 2}\\
-\midrule
-
-{Hardware-Hiding} & ~ \\
-\midrule
-
-\multirow{7}{0.3\textwidth}{Behaviour-Hiding} & Input Parameters\\
-& Output Format\\
-& Output Verification\\
-& Temperature ODEs\\
-& Energy Equations\\ 
-& Control Module\\
-& Specification Parameters Module\\
-\midrule
-
-\multirow{3}{0.3\textwidth}{Software Decision} & {Sequence Data Structure}\\
-& ODE Solver\\
-& Plotting\\
-\bottomrule
+  \centering
+  \begin{tabular}{p{0.3\textwidth} p{0.6\textwidth}}
+  \toprule
+  \textbf{Level 1} & \textbf{Level 2}\\
+  \midrule
+  
+  {Hardware-Hiding Module} & ~ \\
+  \midrule
+  
+  \multirow{6}{0.3\textwidth}{Behaviour-Hiding Module}
+  & Query Interface\\
+  & Eddy Profile Module\\
+  & Flow Field Module\\
+  & Eddy Module\\
+  & Shape Function Module\\
+  & Vector Module\\
+  \midrule
+  
+  \multirow{3}{0.3\textwidth}{Software Decision Module} 
+  & Main Control Module\\
+  & File I/O Module\\
+  & Visualization Module\\
+  \bottomrule
 
 \end{tabular}
 \caption{Module Hierarchy}
@@ -156,32 +159,36 @@ The following table is taken directly from the Module Guide document for this pr
 \newpage
 ~\newpage
 
-\section{MIS of \wss{Module Name}} \label{Module} \wss{Use labels for
-  cross-referencing}
+\section{MIS of Query Interface} \label{mQuery} 
+% \wss{Use labels for cross-referencing}
 
-\wss{You can reference SRS labels, such as R\ref{R_Inputs}.}
+% \wss{You can reference SRS labels, such as R\ref{R_Inputs}.}
 
-\wss{It is also possible to use \LaTeX for hypperlinks to external documents.}
+% \wss{It is also possible to use \LaTeX for hypperlinks to external documents.}
 
 \subsection{Module}
-
-\wss{Short name for the module}
+\texttt{query}
+% \wss{Short name for the module}
 
 \subsection{Uses}
-
+\begin{itemize}
+\item Parse query input to call flow field module, serialize and return the result
+\item Queue multiple queries
+\end{itemize}
 
 \subsection{Syntax}
 
 \subsubsection{Exported Constants}
+None.
 
 \subsubsection{Exported Access Programs}
 
 \begin{center}
-\begin{tabular}{p{2cm} p{4cm} p{4cm} p{2cm}}
+\begin{tabular}{p{3cm} p{4cm} p{4cm} p{4cm}}
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
-\wss{accessProg} & - & - & - \\
+\texttt{handle\_request }& \texttt{request} str & \texttt{response} str & \texttt{InvalidRequestFormat} \\
 \hline
 \end{tabular}
 \end{center}
@@ -189,43 +196,581 @@ The following table is taken directly from the Module Guide document for this pr
 \subsection{Semantics}
 
 \subsubsection{State Variables}
-
-\wss{Not all modules will have state variables.  State variables give the module
-  a memory.}
+None.
+% \wss{Not all modules will have state variables.  State variables give the module
+%   a memory.}
 
 \subsubsection{Environment Variables}
-
-\wss{This section is not necessary for all modules.  Its purpose is to capture
-  when the module has external interaction with the environment, such as for a
-  device driver, screen interface, keyboard, file, etc.}
+None.
+% \wss{This section is not necessary for all modules.  Its purpose is to capture
+%   when the module has external interaction with the environment, such as for a
+%   device driver, screen interface, keyboard, file, etc.}
 
 \subsubsection{Assumptions}
-
-\wss{Try to minimize assumptions and anticipate programmer errors via
-  exceptions, but for practical purposes assumptions are sometimes appropriate.}
+None.
+% \wss{Try to minimize assumptions and anticipate programmer errors via
+%   exceptions, but for practical purposes assumptions are sometimes appropriate.}
 
 \subsubsection{Access Routine Semantics}
 
-\noindent \wss{accessProg}():
+\noindent \texttt{handle\_request(request)}:
 \begin{itemize}
-\item transition: \wss{if appropriate} 
-\item output: \wss{if appropriate} 
-\item exception: \wss{if appropriate} 
+% \item transition: \wss{if appropriate} 
+\item output: out := \texttt{encode(\{VectorT\})}, velocity vectors at all the queried points in one JSON string.
+\item exception: exc := (\texttt{decode(request)} is not \{VectorT\} $\Rightarrow$ \texttt{InvalidRequestFormat}), the request should be a JSON string of positions vectors to query get the velocity vectors.
 \end{itemize}
+\noindent More request methods to be implemented in the future.
 
-\wss{A module without environment variables or state variables is unlikely to
-  have a state transition.  In this case a state transition can only occur if
-  the module is changing the state of another module.}
+% \wss{A module without environment variables or state variables is unlikely to
+%   have a state transition.  In this case a state transition can only occur if
+%   the module is changing the state of another module.}
 
-\wss{Modules rarely have both a transition and an output.  In most cases you
-  will have one or the other.}
+% \wss{Modules rarely have both a transition and an output.  In most cases you
+%   will have one or the other.}
 
 \subsubsection{Local Functions}
 
-\wss{As appropriate} \wss{These functions are for the purpose of specification.
-  They are not necessarily something that is going to be implemented
-  explicitly.  Even if they are implemented, they are not exported; they only
-  have local scope.}
+% \wss{As appropriate} \wss{These functions are for the purpose of specification.
+%   They are not necessarily something that is going to be implemented
+%   explicitly.  Even if they are implemented, they are not exported; they only
+%   have local scope.}
+
+\noindent \texttt{decode(request)}:
+\begin{itemize}
+% \item transition: \wss{if appropriate} 
+\item output: out := \{VectorT\}, an array of position vectors.
+\end{itemize}
+
+\newpage
+\section{MIS of Eddy Profile Module} \label{mProf} 
+
+\subsection{Module}
+\texttt{eddy\_profile}
+
+\subsection{Uses}
+\begin{itemize}
+\item (Currently) Load eddy profile defined by the user [SRS: A3].
+\item (Future) Generate eddy profile based on user input parameters [MG: AC1].
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begin{center}
+\begin{tabular}{p{2.5cm} p{3.5cm} p{5cm} p{4cm}}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+\texttt{load} & \texttt{profile\_name} str & - & \texttt{InvalidProfile} \\
+% \texttt{save} & \texttt{profile\_name} str & - & -  \\
+\texttt{get\_params}& - & \texttt{params} \{{\{$\mathbb{R+}$, $\mathbb{R+}$\}}\} & - \\
+\texttt{get\_weights}& - & \texttt{weights} \{$\mathbb{R+}$\} & - \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+\begin{itemize}
+  \item \texttt{name}: str, name of the eddy profile (is also filename).
+  \item \texttt{params}: \{{\{$\mathbb{R+}$, $\mathbb{R+}$\}}\}, array of strength and radius sets for each type of eddy.
+  \item \texttt{weights}: \{$\mathbb{R+}$\}, corresponding array of weights for each type of eddy.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+None.
+
+\subsubsection{Assumptions}
+None.
+
+\subsubsection{Access Routine Semantics}
+
+\noindent \texttt{load(profile\_name)}:
+\begin{itemize}
+\item transition: \texttt{params, weights} := \texttt{fileIO.read(`profile', profile\_name)}
+\item exception: exc := (\texttt{params} is not \{{\{$\mathbb{R+}$, $\mathbb{R+}$\}}\} or \texttt{weights} is not type \{$\mathbb{R+}$\} $\Rightarrow$ \texttt{InvalidProfile})
+% \item output: out := \texttt{encode(\{VectorT\})}, velocity vectors at all the queried points in one JSON string.
+\end{itemize}
+%   will have one or the other.}
+
+\noindent \texttt{get\_params()}:
+\begin{itemize}
+\item output: out := \texttt{params}
+\end{itemize}
+
+\noindent \texttt{get\_weights()}:
+\begin{itemize}
+\item output: out := \texttt{weights}
+\end{itemize}
+
+\subsubsection{Local Functions}
+Some functions to compute the eddy profile based on user provided parameters, to be implemented in the future.
+
+
+
+\newpage
+\section{MIS of Flow Field Module} \label{mFlow} 
+
+\subsection{Module}
+\texttt{flow\_field}
+
+\subsection{Uses}
+\begin{itemize}
+\item Create flow field based on eddy profile or load existing one.
+\item Compute velocity vector at given position and time.
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begin{center}
+\begin{tabular}{p{2cm} p{4.5cm} p{3.5cm} p{4cm}}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+\texttt{init} & \texttt{profile} EddyProfileT, \newline\texttt{field\_name} str, \newline\texttt{dimensions} VectorT, \newline\texttt{avg\_vel} $\mathbb{R}$, \newline\texttt{eddy\_count} $\mathbb{Z}$ & - & \texttt{InvalidDimensions}\newline\texttt{InvalidAvgVelocity}\newline\texttt{EddyScaleTooLarge}\\
+\texttt{load} & \texttt{field\_name} str & - & -  \\
+\texttt{save} & - & \texttt{field} Record & -  \\
+% \texttt{save} & \texttt{profile\_name} str & - & -  \\
+\texttt{get\_vel}& \texttt{position} VectorT,\newline\texttt{time} $\mathbb{R}$ & \texttt{velocity} VectorT & \texttt{OutOfBoundary}\newline\texttt{NegativeTime} \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+\begin{itemize}
+  \item \texttt{profile}: eddy\_profileT, eddy profile to be used to generate the flow field.
+  \item \texttt{name}: str, name of the flow field (is also filename).
+  \item \texttt{dimensions}: Vector T of \{$L_x, L_y, L_z$\}, size of the flow field, with x being the axial direction, y vertical and z horizontal.
+  \item \texttt{avg\_vel}: $\mathbb{R}$, average flow velocity along x-axis.
+  \item \texttt{eddies}: \{EddyT\}, array of eddies in the flow field.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+None.
+
+\subsubsection{Assumptions}
+\begin{itemize}
+  \item External flow [SRS: A4, MG: AC2]
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+\noindent \texttt{init(profile, field\_name, dimensions, avg\_vel, eddy\_count)}:
+\begin{itemize}
+\item transition: 
+  \begin{itemize}
+    \item \texttt{profile, name, length\_x, length\_y, length\_z, avg\_vel} := as inputted
+    \item \texttt{eddies} := \{\texttt{eddy\_count} number of EddyT randomly generated with \texttt{profile}\}
+  \end{itemize}
+\item exception: 
+  \begin{itemize}
+    \item exc := (any of d in \texttt{dimensions} $\le$ 0 $\Rightarrow$ \texttt{InvalidDimensions})
+    \item exc := (\texttt{avg\_vel} $<$ 0 $\Rightarrow$ \texttt{InvalidAvgVelocity})
+    \item exc := (any of 2$*$\{radius in \texttt{profile}\} $\ge$ any of d in \texttt{dimensions} $\Rightarrow$ \texttt{EddyScaleTooLarge})
+  \end{itemize}
+\end{itemize}
+
+\noindent \texttt{load(field\_name)}:
+\begin{itemize}
+  \item transition: all state variables reconstructed from \texttt{fileIO.read(`field', field\_name)}.
+\end{itemize}
+
+\noindent \texttt{save(new\_name?)}:
+\begin{itemize}
+  \item transition: \texttt{name} := \texttt{new\_name} if provided, otherwise name remains the same.
+  \item output: out := Record (dict) with all current state variables. Each EddyT in \texttt{eddies} is also converted to a Record. So that \texttt{fileIO.write(`field', Record)} can be called to serialized the current state of the flow field into a JSON string for saving.
+\end{itemize}
+
+\noindent \texttt{get\_vel(position, time)}:
+\begin{itemize}
+  \item output: out := $\sum$ \{\texttt{eddy.get\_vel(position - eddy\_pos(eddy, time))} for each \texttt{eddy} in \texttt{eddies}\}, with wrap-around applied for eddies near the boundary.
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+
+\noindent \texttt{eddy\_pos(eddy, time)}:
+\begin{itemize}
+\item output: out := VectorT: \{\texttt{\\
+  get\_offset(time) + eddy.get\_init\_x(),\\
+  eddy.get\_y(get\_iter(time), dimensions[1]),\\
+  eddy.get\_z(get\_iter(time), dimensions[2])}\\
+\}the center position of the eddy at a given time (moving due to flow).
+\end{itemize}
+
+\noindent \texttt{get\_iter(time)}:
+\begin{itemize}
+\item output: out := \texttt{round($\frac{\texttt{avg\_vel}*\texttt{time}}{\texttt{dimensions[0]}}$)}, the number of iterations of the flow field at a given time (how many x-lengths have passed due to average flow velocity).
+\end{itemize}
+
+\noindent \texttt{get\_offset(time)}:
+\begin{itemize}
+\item output: out := $\texttt{avg\_vel}*\texttt{time} \% \texttt{dimensions[0]}$, the x-offset of the flow field at given time in current iteration.
+\end{itemize}
+
+
+\newpage
+\section{MIS of Eddy Module} \label{mEddy} 
+
+\subsection{Module}
+\texttt{eddy}
+
+\subsection{Uses}
+\begin{itemize}
+\item Create eddy object based on parameters given.
+\item Compute velocity vector relative position from center.
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begin{center}
+\begin{tabular}{p{2cm} p{5.6cm} p{3cm} p{3cm}}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+\texttt{init} & \texttt{field\_dimensions} VectorT, \newline\texttt{strength} $\mathbb{R+}$, \newline\texttt{radius} $\mathbb{R+}$, \newline\texttt{orient} VectorT & - & - \\
+% \texttt{save} & \texttt{profile\_name} str & - & -  \\
+\texttt{get\_init\_x}& - & \texttt{init\_x} $\mathbb{R}$ & - \\
+\texttt{get\_y}& \texttt{iter} $\mathbb{Z}$,\newline\texttt{length\_y} $\mathbb{R+}$ & \texttt{y} $\mathbb{R}$ & - \\
+\texttt{get\_z}& \texttt{iter} $\mathbb{Z}$,\newline\texttt{length\_z} $\mathbb{R+}$ & \texttt{z} $\mathbb{R}$ & - \\
+\texttt{get\_vel}& \texttt{rel\_position} VectorT & \texttt{velocity} VectorT & - \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+\begin{itemize}
+  \item \texttt{init\_x}: $\mathbb{R}$, the initial offset from zero x-position.
+  \item \texttt{strength}: $\mathbb{R+}$, intensity of the eddy.
+  \item \texttt{radius}: $\mathbb{R+}$ for length scale. Velocity outside of \texttt{radius} is always zero.
+  \item \texttt{orient}: VectorT, unit vector describing the orientation of the eddy spin axis.
+  \item \texttt{y\_arr}: \{$\mathbb{R}$\}, array of y-positions at each flow iteration.
+  \item \texttt{z\_arr}: \{$\mathbb{R}$\}, array of z-positions at each flow iteration.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+None.
+
+\subsubsection{Assumptions}
+\begin{itemize}
+  \item EddyT objects are not created manually, but generated by calls from \texttt{flow\_field}. Thus, the caller has ensured the validity of all parameters.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+\noindent \texttt{init(init\_x, strength, radius, orient)}:
+\begin{itemize}
+\item transition: 
+  \begin{itemize}
+  \item \texttt{strength, radius, orient} := as inputted
+  \item \texttt{init\_x} := \texttt{rand(0, field\_dimensions[0])}
+  \item \texttt{y[0], y[1], y[2]} := \{\texttt{rand(0, field\_dimensions[1])}\}
+  \item \texttt{z[0], z[1], z[2]} := \{\texttt{rand(0, field\_dimensions[2])}\}
+  \end{itemize}
+\end{itemize}
+
+\noindent \texttt{get\_init\_x()}:
+\begin{itemize}
+  \item output: out := \texttt{init\_x}
+\end{itemize}
+
+\noindent \texttt{get\_y(iter, length\_y)}:
+\begin{itemize}
+  \item transition: \texttt{y[iter]} := \texttt{rand(0, length\_y)} if \texttt{y[iter]} does not exist.
+  \item output: out :=\texttt{y[iter]}
+\end{itemize}
+
+\noindent \texttt{get\_z(iter, length\_z)}:
+\begin{itemize}
+  \item transition: \texttt{z[iter]} := \texttt{rand(0, length\_z)} if \texttt{z[iter]} does not exist.
+  \item output
+  : out :=\texttt{z[iter]}
+\end{itemize}
+\noindent \texttt{get\_vel(rel\_position)}:
+\begin{itemize}
+  \item output: out := computed from \texttt{rel\_position} with \texttt{strength, radius, orient} and \texttt{ShapeFunction.active(rel\_position, radius)}, see [SRS: TM1, TM2]
+\end{itemize}
+
+\noindent \texttt{dump()}:
+\begin{itemize}
+\item output: out := Record of all current state variables. Used by \texttt{flow\_field.save()} to serialize the eddy object.
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+None.
+
+
+\newpage
+\section{MIS of Shape Function Module} \label{mShape}
+
+\subsection{Module}
+\texttt{shape\_function}
+
+\subsection{Uses}
+\begin{itemize}
+\item A library of shape functions to be used by \texttt{eddy} (\ref{mEddy}).
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+\begin{center}
+\begin{tabular}{p{2cm} p{5.6cm} p{3cm} p{2cm}}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+\texttt{set\_active} & \texttt{active\_func} Function & - & - \\
+% \texttt{save} & \texttt{profile\_name} str & - & -  \\
+\texttt{active}& \texttt{rel\_position} VectorT,\newline\texttt{radius} $\mathbb{R}$ & \texttt{shape\_val} $\mathbb{R}$ & - \\
+\texttt{squared}& \texttt{rel\_position} VectorT,\newline\texttt{radius} $\mathbb{R}$ & \texttt{shape\_val} $\mathbb{R}$ & - \\
+\texttt{gaussian}& \texttt{rel\_position} VectorT,\newline\texttt{radius} $\mathbb{R}$ & \texttt{shape\_val} $\mathbb{R}$ & - \\
+\texttt{...}& \texttt{rel\_position} VectorT,\newline\texttt{radius} $\mathbb{R}$ & \texttt{shape\_val} $\mathbb{R}$ & - \\
+\hline
+\end{tabular}
+\end{center}
+User can modify this module to add more shape functions.
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+\begin{itemize}
+  \item \texttt{active}: The function that is currently designated as the active shape function.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+None.
+
+\subsubsection{Assumptions}
+None.
+
+\subsubsection{Access Routine Semantics}
+
+\noindent \texttt{set\_active(active\_func)}:
+\begin{itemize}
+\item transition: \texttt{active} := \texttt{active\_func},\newline so that other modules can always call \texttt{shape\_function.active()} to use the designated function. This should be set in \texttt{main} when the program starts.
+\end{itemize}
+
+\noindent \texttt{active()}:
+\begin{itemize}
+  \item output: out := \texttt{init\_x}
+\end{itemize}
+
+\noindent \texttt{active(rel\_position, radius)}:
+\begin{itemize}
+  \item output: out := shape function value, depending on the active shape function.
+\end{itemize}
+
+\noindent \texttt{squared(rel\_position, radius)}:
+\begin{itemize}
+  \item output: out := shape function value computed by taking the distance from the rel\_position to the center \texttt{mag(rel\_position)}, and \texttt{radius} (or length sclae) of the eddy. See [SRS: TM1].
+\end{itemize}
+
+\noindent \texttt{gaussian(rel\_position, radius)}:
+\begin{itemize}
+  \item output: out := Use a different (gaussian) equation to get the above value, as may be preferred by some researchers.
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+None.
+
+
+\newpage
+\section{MIS of Main Control Module} \label{mMain} 
+
+\subsection{Module}
+\texttt{main}
+
+\subsection{Uses}
+\begin{itemize}
+\item Take command line arguments and call various modules accordingly.
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begin{center}
+\begin{tabular}{p{2cm} p{5.6cm} p{3cm} p{2cm}}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+\texttt{main} & \texttt{command\_args} str, & - & - \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+None.
+
+\subsubsection{Environment Variables}
+\begin{itemize}
+  \item Command line console.
+\end{itemize}
+
+\subsubsection{Assumptions}
+None.
+
+\subsubsection{Access Routine Semantics}
+
+\noindent \texttt{main(command\_args)}:
+\begin{itemize}
+\item \texttt{--new\_field --name <field\_name> --dim <Lx>,<Ly>,<Lz>, --vel <avg\_vel> --count <eddy\_count> --profile <profile\_name>} 
+  \begin{itemize}
+    \item call \texttt{eddy\_profile.load(profile\_name)} to read the eddy profile file.
+    \item call \texttt{flow\_field.init(profile, field\_name, dimensions, avg\_vel, eddy\_count)} to create a new flow field.
+  \end{itemize}
+\item \texttt{--field <field\_name> --query <request>}
+  \begin{itemize}
+    \item call \texttt{flow\_field.load(field\_name)} to load the flow field.
+    \item call \texttt{query.handle\_request(request)} to get the velocity vectors at the queried points.
+  \end{itemize}
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+None.
+
+
+\newpage
+\section{MIS of File I/O Module} \label{mFile} 
+
+\subsection{Module}
+\texttt{fileIO}
+
+\subsection{Uses}
+\begin{itemize}
+\item Read and write JSON files for eddy profile and flow field.
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begin{center}
+\begin{tabular}{p{2cm} p{5cm} p{3cm} p{4cm}}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+\texttt{read} & \texttt{type} str,\newline\texttt{name} str & Record or Array & FileNotExist \\
+\texttt{write} & \texttt{type} str,\newline\texttt{content} Record or Array & - & FailToWrite \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+None.
+
+\subsubsection{Environment Variables}
+\begin{itemize}
+  \item Files on disk.
+\end{itemize}
+
+\subsubsection{Assumptions}
+\begin{itemize}
+  \item The field name or profile name is the same as the filename.
+  \item Saved fields are in \texttt{./fields/} and saved profiles are in \texttt{./profiles/} directories
+\end{itemize}
+
+
+\subsubsection{Access Routine Semantics}
+
+\noindent \texttt{read(type, name)}:
+\begin{itemize}
+\item output: out := Record or Array, the parsed content of the file.
+\item exception: exc := (file cannot be found at \texttt{./<type>/<name>.json} $\Rightarrow$ FileNotExist)
+\end{itemize}
+
+\noindent \texttt{write(type, content)}:
+\begin{itemize}
+\item transition: write the serialized JSON string to the file on disk.
+\item exception: exc := (file cannot be written to disk $\Rightarrow$ FailToWrite)
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+None.
+
+\newpage
+\section{MIS of Visualization Module} \label{mVisual} 
+
+THIS IS A PLACEHOLDER [MG: AC5]
+
+\subsection{Module}
+\texttt{visualize}
+
+\subsection{Uses}
+\begin{itemize}
+\item Render 2D or 3D images of the flow field.
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begin{center}
+\begin{tabular}{p{2cm} p{5cm} p{3cm} p{4cm}}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+... & ... & ... & ... \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+?
+
+\subsubsection{Environment Variables}
+?
+
+\subsubsection{Assumptions}
+?
+
+\subsubsection{Access Routine Semantics}
+?
+
+\subsubsection{Local Functions}
+?
+
 
 \newpage
 
