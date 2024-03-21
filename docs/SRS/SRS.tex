@@ -645,12 +645,12 @@ includes the following elements:
 %   amount of technical language.  They should be understandable by non-domain
 %   experts.}
 
-\noindent Given the flow field dimensions, average velocity and eddie profile(s), the goal (and stretch goal) statements are:
+\noindent Given the flow field dimensions, average velocity and eddie profile(s), the goal statements are:
 
 \begin{itemize}
 
-\item[GS\refstepcounter{goalnum}\thegoalnum \label{G_anyFlowField}:] Generate turbulent flow velocity field with user provided eddy profiles.
-\item[GS\refstepcounter{goalnum}\thegoalnum \label{G_realFlowField}:] (Stretch) Generate realistic turbulent flow velocity field.
+\item[GS\refstepcounter{goalnum}\thegoalnum \label{G_anyFlowField}:] Generate a velocity field that mimics a turbulent flow.
+% \item[GS\refstepcounter{goalnum}\thegoalnum \label{G_realFlowField}:] (Stretch) Generate realistic turbulent flow velocity field.
 \item[GS\refstepcounter{goalnum}\thegoalnum \label{G_interfaceCFD}:] (Stretch) Allow common CFD software to obtain IC and BC through this program.
 
 % \plt{One
@@ -1230,7 +1230,7 @@ A correct solution must exhibit a zero-sum velocity fluctuation across the entir
 \noindent \begin{itemize}
 
 \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Accuracy}:]
-  \textbf{Accuracy} The accuracy of the computed solutions, namely the how realistically velocity field mimics a turbulent flow, should meet the level needed for being used as IC and BC in CFD simulation. Initially this requirement will not be enforced, until a theoretical to obtain realistic eddy profiles is incorporated.
+  \textbf{Accuracy} The accuracy of the computed solutions, namely the how realistically the flow field mimics a turbulent flow, should meet the level needed for being used as IC and BC in CFD simulation. Specifically, \progname{} should be suggest realistic eddy profiles if the user cannot provide one (phase 2 requirement for future) . 
   % \plt{Characterize the accuracy by giving the context/use for
   %   the software.  Maybe something like, ``The accuracy of the computed
   %   solutions should meet the level needed for $<$engineering or scientific
