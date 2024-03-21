@@ -227,7 +227,7 @@ $\mathbf{u_{\text{avg}}}$ & \si[per-mode=symbol] {\metre\per\second} & 3D vector
 \\
 $\mathbf{u'}$ & \si[per-mode=symbol] {\metre\per\second} & 3D vector of flow velocity fluctuation (on top of average velocity)
 \\
-$\alpha$ & \si[per-mode=symbol] {\metre\per\second} & eddy intensity
+$\boldsymbol{\alpha}$ & \si[per-mode=symbol] {\metre\per\second} & 3D vector of eddy intensity
 \\
 $\sigma$ & \si{\metre} & eddy length-scale
 \\ 
@@ -716,8 +716,7 @@ models can be verified.
 \subsubsection{Types}
 
 \begin{itemize}
-  \item Vector $\mathbb{R}^3$: All bold symbols are 3D vectors with components in $x$, $y$ and $z$ directions.
-  \item Scalar $\mathbb{R}$: All non-bold symbols are scalar real numbers, unless otherwise specified.
+  \item Vector $\mathbb{R}^3$: 3D vectors with components in $x$, $y$ and $z$ directions, as \textbf{bold} symbols.
 \end{itemize}
 
 % \plt{This section is optional. Defining types can make the document easier to
@@ -731,7 +730,7 @@ models can be verified.
 \end{itemize}
 
 % \plt{This section is optional.}
-\subsubsection{Modelling Decisions}
+% \subsubsection{Modelling Decisions}
 
 % \plt{This section is optional.}
 
@@ -766,6 +765,7 @@ change [LC], in which the respective assumption is used.
 
 \end{itemize}
 
+\newpage
 \subsubsection{Theoretical Models}\label{sec_theoretical}
 
 % \plt{Theoretical models are sets of abstract mathematical equations or axioms
@@ -782,97 +782,83 @@ on.
 ~\newline
 
 \noindent
+\begin{minipage}{\textwidth}
+\renewcommand*{\arraystretch}{1.5}
+\begin{tabular}{| p{\colAwidth} | p{\colBwidth}|}
+\hline
+\rowcolor[gray]{0.9}
+Number& TM\refstepcounter{theorynum}\thetheorynum \label{SF}\\
+\hline
+Label &\bf Eddy Shape Function \\
+\hline
+% Units&$MLt^{-3}T^0$\\
+% \hline
+Equation & $
+q_\sigma(|\mathbf{r}^k|) = 
+\begin{cases} 
+  \sigma^k [1-|\mathbf{r}^k|^2] & \text{if } |\mathbf{r}^k| < 1 \\
+  0 & \text{elsewhere}
+\end{cases}
+$ \\
+\hline
+Description &
+Shape function describe the distribution of vorticity with respect to distance from the center of an eddy. For distance outside the length-scale of said eddy, a zero vorticity is prescribed.
 
-\deftheory
-% #2 refname of theory
-{TM:SF}
-% #3 label
-{
-  Eddy Shape Function\\
-  \textbf{Number}: TM\refstepcounter{theorynum}\thetheorynum \label{SF}
-}
-% #4 equation
-{
-  $
-    q_i = 
-    \begin{cases} 
-      \sigma_i [1-(d^k)^2] & \text{if } d^k < 1 \\
-      0 & \text{elsewhere}
-    \end{cases}
-  $\\ where $d^k = \sqrt{(r^k_j)^2}$
-}
-% #5 description
-{
-  Will have a proper description later.
-}
-% #6 Notes
-{
-  This is supposed to be the shape function ($q$) of a eddy based on location from its center. I think the value means the scale of the flow speed (intensity) at any point of an eddy, and set the speed to be 0 if outside the eddy boundary. There should also be some definition of the spin orientation of each eddy. I am not entirely sure how to understand the shape function equation, or what $i$ and $j$ refer to. I will look into this with the domain expert.
-}
-% #7 Source
-{
-  ~\citet{PolettoEtAl2013}
-}
-% #8 Referenced by
-{
-  \tref{VFF}
-}
-% #9 Preconditions
-{
-\aref{A_eddy}, \aref{A_ext}, \ddref{radial}
-}
-
-\deftheory
-% #2 refname of theory
-{TM:VFF}
-% #3 label
-{
-  Velocity Fluctuation Field\\
-  \textbf{Number}: TM\refstepcounter{theorynum}\thetheorynum \label{VFF}
-}
-% #4 equation
-{
-$
-  \mathbf{u}'(\mathbf{x}) = \sqrt{\frac{1}{N}}\sum_{k=1}^{N}\frac{q_\sigma(|\mathbf{r}^k|)}{|\mathbf{r}^k|^3}\mathbf{r}^k\times\alpha^k
-$\\
-}
-% #5 description
-{
-  The equation gives the fluctuation of velocity, the deviation from the average flow velocity at any given point in the flow field. It is the sum of the velocity fluctuation of each eddy at that point, based on the radial distance from the center of each eddy. 
-}
-% #6 Notes
-{
-  According to TM:SF, at any given position, the fluctuation from most eddies will likely be 0, as any single position is likely outside the boundaries of most eddies in the field
-}
-% #7 Source
-{
-  ~\citet{PolettoEtAl2013}
-}
-% #8 Referenced by
-{
-  \iref{velocitySum} 
-}
-% #9 Preconditions
-{
-\aref{A_eddy}, \tref{SF}, \ddref{radial}
-}
-% #1 derivation - not applicable by default
-{}
-
-% \plt{``Ref.\ By'' is used repeatedly with the different types of information.
-%   This stands for Referenced By.  It means that the models, definitions and
-%   assumptions listed reference the current model, definition or assumption.
-%   This information is given for traceability.  Ref. By provides a pointer in the
-%   opposite direction to what we commonly do.  You still need to have a reference
-%   in the other direction pointing to the current model, definition or
-%   assumption.  As an example, if TM1 is referenced by GD2, that means that GD2 will
-%   explicitly include a reference to TM1.}
+\begin{itemize}
+  \item $\sigma^k$ is the length-scale (radius) of the $k$th eddy (\si{\metre}).
+  \item $|\mathbf{r}^k|$ is the normalized distance from a given point to the center of the $k$th eddy, with 0 being the center and 1 being the edge. (See \dref{radial})
+\end{itemize}
+\\
+\hline
+Notes & This is only one of many possible shape functions that can be used. But they should all be in the form with respect to a normalized distance. 
+\\
+\hline
+  Source & \citet{PolettoEtAl2013}\\
+  \hline
+  Ref.\ By & \tref{VFF}\\
+  \hline
+\end{tabular}
+\end{minipage}\\
 
 ~\newline
 
-\subsubsection{General Definitions}\label{sec_gendef}
+\noindent
+\begin{minipage}{\textwidth}
+\renewcommand*{\arraystretch}{1.5}
+\begin{tabular}{| p{\colAwidth} | p{\colBwidth}|}
+\hline
+\rowcolor[gray]{0.9}
+Number& TM\refstepcounter{theorynum}\thetheorynum \label{VFF}\\
+\hline
+Label &\bf Velocity Fluctuation Field \\
+\hline
+% Units&$MLt^{-3}T^0$\\
+% \hline
+Equation & $\mathbf{u}'(\mathbf{x}) = \frac{1}{\sqrt{N}}\sum_{k=1}^{N}\frac{q_\sigma(|\mathbf{r}^k(\mathbf{x})|)}{|\mathbf{r}^k(\mathbf{x})|^3}\mathbf{r}^k(\mathbf{x})\times\boldsymbol{\alpha}^k$ \\
+\hline
+Description & The equation gives the fluctuation of velocity (the deviation from the average flow velocity) at point $\mathbf{x}$ in the flow field. It is the normalized sum of the velocity fluctuation due to influence by each eddy at that point.
+\begin{itemize}
+  \item $N$ is the number of eddies.
+  \item $\mathbf{r}^k$ is the normalized distance to the center of the $k$th eddy  [\dref{radial}].
+  \item $\boldsymbol{\alpha}^k$ is the intensity vector of the $k$th eddy (\si[per-mode=symbol]{\metre\per\second}) [\dref{intensity}].
+\end{itemize}
+\\
+\hline
+Notes & According to \tref{SF}, at any given position, the fluctuation from most eddies will likely be 0, as any single position is likely outside the boundaries of most eddies in the field.
+\\
+\hline
+  Source & \citet{PolettoEtAl2013}\\
+  \hline
+  Ref.\ By & \iref{velocitySum} \\
+  \hline
+\end{tabular}
+\end{minipage}\\
 
-There are many forms of refined TM:SF and TM:VFF in the paper. Nikita likely used some form of them his original MATLAB code. I will figure out which one is more suitable to be used in this program and put it here.
+~\newline
+
+% \subsubsection{General Definitions}\label{sec_gendef}
+
+% There are many forms of refined TM:SF and TM:VFF in the paper. Nikita likely used some form of them his original MATLAB code. I will figure out which one is more suitable to be used in this program and put it here.
 
 % \plt{General Definitions (GDs) are a refinement of one or more TMs, and/or of
 %   other GDs.  The GDs are less abstract than the TMs.  Generally the reduction
@@ -894,6 +880,7 @@ There are many forms of refined TM:SF and TM:VFF in the paper. Nikita likely use
 % \plt{Derivations are important for justifying a given GD.  You want it to be
 %   clear where the equation came from.}
 
+\newpage
 \subsubsection{Data Definitions}\label{sec_datadef}
 
 % \plt{The Data Definitions are definitions of symbols and equations that are
@@ -920,22 +907,24 @@ models. The dimension of each quantity is also given.
 \rowcolor[gray]{0.9}
 Number& DD\refstepcounter{datadefnum}\thedatadefnum \label{radial}\\
 \hline
-Label &\bf Normalized radial vector relative to an eddy \\
+Label &\bf Normalized radial vector relative to an eddy center\\
 \hline
 Symbol &$\textbf{r}^k$\\
 \hline
 SI Units& none\\
 \hline
-Equation& $\textbf{r}^k = \frac{\textbf{x}-\textbf{x}^k}{\sigma^k}$ \\
+Equation& $\textbf{r}^k(\mathbf{x}) = \frac{\textbf{x}-\textbf{x}^k}{\sigma^k}$ \\
 \hline
 Description &
-The positional vector relative to the center of the eddy, normalized by the length-scale ($\sigma^k$) of that eddy.\\
+The positional vector relative to the center of the eddy, normalized by the length-scale ($\sigma^k$) of that eddy.
+\begin{itemize}
+  \item $\textbf{x}$ is the given position (\si{\metre}).
+  \item $\textbf{x}^k$ is the center position of the $k$th eddy (\si{\metre}).
+  \item $\sigma^k$ is the length-scale of the $k$th eddy (\si{\metre}).
+\end{itemize}
 \\
-& $\textbf{x}$ is the given position (\si{\metre}).\\
-& $\textbf{x}^k$ is the center position of the $k$th eddy (\si{\metre}).\\
-& $\sigma^k$ is the length-scale of the $k$th eddy (\si{\metre}).\\
 \hline
-  Source &~\citet{PolettoEtAl2013}\\
+  Source & \citet{PolettoEtAl2013}\\
   \hline
   Ref.\ By & \tref{SF}, \tref{VFF}, \iref{velocitySum} \\
   \hline
@@ -961,17 +950,48 @@ SI Units & \si{\metre}\\
 Equation&$\textbf{x}^k(t) = \textbf{x}^k_0 + \mathbf{u_\text{avg}}t$\\
 \hline
 Description & 
-As the flow field has a constant average velocity $\mathbf{u_\text{avg}}$, the center position  of the $k$th eddy will move with the average velocity over time $t$.\\
-  \\
-  & $\textbf{x}^k(t)$ is the center position of the $k$th eddy at time $t$ (\si{\metre}).\\
-  & $\textbf{x}^k_0$ is the initial center position of the $k$th eddy (\si{\metre}).\\
-  & $\mathbf{u_\text{avg}}$ is the average velocity of the flow (\si[per-mode=symbol]{\metre\per\second}).\\
-  & $t$ is time since start (\si{\second}).\\
-  \hline
-  Sources& \aref{A_3D}, \aref{A_1D}\\
-  \hline
-  Ref.\ By & \ddref{radial}, \iref{velocitySum} \\
-  \hline
+As the flow field has a constant average velocity $\mathbf{u_\text{avg}}$, the center position  of the $k$th eddy will move with the average velocity over time $t$.
+\begin{itemize}
+  \item $\textbf{x}^k(t)$ is the center position of the $k$th eddy at time $t$ (\si{\metre}).
+  \item $\textbf{x}^k_0$ is the initial center position of the $k$th eddy (\si{\metre}).
+  \item $\mathbf{u_\text{avg}}$ is the average flow velocity, with zero $y$ and $z$ components (\si[per-mode=symbol]{\metre\per\second}).
+  \item $t$ is time since start (\si{\second}).
+\end{itemize}
+\\
+\hline
+Sources& \aref{A_3D}, \aref{A_1D}\\
+\hline
+Ref.\ By & \ddref{radial}, \iref{velocitySum} \\
+\hline
+\end{tabular}
+\end{minipage}\\
+
+~\newline
+
+\noindent
+\begin{minipage}{\textwidth}
+\renewcommand*{\arraystretch}{1.5}
+\begin{tabular}{| p{\colAwidth} | p{\colBwidth}|}
+\hline
+\rowcolor[gray]{0.9}
+Number& DD\refstepcounter{datadefnum}\thedatadefnum \label{intensity}\\
+\hline
+Label& \bf Eddy intensity vector\\
+\hline
+Symbol &$\boldsymbol{\alpha^k}$\\
+\hline
+SI Units & \si[per-mode=symbol]{\metre\per\second}\\
+\hline
+Equation& none\\
+\hline
+Description & 
+A 3D vector that describes both the direction and intensity magnitude of the $k$th eddy. Fluid flows around such a vector with right hand rule.
+\\
+\hline
+Sources& \citet{PolettoEtAl2013}\\
+\hline
+Ref.\ By & \tref{VFF} \\
+\hline
 \end{tabular}
 \end{minipage}\\
 
@@ -1015,6 +1035,7 @@ As the flow field has a constant average velocity $\mathbf{u_\text{avg}}$, the c
 % \end{tabular}
 % \end{minipage}\\
 
+\newpage
 \subsubsection{Instance Models} \label{sec_instance}    
 
 % \plt{The motivation for this section is to reduce the problem defined in
@@ -1055,7 +1076,7 @@ identified in Sections~\ref{sec_theoretical} and~\ref{sec_gendef}.
   Description 
   &$L_x$, $L_y$, $L_z$ are dimensions of the flow field (\si{\metre}).\\
   &$\mathbf{u_{\text{avg}}}$ is the average velocity of the flow (\si[per-mode=symbol]{\metre\per\second}).\\
-  &$\mathbf{u}'(\mathbf{x},t) = \sqrt{\frac{1}{N}}\sum_{k=1}^{N}\frac{q_\sigma(|\mathbf{r}^k|)}{|\mathbf{r}^k|^3}\mathbf{r}^k\times\alpha^k$ (\si{\second}) is the velocity fluctuation (\si[per-mode=symbol]{\metre\per\second}).\\
+  &$\mathbf{u}'(\mathbf{x},t) = \sqrt{\frac{1}{N}}\sum_{k=1}^{N}\frac{q_\sigma(|\mathbf{r}^k|)}{|\mathbf{r}^k|^3}\mathbf{r}^k\times\boldsymbol{\alpha}^k$ (\si{\second}) is the velocity fluctuation (\si[per-mode=symbol]{\metre\per\second}).\\
   &$\textbf{r}^k(\mathbf{x},t) = \frac{\textbf{x}-\textbf{x}^k}{\sigma^k}$ is the normalize radial vector to each eddy center (\si{\metre}).\\
   &$\textbf{x}^k(t) = \textbf{x}^k_0 + \mathbf{u_\text{avg}}t$ is the center of each eddy at a given time (\si{\metre}).\\
   \\
