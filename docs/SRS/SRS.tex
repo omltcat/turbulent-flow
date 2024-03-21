@@ -1066,24 +1066,34 @@ identified in Sections~\ref{sec_theoretical} and~\ref{sec_gendef}.
   \rowcolor[gray]{0.9}
   Number& IM\refstepcounter{instnum}\theinstnum \label{velocitySum}\\
   \hline
-  Label& \bf Velocity field of the synthetic eddy turbulent flow $\textbf{u}$\\
+  Label& \bf Velocity at any position and time in the flow field\\
   \hline
-  Input& Field construction: $L_x$, $L_y$, $L_z$, $\mathbf{u_{\text{avg}}}$, $N$, $\sigma$, possibly other parameters for the shape function $q$\\
-  & Query: $\mathbf{x}$, $t$\\
-  \hline
-  Output& $\mathbf{u}(\mathbf{x}, t) = \mathbf{u_\text{avg}} + \mathbf{u'}(\mathbf{x}, t)$\\
-  \hline
-  Description 
-  &$L_x$, $L_y$, $L_z$ are dimensions of the flow field (\si{\metre}).\\
-  &$\mathbf{u_{\text{avg}}}$ is the average velocity of the flow (\si[per-mode=symbol]{\metre\per\second}).\\
-  &$\mathbf{u}'(\mathbf{x},t) = \sqrt{\frac{1}{N}}\sum_{k=1}^{N}\frac{q_\sigma(|\mathbf{r}^k|)}{|\mathbf{r}^k|^3}\mathbf{r}^k\times\boldsymbol{\alpha}^k$ (\si{\second}) is the velocity fluctuation (\si[per-mode=symbol]{\metre\per\second}).\\
-  &$\textbf{r}^k(\mathbf{x},t) = \frac{\textbf{x}-\textbf{x}^k}{\sigma^k}$ is the normalize radial vector to each eddy center (\si{\metre}).\\
-  &$\textbf{x}^k(t) = \textbf{x}^k_0 + \mathbf{u_\text{avg}}t$ is the center of each eddy at a given time (\si{\metre}).\\
-  \\
-  &The above model gives the sum of velocity field from the average velocity and all the eddy fluctuations over time. However, it does not yet have a mechanism to destroy eddies as they move out of the flow field and generate new ones to replaced the destroyed ones. The will be done with programming logics.
+  Input
+  & $\mathbf{u_{\text{avg}}}$: Average flow velocity (\si[per-mode=symbol]{\metre\per\second})\\
+  & $N$: Number of eddies\\
+  & $\mathbf{x}^k_0$: Initial center position of each eddy (\si{\metre})\\
+  & $\sigma^k$: Length-scale of each eddy (\si{\metre})\\
+  & $\boldsymbol{\alpha}^k$: Intensity vector of each eddy (\si[per-mode=symbol]{\metre\per\second}) [\ddref{intensity}]\\
+  & $\mathbf{x}$: Any position in the flow field (\si{\metre})\\
+  & $t$: Any time since start (\si{\second})
   \\
   \hline
-  Sources& \citet{PolettoEtAl2013} \\
+  Output
+  & $\mathbf{u}$\\ 
+  \hline
+  Equation & $\mathbf{u}(\mathbf{x}, t) = \mathbf{u_\text{avg}} + \mathbf{u'}(\mathbf{x}, t)$\\
+  & where \\
+  & $\mathbf{u}'(\mathbf{x},t) = \frac{1}{\sqrt{N}}\sum_{k=1}^{N}\frac{q_\sigma(|\mathbf{r}^k(\mathbf{x}, t)|)}{|\mathbf{r}^k(\mathbf{x}, t)|^3}\mathbf{r}^k(\mathbf{x}, t)\times\boldsymbol{\alpha}^k$ [\tref{VFF}]\\
+  & $ q_\sigma(|\mathbf{r}^k(\mathbf{x},t)|) = \sigma^k [1-|\mathbf{r}^k(\mathbf{x},t)|^2] \text{ if } |\mathbf{r}^k(\mathbf{x},t)| < 1 \text{ , otherwise } 0 $ [\tref{SF}]\\
+  & $\mathbf{r}^k(\mathbf{x},t) = \frac{\mathbf{x}-\mathbf{x}^k(t)}{\sigma^k}$ [\ddref{radial}]\\
+  & $\mathbf{x}^k(t) = \mathbf{x}^k_0 + \mathbf{u_\text{avg}}t$ [\ddref{center}]\\
+  \hline
+  Description
+  & The above model gives the velocity vector at any position within the flow field at any given time, by combining the influence from each eddy at such time as they move down the flow field with average velocity.\\
+  & Such influence is calculated by the relative position of that point to the center of each eddy, according to its length-scale, intensity and shape function.
+  \\
+  \hline
+  Sources& \citet{PolettoEtAl2013}, \tref{SF}, \tref{VFF}, \ddref{radial}, \ddref{center}, \ddref{intensity}\\
   \hline
   Ref.\ By & None\\
   \hline
