@@ -1135,7 +1135,7 @@ uncertainty quantification exercise.
   \midrule 
     $\sigma$ & $\sigma > 0$ & - & 0.01 \si[per-mode=symbol] {\metre} & 0\%
   \\
-    $\textbf{x}$* & $\textbf{x} \in region(L_x,L_y,L_z)$ & - & 1 \si[per-mode=symbol] {\metre} & 0\%
+    $\textbf{x}$ & $\textbf{x} \in region(L_x,L_y,L_z)$ & - & 1 \si[per-mode=symbol] {\metre} & 0\%
   \\
     $t$ & $t \geq 0$ & - & 5 \si[per-mode=symbol] {\second} & 0\%
   \\
@@ -1144,10 +1144,11 @@ uncertainty quantification exercise.
 \end{table}
 
 \noindent 
-\begin{description}
-\item[(*)] Technically, we can allow queried $\textbf{x}$ to be outside the flow field and return a velocity of 0 or $\mathbf{u_\text{avg}}$, along with a warning.
+% \begin{description}
+% \item[(*)] Technically, we can allow queried $\textbf{x}$ to be outside the flow field and return a velocity of 0 or $\mathbf{u_\text{avg}}$, along with a warning.
+% Changed to throw exception in MIS
 % \plt{you might need to add some notes or clarifications}
-\end{description}
+% \end{description}
 
 % \begin{table}[!h]
 % \caption{Specification Parameter Values} \label{TblSpecParams}
