@@ -357,7 +357,7 @@ In this document, the following notation is used:
 %   independently verify/derive every statement made.}
 
 \section{Introduction}
-When using CFD (Computational Fluid Dynamics) to simulate turbulent flow, it is typical to start with a laminar flow up stream and let it develop into a turbulent flow downstream. However, this is computationally expensive as it need to simulate over a larger region and longer time, before the flow can develop into the desired state. 
+When using CFD (Computational Fluid Dynamics) to simulate turbulent flow, it is typical to start with a laminar flow up stream and let it develop into a turbulent flow downstream. However, this is computationally expensive as it requires simulations over a larger region and longer time, before the flow can develop into the desired state. 
 
 A potential approach to save computational time is to start with a artificially generated turbulent flow as initial and boundary conditions (IC and BC) for further CFD simulations. \citet{PolettoEtAl2013} proposed a method to generate a velocity field of such flow with synthetic eddies, which this software aims to implement.
 
@@ -387,7 +387,7 @@ User of this software can also refer to this document to understand the its capa
 
 \subsection{Scope of Requirements} 
 
-The scope of this software is limited to consider 3D space external flow scenarios only (for now, feasibility of internal flow will be looked into with the domain expert.). It is also limited 1D flow direction with one inlet and one outlet.
+The scope of this software is limited to consider 3D space external flow scenarios only (for now, feasibility of internal flow such as within a pipe will be looked into with the domain expert.). It is also limited 1D flow direction with one inlet and one outlet.
 
 As the first step of this project, the software will generate any velocity field based on user provided eddy profiles, regardless of whether they will lead to a realistic turbulent flow. This may change later as theoretical work progresses which allows the software to ensure realistic eddy profiles.
 
@@ -410,7 +410,7 @@ As the first step of this project, the software will generate any velocity field
 
 \subsection{Characteristics of Intended Reader} \label{sec_IntendedReader}
 
-The intended readers of this document are expected to have an undergraduate level understanding of fluid theories and aware of the general workflow when conducting CFD simulation. If not, a brief overview of relevant information needed to understand this document is provided in ~\ref{sec_termDef}.
+The intended readers of this document are expected to have an undergraduate level understanding of fluid theories (from course such as Junior level Fluid Dynamics or equivalent) and aware of the general workflow when conducting CFD simulation. If not, a brief overview of relevant information needed to understand this document is provided in ~\ref{sec_termDef}.
 
 % \plt{This section summarizes the skills and knowledge of the readers of the
 %   SRS.  It does NOT have the same purpose as the ``User Characteristics''
@@ -428,7 +428,7 @@ The intended readers of this document are expected to have an undergraduate leve
 %   graduate course on advanced quantum mechanics?}
 
 \subsection{Organization of Document}
-The Introduction section is an intro to this document itself, including reader characteristics and necessary brief background knowledge needed to understand the scope of this project. The General System Description section (\ref{Sec_GSD}) provides a high-level view of what the user need to know to utilize this software. Detailed problem description and the theoretical behind the software are presented in Specific System Description (\ref{Sec_SSD}), followed by Requirements of the software (\ref{Sec_req}). Not all the requirements will be satisfied in the first version of the software. The development will gradually implement features as detailed in Development Plan (\ref{Sec_plan}).
+The introduction section includes reader characteristics and necessary brief background knowledge needed to understand the scope of this project. The General System Description section (\ref{Sec_GSD}) provides a high-level view of what the user need to know to utilize this software. Detailed problem description and the theoretical behind the software are presented in Specific System Description (\ref{Sec_SSD}), followed by Requirements of the software (\ref{Sec_req}). Not all the requirements will be satisfied in the first version of the software. The development will gradually implement features as detailed in Development Plan (\ref{Sec_plan}).
 
 % \plt{This section provides a roadmap of the SRS document.  It will help the
 %   reader orient themselves.  It will provide direction that will help them
@@ -519,9 +519,9 @@ The software takes in user provided flow field dimensions, average velocity and 
 % \wss{The }
 \subsection{User Characteristics} \label{SecUserCharacteristics}
 
-The end user of \progname{} is expected to have understandings of fluid theories relevant to the use of CFD. They should be able to conduct CFD simulations even without the use of this software. 
+The expected end users of \progname{} are turbulent flow researchers and engineers looking to leverage \progname{} in their CFD simulations. They should have a (at least) undergraduate Junior level understanding of Fluid Dynamics and can perform CFD without \progname{}.
 
-(for now) They should also have a basic understanding of synthetic eddy theories, detailed later in this document in order to provide suitable eddy profiles.
+To provide suitable eddy profiles for \progname{}, the user need to be aware of the synthetic eddy theories. This is detailed later in this document, with more information available in \citet{PolettoEtAl2013}.
 
 % \plt{This section summarizes the knowledge/skills expected of the user.
 %   Measuring usability, which is often a required non-function requirement,
@@ -616,7 +616,7 @@ includes the following elements:
 \begin{figure}[h!]
   \begin{center}
    \includegraphics[width=0.8\textwidth]{PS.png}
-  \caption{System Context}
+  \caption{Physical System}
   \label{Fig_PhysicalSystem} 
   \end{center}
 \end{figure}
@@ -1113,11 +1113,11 @@ uncertainty quantification exercise.
   \textbf{Var} & \textbf{Physical Constraints} & \textbf{Software Constraints} &
                              \textbf{Typical Value} & \textbf{Uncertainty}\\
   \midrule 
-    $\sigma$ & $\sigma > 0$ & $\sigma > 0$ & 0.01 \si[per-mode=symbol] {\metre} & 0\%
+    $\sigma$ & $\sigma > 0$ & - & 0.01 \si[per-mode=symbol] {\metre} & 0\%
   \\
-    $\textbf{x}$* & $\textbf{x} \in region(L_x,L_y,L_z)$ & $-\frac{L_x}{2} \leq \textbf{x}.x \leq \frac{L_x}{2}$, same for y, z & 1 \si[per-mode=symbol] {\metre} & 0\%
+    $\textbf{x}$* & $\textbf{x} \in region(L_x,L_y,L_z)$ & - & 1 \si[per-mode=symbol] {\metre} & 0\%
   \\
-    $t$ & $t \geq 0$ & $t \geq 0$ & 5 \si[per-mode=symbol] {\second} & 0\%
+    $t$ & $t \geq 0$ & - & 5 \si[per-mode=symbol] {\second} & 0\%
   \\
   \bottomrule
 \end{longtable*}
@@ -1246,7 +1246,7 @@ A correct solution must exhibit a zero-sum velocity fluctuation across the entir
   %   link to the VnV plan would be a nice extra.}
 
 \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Maintainability}:]
-  \textbf{Maintainability} The source code should be modular and well-documented. Potential changes to the eddy generation algorithm should be understandable and modifiable by a CFD user if they wish to review the generation method or adapt this software for another theoretical model. 
+  \textbf{Maintainability} The source code should be clear and well-documented. Potential changes to the eddy generation algorithm should be understandable and modifiable by a CFD user if they wish to review the generation method or adapt this software for another theoretical model. 
   % \plt{The effort required to make any of the likely
   %   changes listed for \progname{} should be less than FRACTION of the original
   %   development time.  FRACTION is then a symbolic constant that can be defined
