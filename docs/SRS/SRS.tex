@@ -806,14 +806,14 @@ Shape function describe the distribution of vorticity with respect to distance f
 
 \begin{itemize}
   \item $\sigma^k$ is the length-scale (radius) of the $k$th eddy (\si{\metre}).
-  \item $|\mathbf{r}^k|$ is the normalized distance from a given point to the center of the $k$th eddy, with 0 being the center and 1 being the edge. (See \dref{radial})
+  \item $|\mathbf{r}^k|$ is the normalized distance from a given point to the center of the $k$th eddy, with 0 being the center and 1 being the edge. [\ddref{radial}]
 \end{itemize}
 \\
 \hline
 Notes & This is only one of many possible shape functions that can be used. But they should all be in the form with respect to a normalized distance. 
 \\
 \hline
-  Source & \citet{PolettoEtAl2013}\\
+  Source & \citet{PolettoEtAl2013}, \ddref{radial}\\
   \hline
   Ref.\ By & \tref{VFF}\\
   \hline
@@ -839,15 +839,15 @@ Equation & $\mathbf{u}'(\mathbf{x}) = \frac{1}{\sqrt{N}}\sum_{k=1}^{N}\frac{q_\s
 Description & The equation gives the fluctuation of velocity (the deviation from the average flow velocity) at point $\mathbf{x}$ in the flow field. It is the normalized sum of the velocity fluctuation due to influence by each eddy at that point.
 \begin{itemize}
   \item $N$ is the number of eddies.
-  \item $\mathbf{r}^k$ is the normalized distance to the center of the $k$th eddy  [\dref{radial}].
-  \item $\boldsymbol{\alpha}^k$ is the intensity vector of the $k$th eddy (\si[per-mode=symbol]{\metre\per\second}) [\dref{intensity}].
+  \item $\mathbf{r}^k$ is the normalized distance to the center of the $k$th eddy  [\ddref{radial}].
+  \item $\boldsymbol{\alpha}^k$ is the intensity vector of the $k$th eddy (\si[per-mode=symbol]{\metre\per\second}) [\ddref{intensity}].
 \end{itemize}
 \\
 \hline
 Notes & According to \tref{SF}, at any given position, the fluctuation from most eddies will likely be 0, as any single position is likely outside the boundaries of most eddies in the field.
 \\
 \hline
-  Source & \citet{PolettoEtAl2013}\\
+  Source & \citet{PolettoEtAl2013}, \ddref{radial}, \ddref{intensity}\\
   \hline
   Ref.\ By & \iref{velocitySum} \\
   \hline
