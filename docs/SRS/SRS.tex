@@ -459,6 +459,8 @@ SynthEddy is a software that generates a velocity field for turbulent flow simul
 
 The software takes in user provided flow field dimensions, average velocity and eddy profiles and generates a velocity field. The user can then query the software to get the velocity vector at any point of interest in space and time. This query can also be done by CFD software to use the generated velocity field as IC and BC.
 
+Eddy profile include the intensity and length-scale of each eddy, this will be detailed in \ref{sec_theoretical} and \ref{sec_datadef}.
+
 % \plt{Your system context will include a figure that shows the abstract view of
 %   the software.  Often in a scientific context, the program can be viewed
 %   abstractly following the design pattern of Inputs $\rightarrow$ Calculations
@@ -1214,7 +1216,7 @@ A correct solution must exhibit a zero-sum velocity fluctuation across the entir
 %     always required, but often echoing the inputs as part of the output is a
 %     good idea.}
 
-\item[R\refstepcounter{reqnum}\thereqnum \label{R_anyEddy}:] Can generate a velocity field given any valid eddy profiles input (\iref{velocitySum}).
+\item[R\refstepcounter{reqnum}\thereqnum \label{R_anyEddy}:] Can generate a velocity field given any valid eddy profiles input (length-scale and intensity of each eddy) (\iref{velocitySum}).
 % \item[R\refstepcounter{reqnum}\thereqnum \label{R_realEddy}:] (Future) Capable of providing a realistic eddy profile before generation.
 % \plt{Calculation related requirements.}
 
