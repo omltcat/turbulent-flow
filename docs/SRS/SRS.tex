@@ -1169,7 +1169,7 @@ uncertainty quantification exercise.
 \subsubsection{Properties of a Correct Solution} \label{sec_CorrectSolution}
 
 \noindent
-A correct solution must exhibit a zero-sum velocity fluctuation across the entire field, i.e. velocity field is divergence-free, obeying conservation of mass.
+A correct solution must be a divergence-free velocity field, obeying conservation of mass.
 % \plt{fill in the details}.  \plt{These
 %   properties are in addition to the stated requirements.  There is no need to
 %   repeat the requirements here.  These additional properties may not exist for
@@ -1184,7 +1184,7 @@ A correct solution must exhibit a zero-sum velocity fluctuation across the entir
   \toprule
   \textbf{Var} & \textbf{Physical Constraints} \\
   \midrule 
-  $\textbf{u}$ & $\int_{field}\mathbf{u}(\mathbf{x})-\mathbf{u_\text{avg}} = 0$ (by~\rref{R_zeroSum})
+  $\textbf{u}$ & $\text{div}(\mathbf{u}|_\text{field}) = 0$
   \\
   \bottomrule
 \end{longtable*}
@@ -1219,8 +1219,6 @@ A correct solution must exhibit a zero-sum velocity fluctuation across the entir
 \item[R\refstepcounter{reqnum}\thereqnum \label{R_anyEddy}:] Can generate a velocity field given any valid eddy profiles input (length-scale and intensity of each eddy) (\iref{velocitySum}).
 % \item[R\refstepcounter{reqnum}\thereqnum \label{R_realEddy}:] (Future) Capable of providing a realistic eddy profile before generation.
 % \plt{Calculation related requirements.}
-
-\item[R\refstepcounter{reqnum}\thereqnum \label{R_zeroSum}:] Generated velocity field must be divergence-free (zero sum of velocity fluctuation, conservation of mass, required by the theory ~\citet{PolettoEtAl2013}) (\iref{velocitySum}).
 
 \item[R\refstepcounter{reqnum}\thereqnum \label{R_CFD}:] (Future) Allow CFD software to interface with this software to obtain IC and BC.
   % \plt{Verification related requirements.}
