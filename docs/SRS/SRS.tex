@@ -1213,7 +1213,7 @@ A correct solution must exhibit a zero-sum velocity fluctuation across the entir
 %     good idea.}
 
 \item[R\refstepcounter{reqnum}\thereqnum \label{R_anyEddy}:] Can generate a velocity field given any valid eddy profiles input (\iref{velocitySum}).
-\item[R\refstepcounter{reqnum}\thereqnum \label{R_realEddy}:] (Future) Capable of providing a realistic eddy profile before generation.
+% \item[R\refstepcounter{reqnum}\thereqnum \label{R_realEddy}:] (Future) Capable of providing a realistic eddy profile before generation.
 % \plt{Calculation related requirements.}
 
 \item[R\refstepcounter{reqnum}\thereqnum \label{R_zeroSum}:] Generated velocity field must be divergence-free (zero sum of velocity fluctuation, conservation of mass, required by the theory ~\citet{PolettoEtAl2013}) (\iref{velocitySum}).
@@ -1251,7 +1251,7 @@ A correct solution must exhibit a zero-sum velocity fluctuation across the entir
 \noindent \begin{itemize}
 
 \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Accuracy}:]
-  \textbf{Accuracy} The accuracy of the computed solutions, namely the how realistically the flow field mimics a turbulent flow, should meet the level needed for being used as IC and BC in CFD simulation. Specifically, \progname{} should be suggest realistic eddy profiles if the user cannot provide one (phase 2 requirement for future) . 
+  \textbf{Accuracy} (Future) The accuracy of the computed solutions, namely the how realistically the flow field mimics a turbulent flow, should meet the level needed for being used as IC and BC in CFD simulation. Specifically, \progname{} should be suggest realistic eddy profiles if the user cannot provide one . 
   % \plt{Characterize the accuracy by giving the context/use for
   %   the software.  Maybe something like, ``The accuracy of the computed
   %   solutions should meet the level needed for $<$engineering or scientific
