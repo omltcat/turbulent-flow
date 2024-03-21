@@ -858,14 +858,44 @@ Notes & According to \tref{SF}, at any given position, the fluctuation from most
 \hline
   Source & \citet{PolettoEtAl2013}, \ddref{radial}, \ddref{intensity}\\
   \hline
-  Ref.\ By & \iref{velocitySum} \\
+  Ref.\ By & \dref{Holyev} \\
   \hline
 \end{tabular}
 \end{minipage}\\
 
 ~\newline
 
-% \subsubsection{General Definitions}\label{sec_gendef}
+
+\subsubsection{General Definitions}\label{sec_gendef}
+
+~\newline
+
+\noindent
+\begin{minipage}{\textwidth}
+\renewcommand*{\arraystretch}{1.5}
+\begin{tabular}{| p{\colAwidth} | p{\colBwidth}|}
+\hline
+\rowcolor[gray]{0.9}
+Number& GD\refstepcounter{defnum}\thedefnum \label{Holyev}\\
+\hline
+Label &\bf Velocity fluctuation without normalizing energy \\
+\hline
+% Units&$MLt^{-3}T^0$\\
+% \hline
+Equation & $\mathbf{u}'(\mathbf{x}) = \sum_{k=1}^{N}\frac{q_\sigma(|\mathbf{r}^k(\mathbf{x})|)}{|\mathbf{r}^k(\mathbf{x})|^3}\mathbf{r}^k(\mathbf{x})\times\boldsymbol{\alpha}^k$ \\
+\hline
+Description & The equation in \tref{VFF} uses $\frac{1}{\sqrt{N}}$ to keep the total turbulent kinetic energy of the field constant when the number of eddies ($N$) changes. Holyev proposes the removal of this term, so that energy is simply the result of $N$ and $\boldsymbol{\alpha}$.
+\\
+\hline
+Notes & In \cite{PolettoEtAl2013}, more eddies means each eddy is weaker. Holyev removes such relation to find the optimal combination to fit a realistic turbulent flow, which \progname{} will incorporate in the future.
+\\
+\hline
+  Source & \tref{VFF}, \citet{PolettoEtAl2013}, Nikita Holyev\\
+  \hline
+  Ref.\ By & \iref{velocitySum} \\
+  \hline
+\end{tabular}
+\end{minipage}\\
 
 % There are many forms of refined TM:SF and TM:VFF in the paper. Nikita likely used some form of them his original MATLAB code. I will figure out which one is more suitable to be used in this program and put it here.
 
@@ -1056,7 +1086,7 @@ Ref.\ By & \tref{VFF} \\
 This section transforms the problem defined in Section~\ref{Sec_pd} into 
 one which is expressed in mathematical terms. It uses concrete symbols defined 
 in Section~\ref{sec_datadef} to replace the abstract symbols in the models 
-identified in Sections~\ref{sec_theoretical}.
+identified in Sections~\ref{sec_theoretical} and \ref{sec_gendef}.
 
 % The goals \plt{reference your goals} are solved by \plt{reference your instance
 %   models}.  \plt{other details, with cross-references where appropriate.}
@@ -1092,7 +1122,7 @@ identified in Sections~\ref{sec_theoretical}.
   \hline
   Equation & $\mathbf{u}(\mathbf{x}, t) = \mathbf{u_\text{avg}} + \mathbf{u'}(\mathbf{x}, t)$\\
   & where \\
-  & $\mathbf{u}'(\mathbf{x},t) = \frac{1}{\sqrt{N}}\sum_{k=1}^{N}\frac{q_\sigma(|\mathbf{r}^k(\mathbf{x}, t)|)}{|\mathbf{r}^k(\mathbf{x}, t)|^3}\mathbf{r}^k(\mathbf{x}, t)\times\boldsymbol{\alpha}^k$ [\tref{VFF}]\\
+  & $\mathbf{u}'(\mathbf{x},t) = \sum_{k=1}^{N}\frac{q_\sigma(|\mathbf{r}^k(\mathbf{x}, t)|)}{|\mathbf{r}^k(\mathbf{x}, t)|^3}\mathbf{r}^k(\mathbf{x}, t)\times\boldsymbol{\alpha}^k$ [\dref{Holyev}]\\
   & $ q_\sigma(|\mathbf{r}^k(\mathbf{x},t)|) = \sigma^k [1-|\mathbf{r}^k(\mathbf{x},t)|^2] \text{ if } |\mathbf{r}^k(\mathbf{x},t)| < 1 \text{ , otherwise } 0 $ [\tref{SF}]\\
   & $\mathbf{r}^k(\mathbf{x},t) = \frac{\mathbf{x}-\mathbf{x}^k(t)}{\sigma^k}$ [\ddref{radial}]\\
   & $\mathbf{x}^k(t) = \mathbf{x}^k_0 + \mathbf{u_\text{avg}}t$ [\ddref{center}]\\
@@ -1102,7 +1132,7 @@ identified in Sections~\ref{sec_theoretical}.
   & Such influence is calculated by the relative position of that point to the center of each eddy, according to its length-scale, intensity and shape function.
   \\
   \hline
-  Sources& \citet{PolettoEtAl2013}, \tref{SF}, \tref{VFF}, \ddref{radial}, \ddref{center}, \ddref{intensity}\\
+  Sources& \dref{Holyev}, \tref{SF}, \ddref{radial}, \ddref{center}, \ddref{intensity}\\
   \hline
   Ref.\ By & None\\
   \hline
