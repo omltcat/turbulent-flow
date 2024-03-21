@@ -172,8 +172,7 @@ The following table is taken directly from the Module Guide document for this pr
 
 \subsection{Uses}
 \begin{itemize}
-\item Parse query input to call flow field module, serialize and return the result
-\item Queue multiple queries
+\item Flow Field Module [MIS\ref{mFlow}]
 \end{itemize}
 
 \subsection{Syntax}
@@ -249,8 +248,7 @@ None.
 
 \subsection{Uses}
 \begin{itemize}
-\item (Currently) Load eddy profile defined by the user [SRS: A3].
-\item (Future) Generate eddy profile based on user input parameters [MG: AC1].
+\item File I/O Module [MIS\ref{mFile}]
 \end{itemize}
 
 \subsection{Syntax}
@@ -321,8 +319,10 @@ Some functions to compute the eddy profile based on user provided parameters, to
 
 \subsection{Uses}
 \begin{itemize}
-\item Create flow field based on eddy profile or load existing one.
-\item Compute velocity vector at given position and time.
+\item Eddy Module [MIS\ref{mEddy}]
+\item Vector Module [NumPy]
+\item File I/O Module [MIS\ref{mFile}]
+\item Visualization Module [MIS\ref{mVisual}] (PLACEHOLDER)
 \end{itemize}
 
 \subsection{Syntax}
@@ -429,8 +429,7 @@ None.
 
 \subsection{Uses}
 \begin{itemize}
-\item Create eddy object based on parameters given.
-\item Compute velocity vector relative position from center.
+\item Shape FUnction Module [MIS\ref{mShape}]
 \end{itemize}
 
 \subsection{Syntax}
@@ -528,7 +527,7 @@ None.
 
 \subsection{Uses}
 \begin{itemize}
-\item A library of shape functions to be used by \texttt{eddy} (\ref{mEddy}).
+\item Vector Module [NumPy]
 \end{itemize}
 
 \subsection{Syntax}
@@ -606,7 +605,9 @@ None.
 
 \subsection{Uses}
 \begin{itemize}
-\item Take command line arguments and call various modules accordingly.
+\item Query Interface [MIS\ref{mQuery}]
+\item Flow Field Module [MIS\ref{mFlow}]
+\item Eddy Profile Module [MIS\ref{mEddy}]
 \end{itemize}
 
 \subsection{Syntax}
@@ -668,7 +669,7 @@ None.
 
 \subsection{Uses}
 \begin{itemize}
-\item Read and write JSON files for eddy profile and flow field.
+\item Hardware Hiding Module [OS]
 \end{itemize}
 
 \subsection{Syntax}
@@ -734,7 +735,7 @@ THIS IS A PLACEHOLDER [MG: AC5]
 
 \subsection{Uses}
 \begin{itemize}
-\item Render 2D or 3D images of the flow field.
+\item None
 \end{itemize}
 
 \subsection{Syntax}
