@@ -824,13 +824,10 @@ Notes & This is only one of many possible shape functions that can be used. But 
 \hline
   Source & \citet{PolettoEtAl2013}, \ddref{radial}\\
   \hline
-  Ref.\ By & \tref{VFF}\\
+  Ref.\ By & \tref{VFF}, \iref{velocitySum}\\
   \hline
 \end{tabular}
 \end{minipage}\\
-
-~\newline
-
 \noindent
 \begin{minipage}{\textwidth}
 \renewcommand*{\arraystretch}{1.5}
@@ -845,7 +842,7 @@ Label &\bf Velocity Fluctuation Field \\
 % \hline
 Equation & $\mathbf{u}'(\mathbf{x}) = \frac{1}{\sqrt{N}}\sum_{k=1}^{N}\frac{q_\sigma(|\mathbf{r}^k(\mathbf{x})|)}{|\mathbf{r}^k(\mathbf{x})|^3}\mathbf{r}^k(\mathbf{x})\times\boldsymbol{\alpha}^k$ \\
 \hline
-Description & The equation gives the fluctuation of velocity (the deviation from the average flow velocity) at point $\mathbf{x}$ in the flow field. It is the normalized sum of the velocity fluctuation due to influence by each eddy at that point.
+Description & The equation gives the fluctuation of velocity (the deviation from the average flow velocity) at point $\mathbf{x}$ in the flow field. It is the normalized sum of the velocity fluctuation by each eddy, with shape function $q_\sigma(|\mathbf{r}^k(\mathbf{x})|)$ [\tref{SF}].
 \begin{itemize}
   \item $N$ is the number of eddies.
   \item $\mathbf{r}^k$ is the normalized distance to the center of the $k$th eddy  [\ddref{radial}].
@@ -853,10 +850,10 @@ Description & The equation gives the fluctuation of velocity (the deviation from
 \end{itemize}
 \\
 \hline
-Notes & According to \tref{SF}, at any given position, the fluctuation from most eddies will likely be 0, as any single position is likely outside the boundaries of most eddies in the field.
+Notes & According to \tref{SF}, at any single position, the fluctuation from most eddies will likely be 0, due to outside the boundaries of most eddies in the field.
 \\
 \hline
-  Source & \citet{PolettoEtAl2013}, \ddref{radial}, \ddref{intensity}\\
+  Source & \citet{PolettoEtAl2013}, \tref{SF}, \ddref{radial}, \ddref{intensity}\\
   \hline
   Ref.\ By & \dref{Holyev} \\
   \hline
@@ -867,6 +864,8 @@ Notes & According to \tref{SF}, at any given position, the fluctuation from most
 
 
 \subsubsection{General Definitions}\label{sec_gendef}
+This section collects the laws and equations that will be used in building the
+instance models.
 
 ~\newline
 
@@ -958,12 +957,12 @@ Description &
 The positional vector relative to the center of the eddy, normalized by the length-scale ($\sigma^k$) of that eddy.
 \begin{itemize}
   \item $\textbf{x}$ is the given position (\si{\metre}).
-  \item $\textbf{x}^k$ is the center position of the $k$th eddy (\si{\metre}).
+  \item $\textbf{x}^k$ is the center position of the $k$th eddy (\si{\metre}) [\ddref{center}].
   \item $\sigma^k$ is the length-scale of the $k$th eddy (\si{\metre}).
 \end{itemize}
 \\
 \hline
-  Source & \citet{PolettoEtAl2013}\\
+  Source & \citet{PolettoEtAl2013}, \ddref{center}\\
   \hline
   Ref.\ By & \tref{SF}, \tref{VFF}, \iref{velocitySum} \\
   \hline
@@ -1029,7 +1028,7 @@ A 3D vector that describes both the direction and intensity magnitude of the $k$
 \hline
 Sources& \citet{PolettoEtAl2013}\\
 \hline
-Ref.\ By & \tref{VFF} \\
+Ref.\ By & \tref{VFF}, \iref{velocitySum}\\
 \hline
 \end{tabular}
 \end{minipage}\\
@@ -1339,7 +1338,7 @@ A correct solution must be a divergence-free velocity field, obeying conservatio
 
 \noindent \begin{itemize}
 
-\item[LC\refstepcounter{lcnum}\thelcnum\label{LC_realEddy}:] When theoretical work by Nikita progress, the software will be updated to incorporate the new method to obtain realistic eddy profiles before generating velocity field (\aref{A_eddy}).
+\item[LC\refstepcounter{lcnum}\thelcnum\label{LC_realEddy}:] When theoretical work by Nikita Holyev progress, the software update to incorporate the new method to obtain realistic eddy profiles before generating velocity field (\aref{A_eddy}).
 \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_internal}:] Possibility to use this software for internal flow will be looked into. This can be valuable as most turbulent flow scenarios are internal (e.g. within a pipe) (\aref{A_ext}).
 % \plt{Give
 %     the likely changes, with a reference to the related assumption (aref), as appropriate.}
@@ -1403,13 +1402,15 @@ the assumptions.
 \centering
 \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
 \hline        
-	& \tref{SF}& \tref{VFF}& \ddref{radial}& \ddref{center}& \iref{velocitySum} \\
+	& \tref{SF}& \tref{VFF}& \dref{Holyev} & \ddref{radial}& \ddref{center}& \ddref{intensity} & \iref{velocitySum} \\
 \hline
-\tref{SF}           & & &X& & \\ \hline
-\tref{VFF}          &X& &X& & \\ \hline
-\ddref{radial}      & & & &X& \\ \hline
-\ddref{center}      & & & & & \\ \hline
-\iref{velocitySum}  & &X&X&X& \\ \hline
+\tref{SF}           & & & &X& & & \\ \hline
+\tref{VFF}          &X& & &X& &X& \\ \hline
+\dref{Holyev}       & &X& & & & & \\ \hline
+\ddref{radial}      & & & & &X& & \\ \hline
+\ddref{center}      & & & & & & & \\ \hline
+\ddref{intensity}   & & & & & & & \\ \hline
+\iref{velocitySum}  &X& &X&X&X&X& \\ \hline
 \end{tabular}
 \caption{Traceability Matrix Showing the Connections Between Items of Different Sections}
 \label{Table:trace}
@@ -1419,14 +1420,12 @@ the assumptions.
 \centering
 \begin{tabular}{|c|c|c|c|c|c|c|c|}
 \hline
-	& \iref{velocitySum}& \rref{R_inputs}& \rref{R_anyEddy}& \rref{R_realEddy}& \rref{R_zeroSum}& \rref{R_CFD} \\
+	& \iref{velocitySum}& \rref{R_inputs}& \rref{R_anyEddy}& \rref{R_CFD} \\
 \hline
-\iref{velocitySum}  & & & & & & \\ \hline
-\rref{R_inputs}     & & & & & & \\ \hline
-\rref{R_anyEddy}    &X& & & & & \\ \hline
-\rref{R_realEddy}   & & & & & & \\ \hline
-\rref{R_zeroSum}    &X& & & & & \\ \hline
-\rref{R_CFD}        & & & & & & \\ \hline
+\iref{velocitySum}  & & & & \\ \hline
+\rref{R_inputs}     & & & & \\ \hline
+\rref{R_anyEddy}    &X& & & \\ \hline
+\rref{R_CFD}        & & & & \\ \hline
 \end{tabular}
 \caption{Traceability Matrix Showing the Connections Between Requirements and Instance Models}
 \label{Table:R_trace}
@@ -1465,7 +1464,7 @@ the assumptions.
 
 \section{Development Plan} \label{Sec_plan}
 
-The first step would be to implement \rref{R_anyEddy} given any user provided eddy profiles, and ensure \rref{R_zeroSum} divergence-free field generation. At this point, the software allows the user to manually query the velocity field at any point within the velocity field (\rref{R_inputs}). 
+The first step would be to implement \rref{R_anyEddy} given any user provided eddy profiles, and ensure divergence-free field generation. At this point, the software allows the user to manually query the velocity field at any point within the velocity field (\rref{R_inputs}). 
 
 Later as theoretical work by Nikita progresses, the software will be updated to incorporate the new method to obtain realistic eddy profiles before generating velocity field (\rref{R_realEddy}).
 
