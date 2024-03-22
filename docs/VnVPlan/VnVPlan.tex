@@ -328,7 +328,8 @@ How test will be performed: Automated test script, GitHub Actions.
     $\mathbf{x_1}=(0.5,0.5,0.5)$ \tab$\mathbf{x_2}=(-0.5,-0.5,-0.5)$\\
     $\mathbf{x_3}=(2,2,2)$ \tab$\mathbf{x_4}=(-2,-2,-2)$
   \end{itemize}
-  Output: Velocity vectors at each point: $\mathbf{u_1}$, $\mathbf{u_2}$, $\mathbf{u_3}$, $\mathbf{u_4}$
+  Output: Velocity vectors at each point: $\mathbf{u_1}$, $\mathbf{u_2}$, $\mathbf{u_3}$, $\mathbf{u_4}$\\
+  Expected behavior:
   \begin{itemize}
     \item $|\mathbf{u_1} -\mathbf{u_2}| <\text{tol}|\mathbf{u_1}|$\tab $|\mathbf{u_3}| = |\mathbf{u_4}|=0$
   \end{itemize}
@@ -359,7 +360,8 @@ How test will be performed: Automated test script, GitHub Actions.
     $\alpha=(0,0,1)$ (intensity = 1, orientation along z-axis)
     \item Query: Mesh grid of points covering the eddy
   \end{itemize}
-  Output: Velocity vectors at each point $\mathbf{u}$
+  Output: Velocity vectors at each point $\mathbf{u}$\\
+  Expected behavior:
   \begin{itemize}
     \item $\text{std}(\mathbf{u_z}) < \text{tol}$
   \end{itemize}
@@ -395,7 +397,8 @@ How test will be performed: Automated test script, GitHub Actions.
     \item Profile: Any number of eddies, random orientations
     \item Query: Mesh grid of points of the entire flow field at any $t$
   \end{itemize}
-  Output: Velocity vectors at each point: $\mathbf{u}$
+  Output: Velocity vectors at each point: $\mathbf{u}$\\
+  Expected behavior:
   \begin{itemize}
     \item $|\sum\mathbf{u}-\mathbf{u_{avg}}| < \text{tol}$
   \end{itemize}
@@ -416,7 +419,8 @@ How test will be performed: Automated test script, GitHub Actions.
     \item Query: Mesh grid of points of the entire flow field\\
     $t_0=0$\tab$t_1=10$
   \end{itemize}
-  Output: Velocity vectors at each point: $\mathbf{u}$
+  Output: Velocity vectors at each point: $\mathbf{u}$\\
+  Expected behavior:
   \begin{itemize}
     \item $\text{std}(\mathbf{u})|_{t_0} - \text{std}(\mathbf{u})|_{t_1} < \text{tol}$
   \end{itemize}
@@ -437,7 +441,8 @@ How test will be performed: Automated test script, GitHub Actions.
     Increasing eddy intensity $|\mathbf{\alpha}|$
     \item Query: Mesh grid of points of the entire flow field
   \end{itemize}
-  Output: Velocity vectors at each point: $\mathbf{u}$
+  Output: Velocity vectors at each point: $\mathbf{u}$\\
+  Expected behavior:
   \begin{itemize}
     \item if $|\mathbf{\alpha}|_1 > |\mathbf{\alpha}|_2$ then $\text{std}(\mathbf{u})_1 > \text{std}(\mathbf{u})_2$
   \end{itemize}
@@ -464,7 +469,8 @@ How test will be performed: Automated test script, GitHub Actions.
     \item Profile: Any number of eddies, random orientations
     \item Query: Mesh grid of points of the entire flow field
   \end{itemize}
-  Output: Velocity vectors at each point: $\mathbf{u}$
+  Output: Velocity vectors at each point: $\mathbf{u}$\\
+  Expected behavior:
   \begin{itemize}
     \item $\text{div}(\mathbf{u}) < \text{tol}$
   \end{itemize}
@@ -495,7 +501,8 @@ Test case for this requirement will be added in the future given more theoretica
     \item Profile: Any number of eddies, random orientations
     \item Query: CFD software should query points in the flow field
   \end{itemize}
-  Output: Velocity vectors at each point: $\mathbf{u}$
+  Output: Velocity vectors at each point: $\mathbf{u}$\\
+  Expected behavior:
   \begin{itemize}
     \item They should be feed into the CFD software
   \end{itemize}
