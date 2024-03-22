@@ -212,17 +212,17 @@ actually be implemented.
 \midrule
 
 \multirow{6}{0.3\textwidth}{Behaviour-Hiding Module}
+& Main Control Module\\
 & Query Interface\\
 & Eddy Profile Module\\
 & Flow Field Module\\
 & Eddy Module\\
 & Shape Function Module\\
-& Vector Module\\
 \midrule
 
 \multirow{3}{0.3\textwidth}{Software Decision Module} 
-& Main Control Module\\
 & File I/O Module\\
+& Vector Module\\
 & Visualization Module\\
 \bottomrule
 
@@ -283,6 +283,14 @@ to be implemented.
 \item[Implemented By:] --
 \end{description}
 
+\subsubsection{Main Control Module (\mref{mMain})}
+\begin{description}
+\item[Secrets:]Overall flow of the program
+\item[Services:]Taking command line arguments, initializing the system, and calling appropriate modules.
+\item[Implemented By:] \progname{}
+\item[Type of Module:] Abstract Object
+\end{description}
+
 \subsubsection{Query Interface (\mref{mQuery})}
 \begin{description}
 \item[Secrets:]Query format and structure.
@@ -325,14 +333,6 @@ to be implemented.
 \item[Type of Module:] Library
 \end{description}
 
-\subsubsection{Vector Module (\mref{mVector})}
-\begin{description}
-\item[Secrets:]Algorithms for fast vector operations
-\item[Services:]Common vector/matrix operations.
-\item[Implemented By:] NumPy
-\item[Type of Module:] Abstract Data Type
-\end{description}
-
 
 \subsection{Software Decision Module}
 
@@ -347,20 +347,20 @@ to be implemented.
 \item[Implemented By:] --
 \end{description}
 
-\subsubsection{Main Control Module (\mref{mMain})}
-\begin{description}
-\item[Secrets:]Overall flow of the program
-\item[Services:]Taking command line arguments, initializing the system, and calling appropriate modules.
-\item[Implemented By:] \progname{}
-\item[Type of Module:] Abstract Object
-\end{description}
-
 \subsubsection{File I/O Module (\mref{mFile})}
 \begin{description}
 \item[Secrets:]File format and structure
 \item[Services:]Read and write to file for persistent eddy profiles and flow fields between program runs.
 \item[Implemented By:] \progname{}
 \item[Type of Module:] Abstract Object
+\end{description}
+
+\subsubsection{Vector Module (\mref{mVector})}
+\begin{description}
+\item[Secrets:]Algorithms for fast vector operations
+\item[Services:]Common vector/matrix operations.
+\item[Implemented By:] NumPy
+\item[Type of Module:] Abstract Data Type
 \end{description}
 
 \subsubsection{Visualization Module (\mref{mVisual})}

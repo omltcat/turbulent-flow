@@ -173,8 +173,70 @@ The following table is taken directly from the Module Guide document for this pr
 \end{table}
 
 \newpage
-~\newpage
+\section{MIS of Main Control Module} \label{mMain} 
 
+\subsection{Module}
+\texttt{main}
+
+\subsection{Uses}
+\begin{itemize}
+\item Query Interface [MIS\ref{mQuery}]
+\item Flow Field Module [MIS\ref{mFlow}]
+\item Eddy Profile Module [MIS\ref{mEddy}]
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begin{center}
+\begin{tabular}{p{2cm} p{5.6cm} p{3cm} p{2cm}}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+\texttt{main} & \texttt{command\_args} str, & - & - \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+None.
+
+\subsubsection{Environment Variables}
+\begin{itemize}
+  \item Command line console.
+\end{itemize}
+
+\subsubsection{Assumptions}
+None.
+
+\subsubsection{Access Routine Semantics}
+
+\noindent \texttt{main(command\_args)}:
+\begin{itemize}
+\item \texttt{--new\_field --name <field\_name> --dim <Lx>,<Ly>,<Lz>, --vel <avg\_vel> --count <eddy\_count> --profile <profile\_name>} 
+  \begin{itemize}
+    \item call \texttt{eddy\_profile.load(profile\_name)} to read the eddy profile file.
+    \item call \texttt{flow\_field.init(profile, field\_name, dimensions, avg\_vel, eddy\_count)} to create a new flow field.
+  \end{itemize}
+\item \texttt{--field <field\_name> --query <request>}
+  \begin{itemize}
+    \item call \texttt{flow\_field.load(field\_name)} to load the flow field.
+    \item call \texttt{query.handle\_request(request)} to get the velocity vectors at the queried points.
+  \end{itemize}
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+None.
+
+
+\newpage
 \section{MIS of Query Interface} \label{mQuery} 
 % \wss{Use labels for cross-referencing}
 
@@ -616,70 +678,6 @@ None.
 \noindent \texttt{gaussian(rel\_position, radius)}:
 \begin{itemize}
   \item output: out := Use a different (gaussian) equation to get the above value, as may be preferred by some researchers.
-\end{itemize}
-
-\subsubsection{Local Functions}
-
-None.
-
-
-\newpage
-\section{MIS of Main Control Module} \label{mMain} 
-
-\subsection{Module}
-\texttt{main}
-
-\subsection{Uses}
-\begin{itemize}
-\item Query Interface [MIS\ref{mQuery}]
-\item Flow Field Module [MIS\ref{mFlow}]
-\item Eddy Profile Module [MIS\ref{mEddy}]
-\end{itemize}
-
-\subsection{Syntax}
-
-\subsubsection{Exported Constants}
-None.
-
-\subsubsection{Exported Access Programs}
-
-\begin{center}
-\begin{tabular}{p{2cm} p{5.6cm} p{3cm} p{2cm}}
-\hline
-\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
-\hline
-\texttt{main} & \texttt{command\_args} str, & - & - \\
-\hline
-\end{tabular}
-\end{center}
-
-\subsection{Semantics}
-
-\subsubsection{State Variables}
-None.
-
-\subsubsection{Environment Variables}
-\begin{itemize}
-  \item Command line console.
-\end{itemize}
-
-\subsubsection{Assumptions}
-None.
-
-\subsubsection{Access Routine Semantics}
-
-\noindent \texttt{main(command\_args)}:
-\begin{itemize}
-\item \texttt{--new\_field --name <field\_name> --dim <Lx>,<Ly>,<Lz>, --vel <avg\_vel> --count <eddy\_count> --profile <profile\_name>} 
-  \begin{itemize}
-    \item call \texttt{eddy\_profile.load(profile\_name)} to read the eddy profile file.
-    \item call \texttt{flow\_field.init(profile, field\_name, dimensions, avg\_vel, eddy\_count)} to create a new flow field.
-  \end{itemize}
-\item \texttt{--field <field\_name> --query <request>}
-  \begin{itemize}
-    \item call \texttt{flow\_field.load(field\_name)} to load the flow field.
-    \item call \texttt{query.handle\_request(request)} to get the velocity vectors at the queried points.
-  \end{itemize}
 \end{itemize}
 
 \subsubsection{Local Functions}
