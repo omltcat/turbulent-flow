@@ -109,7 +109,6 @@ character & char & a single symbol or digit\\
 integer & $\mathbb{Z}$ & a number without a fractional component in (-$\infty$, $\infty$) \\
 natural number & $\mathbb{N}$ & a number without a fractional component in [1, $\infty$) \\
 real & $\mathbb{R}$ & any number in (-$\infty$, $\infty$)\\
-string & str & an array of char\\
 \bottomrule
 \end{tabular} 
 \end{center}
@@ -122,10 +121,27 @@ different types. In addition, \progname \ uses functions, which
 are defined by the data types of their inputs and outputs. Local functions are
 described by giving their type signature followed by their specification.
 
-\section{Module Decomposition}
+\subsection{Variable Name Traceability}
+To help program development and understanding, several concepts regarding the eddy profile from the SRS TM and DD are renamed in the MIS to better reflect their usage in the code:
+\begin{itemize}
+  \item radius: length-scale ($\sigma$) of the eddy. Since the eddy vorticity distribution is cut-off outside the length-scale, they are essentially spheres in 3D space [SRS: TM1].
+  \item strength: magnitude of the eddy intensity vector ($\boldsymbol{\alpha}$) [SRS: DD3].
+  \item orient: unit vector direction of the eddy intensity vector ($\boldsymbol{\alpha}$) [SRS: DD3].
+\end{itemize}
+
+\subsection{Abstract Data Types}
+
+As several modules listed in Section \ref{SecMD} are Abstract Data Types (ADTs), this documents use their types as follows:
+\begin{itemize}
+  \item VectorT: 3-element NumPy array $\mathbb{R}^3$, representing a 3D position or velocity vector and vector/matrix operation methods [MG: M7].
+  \item EddyT: Eddy object, stores eddy strength, radius orient and position information, with methods for velocity calculation, see Eddy Module [MIS\ref{mEddy}].
+  \item EddyProfileT: Eddy profile object, stores a Record of different types of eddies with their parameters (strength, radius), and weights for random generation [MIS\ref{mProf}].
+  \item FlowFieldT: Flow field object, stores all EddyT objects in that field, with methods for velocity sum calculation, see Flow Field Module [MIS\ref{mFlow}].
+\end{itemize}
+
+\section{Module Decomposition} \label{SecMD}
 
 The following table is taken directly from the Module Guide document for this project.
-
 \begin{table}[h!]
   \centering
   \begin{tabular}{p{0.3\textwidth} p{0.6\textwidth}}
@@ -356,9 +372,9 @@ None.
 
 \subsubsection{State Variables}
 \begin{itemize}
-  \item \texttt{profile}: eddy\_profileT, eddy profile to be used to generate the flow field.
+  \item \texttt{profile}: EddyProfileT, eddy profile to be used to generate the flow field.
   \item \texttt{name}: str, name of the flow field (is also filename).
-  \item \texttt{dimensions}: Vector T of \{$L_x, L_y, L_z$\}, size of the flow field, with x being the axial direction, y vertical and z horizontal.
+  \item \texttt{dimensions}: VectorT of \{$L_x, L_y, L_z$\}, size of the flow field, with x being the axial direction, y vertical and z horizontal.
   \item \texttt{avg\_vel}: $\mathbb{R}$, average flow velocity along x-axis.
   \item \texttt{eddies}: \{EddyT\}, array of eddies in the flow field.
 \end{itemize}
