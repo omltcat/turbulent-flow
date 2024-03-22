@@ -66,15 +66,19 @@
 
 \section{Symbols, Abbreviations, and Acronyms}
 
-Please refer to the Software Requirements Specification (SRS) \citet{SRS} of this project. Section 1 contains Symbols, Abbreviations, and Acronyms. If you are not familiar with fluids and CFD, Section 4.1.1 of the SRS contains a list of Terminology and Definitions.
-% \renewcommand{\arraystretch}{1.2}
-% \begin{tabular}{l l} 
-%   \toprule		
-%   \textbf{symbol} & \textbf{description}\\
-%   \midrule 
-%   T & Test\\
-%   \bottomrule
-% \end{tabular}\\
+Please refer to the Software Requirements Specification (SRS) \citet{SRS} of this project. Section 1 contains Symbols, Abbreviations, and Acronyms. If you are not familiar with fluids and CFD, Section 4.1.1 of the SRS contains a list of Terminology and Definitions.\\
+~\newline
+The following symbols and operators are used in this document:\\
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{l l} 
+  \toprule		
+  \textbf{symbol} & \textbf{description}\\
+  \midrule 
+  tol & Tolerance, a small value used when testing differences, see \ref{secSymParams}\\
+  std() & Standard deviation of multiple values.\\
+  div() & Divergence of a velocity field.\\
+  \bottomrule
+\end{tabular}\\
 
 % \wss{symbols, abbreviations, or acronyms --- you can simply reference the SRS
 %   \citep{SRS} tables, if appropriate}
@@ -694,7 +698,7 @@ How test will be performed:
 
 % This is where you can place additional information.
 
-\subsection{Symbolic Parameters}
+\subsection{Symbolic Parameters} \label{secSymParams}
 
 The definition of the test cases will call for SYMBOLIC\_CONSTANTS.
 Their values are defined in this section for easy maintenance.
