@@ -89,11 +89,11 @@ The following symbols and operators are used in this document:\\
 
 \pagenumbering{arabic}
 
+\section{General Information}
+
 This document lays the plan for the verification and validation of the software \progname{}. It provides an overview of what the tests aim to achieve, and then details the plan for each test. It also serves as a communication aid between the software development team and the domain experts on the theoretical side, so that it can be ensured that the correct aspect of the software is being tested with valid expectations.
 % ... \wss{provide an introductory blurb and roadmap of the
   % Verification and Validation plan}
-
-\section{General Information}
 
 \subsection{Summary}
 
@@ -139,8 +139,8 @@ Furthermore, maintainability, namely the ability for user to easily modify the s
 \subsection{Relevant Documentation}
 
 \begin{itemize}
-  \item Software Requirements Specification (SRS) \citet{SRS} is the most important guideline for this VnV plan. It contains the requirements of the software, and the theoretical Modules of the synthetic eddy method. 
-  \item Design Documents will be used to guide the unit testing and the design verification.
+  \item Software Requirements Specification (\href{https://github.com/omltcat/turbulent-flow/blob/main/docs/SRS/SRS.pdf}{SRS}) \citet{SRS} is the most important guideline for this VnV plan. It contains the requirements of the software, and the theoretical Modules of the synthetic eddy method. 
+  \item Design Documents will be used to guide the unit testing and the design verification. This include the Module Guide (\href{https://github.com/omltcat/turbulent-flow/blob/main/docs/Design/SoftArchitecture/MG.pdf}{MG}) and the Module Interface Specification (\href{https://github.com/omltcat/turbulent-flow/blob/main/docs/Design/SoftDetailedDes/MIS.pdf}{MIS}). 
 \end{itemize}
 
 % \wss{Reference relevant documentation.  This will definitely include your SRS
@@ -163,10 +163,10 @@ This section lays out how the VnV will be carried out in aspect and by whom. It 
 \begin{itemize}
   \item Phil Du - Developer: Writing test scripts according to VnV and implementing automated tests with continuous integration (CI). Ensuring coding standards are respected with linters.
   \item Nikita Holyev - Theorist: Reviewing the VnV plan to ensure that the tests are relevant to the theoretical models.
-  \item Cynthia Liu - Subject Matter Expert: Reviewing the VnV plan and design documents to make sure the SRS is met.
+  \item Cynthia Liu - Domain Expert: Reviewing the VnV plan and design documents to make sure the SRS is met.
   \item Morteza Mirzaei - Secondary reviewer of the VnV plan.
   \item Dr. Spencer Smith - Supervisor.
-  \item Several volunteers as subjects for usability (future) and maintainability testing.
+  \item Several volunteers as subjects for usability (future) and maintainability testing, see \ref{NonfuncTest} for detailed procedures. They are recruited from class as well as potential users of the software.
 \end{itemize}
 
 % \wss{Your teammates.  Maybe your supervisor.
@@ -199,7 +199,12 @@ The Functional and Nonfunctional Requirements in the SRS serve as a checklist.
 
 \subsection{Verification and Validation Plan Verification Plan}
 
-The VnV plan itself is verified by review. The developer and reviewers will ensure that all the requirements in the SRS are covered by the plan. The theorist will specifically review the flow field tests to ensure that they represent the theoretical characteristics of the synthetic eddy method.
+The VnV plan itself is verified by review. The developer and reviewers will ensure that all the requirements in the SRS are covered by the plan. 
+\begin{itemize}
+  \item The developer, domain expert, secondary reviewer and supervisor will use GitHub Issues to discuss and track suggestions made to improve the VnV plan.
+  \item The developer will host one-on-one meetings with the theorist to brief him on the development and testing of the software, to ensure that they are relevant to the theoretical models.
+\end{itemize}
+ 
 
 % \wss{The verification and validation plan is an artifact that should also be
 % verified.  Techniques for this include review and mutation testing.}
@@ -223,9 +228,9 @@ Successful implementation of the synthetic eddy method can be verified by automa
 
 \begin{itemize}
   \item Continuous Integration (CI): GitHub Actions for automated tests.
-  \item Memory Usage Monitoring: pytest.
-  \item Code Coverage: pytest.
-  \item Linters: flake8.
+  \item Memory Usage Monitoring: \href{https://docs.pytest.org/}{pytest}.
+  \item Code Coverage: \href{https://docs.pytest.org/}{pytest}.
+  \item Linters: \href{https://marketplace.visualstudio.com/items?itemName=ms-python.flake8}{flake8}: ensure PEP8 coding standards are respected.
 \end{itemize}
 
 % \wss{What tools are you using for automated testing.  Likely a unit testing
@@ -245,7 +250,9 @@ Successful implementation of the synthetic eddy method can be verified by automa
 
 \subsection{Software Validation Plan}
 
-As there is no suitable external data or pseudo-oracle to directly compare with the results of this software, the validation will be done by comparing the generated flow fields with the expected theoretical characteristics of the synthetic eddy method. Several aspects of the flow field will be tested, as detailed in Section \ref{FuncTest}. The test scripts will be run automatically with GitHub Actions.
+Validation against real-life experiments is outside the scope of this project. The basis of \progname{} is theoretical. The focus is to ensure that the software properly represent the theoretical proposals [SRS: TM1, TM2 and GD1].
+
+% As there is no suitable external data or pseudo-oracle to directly compare with the results of this software, the validation will be done by comparing the generated flow fields with the expected theoretical characteristics of the synthetic eddy method. Several aspects of the flow field will be tested, as detailed in Section \ref{FuncTest}. The test scripts will be run automatically with GitHub Actions.
 
 % \wss{If there is any external data that can be used for validation, you should
 %   point to it here.  If there are no plans for validation, you should state that
@@ -266,6 +273,8 @@ As there is no suitable external data or pseudo-oracle to directly compare with 
 % \wss{This section might reference back to the SRS verification section.}
 \newpage
 \section{System Test Description}
+
+The system tests are divided into two main categories: Functional and Nonfunctional Requirements. The Functional Requirements, other than the CFD interface, are tested with automated scripts, while the Nonfunctional Requirements are tested manually. The tests are traced to the requirements in the \href{https://github.com/omltcat/turbulent-flow/blob/main/docs/SRS/SRS.pdf}{SRS}.
 	
 \subsection{Tests for Functional Requirements} \label{FuncTest}
 
@@ -475,7 +484,7 @@ How test will be performed: Automated test script, GitHub Actions.
     \item $\text{div}(\mathbf{u}) < \text{tol}$
   \end{itemize}
 
-  Test Case Derivation: The flow field should be divergence-free.
+  Test Case Derivation: The flow field should be divergence-free (below tolerance). Divergence measures if a vector field satisfies the conservation of mass, i.e. nothing is created or destroyed. See \href{https://numpy.org/doc/stable/reference/generated/numpy.gradient.html}{numpy.gradient} for more information regarding its calculation.
 
   How test will be performed: Automated test script, GitHub Actions.
 
