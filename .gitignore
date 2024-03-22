@@ -280,3 +280,5 @@ TSWLatexianTemp*
 
 # VS Code settings
 .vscode/
+
+Thumbs.db
