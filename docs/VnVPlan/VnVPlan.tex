@@ -292,11 +292,11 @@ Areas of testing are structured with respect to the list of Function Requirement
 
 Control: Automatic
 					
-Initial State: Empty flow field with size 1m x 1m x 1m
+Initial State: Empty flow field with size (1m, 1m, 1m)
 					
 Input: $\mathbf{x}=(2,2,2)$
 					
-Output: Throw error
+Output: Throw exception: Queried point outside of flow field!
 
 Test Case Derivation: Execution should be halted as results outside of the flow field are not meaningful.
 					
