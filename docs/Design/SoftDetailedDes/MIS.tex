@@ -212,9 +212,14 @@ None.
 
 \subsubsection{Access Routine Semantics}
 
-\noindent \texttt{handle\_request(request)}:
+\noindent \texttt{handle\_request(request)}:\\
+Decode the request string and call the Flow Field Module to get the velocity vectors at the queried positions and times.
 \begin{itemize}
-% \item transition: \wss{if appropriate} 
+\item transition:
+  \begin{itemize}
+    \item \texttt{decode(request)} to get the positions and times \{\{VectorT, $\mathbb{R}$\}\} to be queried.
+    \item call \texttt{flow\_field.sum\_vel(position, time)} to get the final velocity vector at each position/time, and put them in the response array \{VectorT\}.
+  \end{itemize}
 \item output: out := \texttt{encode(\{VectorT\})}, velocity vectors at all the queried points in one JSON string.
 \item exception: exc := (\texttt{decode(request)} is not \{VectorT\} $\Rightarrow$ \texttt{InvalidRequestFormat}), the request should be a JSON string of positions vectors to query get the velocity vectors.
 \end{itemize}
@@ -288,7 +293,8 @@ None.
 
 \subsubsection{Access Routine Semantics}
 
-\noindent \texttt{load(profile\_name)}:
+\noindent \texttt{load(profile\_name)}:\\
+Load a saved eddy profile from file, which contains the one or more eddy types, their parameters (intensity magnitude and length-scale) and weights (for random generation).
 \begin{itemize}
 \item transition: \texttt{params, weights} := \texttt{fileIO.read(`profile', profile\_name)}
 \item exception: exc := (\texttt{params} is not \{{\{$\mathbb{R+}$, $\mathbb{R+}$\}}\} or \texttt{weights} is not type \{$\mathbb{R+}$\} $\Rightarrow$ \texttt{InvalidProfile})
@@ -341,7 +347,7 @@ None.
 \texttt{load} & \texttt{field\_name} str & - & -  \\
 \texttt{save} & - & \texttt{field} Record & -  \\
 % \texttt{save} & \texttt{profile\_name} str & - & -  \\
-\texttt{get\_vel}& \texttt{position} VectorT,\newline\texttt{time} $\mathbb{R}$ & \texttt{velocity} VectorT & \texttt{OutOfBoundary}\newline\texttt{NegativeTime} \\
+\texttt{sum\_vel}& \texttt{position} VectorT,\newline\texttt{time} $\mathbb{R}$ & \texttt{velocity} VectorT & \texttt{OutOfBoundary}\newline\texttt{NegativeTime} \\
 \hline
 \end{tabular}
 \end{center}
@@ -367,7 +373,8 @@ None.
 
 \subsubsection{Access Routine Semantics}
 
-\noindent \texttt{init(profile, field\_name, dimensions, avg\_vel, eddy\_count)}:
+\noindent \texttt{init(profile, field\_name, dimensions, avg\_vel, eddy\_count)}:\\
+Initialize the flow field with given eddy profile. Randomly generate eddies based on their parameters and associated weights, and give them initial positions within the flow field.
 \begin{itemize}
 \item transition: 
   \begin{itemize}
@@ -393,7 +400,8 @@ None.
   \item output: out := Record (dict) with all current state variables. Each EddyT in \texttt{eddies} is also converted to a Record. So that \texttt{fileIO.write(`field', Record)} can be called to serialized the current state of the flow field into a JSON string for saving.
 \end{itemize}
 
-\noindent \texttt{get\_vel(position, time)}:
+\noindent \texttt{sum\_vel(position, time)}:\\
+Add up the velocity influence from all eddies at a given position and time.
 \begin{itemize}
   \item output: out := $\sum$ \{\texttt{eddy.get\_vel(position - eddy\_pos(eddy, time))} for each \texttt{eddy} in \texttt{eddies}\}, with wrap-around applied for eddies near the boundary.
 \end{itemize}
@@ -407,7 +415,7 @@ None.
   get\_offset(time) + eddy.get\_init\_x(),\\
   eddy.get\_y(get\_iter(time), dimensions[1]),\\
   eddy.get\_z(get\_iter(time), dimensions[2])}\\
-\}the center position of the eddy at a given time (moving due to flow).
+\}, the center position of the eddy at a given time (moving due to flow).
 \end{itemize}
 
 \noindent \texttt{get\_iter(time)}:
@@ -476,7 +484,8 @@ None.
 
 \subsubsection{Access Routine Semantics}
 
-\noindent \texttt{init(init\_x, strength, radius, orient)}:
+\noindent \texttt{init(init\_x, strength, radius, orient)}:\\
+Initialize the eddy object to give it strength, radius and orientation, and random initial position. The initial position is generated for 3 flow field iterations, so that wrap-around can be applied at inlet and outlet from the beginning.
 \begin{itemize}
 \item transition: 
   \begin{itemize}
@@ -504,7 +513,8 @@ None.
   \item output
   : out :=\texttt{z[iter]}
 \end{itemize}
-\noindent \texttt{get\_vel(rel\_position)}:
+\noindent \texttt{get\_vel(rel\_position)}:\\
+Get the velocity influence due to this eddy at a given position relative to the eddy center.
 \begin{itemize}
   \item output: out := computed from \texttt{rel\_position} with \texttt{strength, radius, orient} and \texttt{ShapeFunction.active(rel\_position, radius)}, see [SRS: TM1, GM1]
 \end{itemize}
