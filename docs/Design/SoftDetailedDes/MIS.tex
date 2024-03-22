@@ -323,6 +323,11 @@ Decode the request string and call the Flow Field Module to get the velocity vec
 \item output: out := \{VectorT\}, an array of position vectors.
 \end{itemize}
 
+\noindent \texttt{encode(response)}:
+\begin{itemize}
+  \item output: out := JSON string of the response array.
+\end{itemize}
+
 \newpage
 \section{MIS of Eddy Profile Module} \label{mProf} 
 
@@ -359,7 +364,7 @@ None.
 \subsubsection{State Variables}
 \begin{itemize}
   \item \texttt{name}: str, name of the eddy profile (is also filename).
-  \item \texttt{params}: \{{\{$\mathbb{R+}$, $\mathbb{R+}$\}}\}, array of strength and radius sets for each type of eddy.
+  \item \texttt{params}: \{{\{$\mathbb{R+}$, $\mathbb{R+}$\}}\}, array of \{strength, radius\} sets for each type of eddy.
   \item \texttt{weights}: \{$\mathbb{R+}$\}, corresponding array of weights for each type of eddy.
 \end{itemize}
 
@@ -515,7 +520,7 @@ Add up the velocity influence from all eddies at a given position and time.
 
 \subsection{Uses}
 \begin{itemize}
-\item Shape FUnction Module [MIS\ref{mShape}]
+\item Shape Function Module [MIS\ref{mShape}]
 \end{itemize}
 
 \subsection{Syntax}
