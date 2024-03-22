@@ -134,10 +134,10 @@ To help program development and understanding, several concepts regarding the ed
 
 As several modules listed in Section \ref{SecMD} are Abstract Data Types (ADTs), this documents use their types as follows:
 \begin{itemize}
-  \item VectorT: 3-element NumPy array $\mathbb{R}^3$, representing a 3D position or velocity vector and vector/matrix operation methods [MG: M7].
-  \item EddyT: Eddy object, stores eddy strength, radius orient and position information, with methods for velocity calculation, see Eddy Module [MIS\ref{mEddy}].
-  \item EddyProfileT: Eddy profile object, stores a Record of different types of eddies with their parameters (strength, radius), and weights for random generation [MIS\ref{mProf}].
-  \item FlowFieldT: Flow field object, stores all EddyT objects in that field, with methods for velocity sum calculation, see Flow Field Module [MIS\ref{mFlow}].
+  \item \textbf{VectorT}: 3-element NumPy array $\mathbb{R}^3$, representing a 3D position or velocity vector and vector/matrix operation methods [MG: M9].
+  \item \textbf{EddyT}: Eddy object, stores eddy strength, radius orient and position information, with methods for velocity calculation, see Eddy Module [MIS\ref{mEddy}].
+  \item \textbf{EddyProfileT}: Eddy profile object, stores a Record of different types of eddies with their parameters (strength, radius), and weights for random generation [MIS\ref{mProf}].
+  \item \textbf{FlowFieldT}: Flow field object, stores all EddyT objects in that field, with methods for velocity sum calculation, see Flow Field Module [MIS\ref{mFlow}].
 \end{itemize}
 
 \section{Module Decomposition} \label{SecMD}
