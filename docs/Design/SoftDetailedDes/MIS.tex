@@ -123,11 +123,10 @@ are defined by the data types of their inputs and outputs. Local functions are
 described by giving their type signature followed by their specification.
 
 \subsection{Variable Name Traceability}
-To help program development and understanding, several concepts regarding the eddy profile from the SRS TM and DD are renamed in the MIS to better reflect their usage in the code:
+To help program development and understanding, some notations regarding the eddy profile from the SRS TM and DD are altered in the MIS to better reflect their usage in the code:
 \begin{itemize}
-  \item radius: length-scale ($\sigma$) of the eddy. Since the eddy vorticity distribution is cut-off outside the length-scale, they are essentially spheres in 3D space [SRS: TM1].
-  \item strength: magnitude of the eddy intensity vector ($\boldsymbol{\alpha}$) [SRS: DD3].
-  \item orient: unit vector direction of the eddy intensity vector ($\boldsymbol{\alpha}$) [SRS: DD3].
+  \item intensity: magnitude of the eddy intensity vector ($\boldsymbol{\alpha}$) [SRS: DD3].
+  \item orientation: unit vector direction of the eddy intensity vector ($\boldsymbol{\alpha}$) [SRS: DD3].
 \end{itemize}
 
 \subsection{Abstract Data Types}
@@ -135,8 +134,8 @@ To help program development and understanding, several concepts regarding the ed
 As several modules listed in Section \ref{SecMD} are Abstract Data Types (ADTs), this documents use their types as follows:
 \begin{itemize}
   \item \textbf{VectorT}: 3-element NumPy array $\mathbb{R}^3$, representing a 3D position or velocity vector and vector/matrix operation methods [MG: M9].
-  \item \textbf{EddyT}: Eddy object, stores eddy strength, radius orient and position information, with methods for velocity calculation, see Eddy Module [MIS\ref{mEddy}].
-  \item \textbf{EddyProfileT}: Eddy profile object, stores a Record of different types of eddies with their parameters (strength, radius), and weights for random generation [MIS\ref{mProf}].
+  \item \textbf{EddyT}: Eddy object, stores eddy intensity, length\_scale orientation and position information, with methods for velocity calculation, see Eddy Module [MIS\ref{mEddy}].
+  \item \textbf{EddyProfileT}: Eddy profile object, stores a Record of different types of eddies with their parameters (intensity, length\_scale), and weights for random generation [MIS\ref{mProf}].
   \item \textbf{FlowFieldT}: Flow field object, stores all EddyT objects in that field, with methods for velocity sum calculation, see Flow Field Module [MIS\ref{mFlow}].
 \end{itemize}
 
@@ -365,7 +364,7 @@ None.
 \subsubsection{State Variables}
 \begin{itemize}
   \item \texttt{name}: str, name of the eddy profile (is also filename).
-  \item \texttt{params}: \{{\{$\mathbb{R+}$, $\mathbb{R+}$\}}\}, array of \{strength, radius\} sets for each type of eddy.
+  \item \texttt{params}: \{{\{$\mathbb{R+}$, $\mathbb{R+}$\}}\}, array of \{intensity, length\_scale\} sets for each type of eddy.
   \item \texttt{weights}: \{$\mathbb{R+}$\}, corresponding array of weights for each type of eddy.
 \end{itemize}
 
@@ -469,7 +468,7 @@ Initialize the flow field with given eddy profile. Randomly generate eddies base
   \begin{itemize}
     \item exc := (any of d in \texttt{dimensions} $\le$ 0 $\Rightarrow$ \texttt{InvalidDimensions})
     \item exc := (\texttt{avg\_vel} $<$ 0 $\Rightarrow$ \texttt{InvalidAvgVelocity})
-    \item exc := (any of 2$*$\{radius in \texttt{profile}\} $\ge$ any of d in \texttt{dimensions} $\Rightarrow$ \texttt{EddyScaleTooLarge})
+    \item exc := (any of 2$*$\{length\_scale in \texttt{profile}\} $\ge$ any of d in \texttt{dimensions} $\Rightarrow$ \texttt{EddyScaleTooLarge})
   \end{itemize}
 \end{itemize}
 
@@ -536,7 +535,7 @@ None.
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
-\texttt{init} & \texttt{field\_dimensions} VectorT, \newline\texttt{strength} $\mathbb{R+}$, \newline\texttt{radius} $\mathbb{R+}$, \newline\texttt{orient} VectorT & - & - \\
+\texttt{init} & \texttt{field\_dimensions} VectorT, \newline\texttt{intensity} $\mathbb{R+}$, \newline\texttt{length\_scale} $\mathbb{R+}$, \newline\texttt{orientation} VectorT & - & - \\
 % \texttt{save} & \texttt{profile\_name} str & - & -  \\
 \texttt{get\_init\_x}& - & \texttt{init\_x} $\mathbb{R}$ & - \\
 \texttt{get\_y}& \texttt{iter} $\mathbb{Z}$,\newline\texttt{length\_y} $\mathbb{R+}$ & \texttt{y} $\mathbb{R}$ & - \\
@@ -551,9 +550,9 @@ None.
 \subsubsection{State Variables}
 \begin{itemize}
   \item \texttt{init\_x}: $\mathbb{R}$, the initial offset from zero x-position.
-  \item \texttt{strength}: $\mathbb{R+}$, intensity of the eddy.
-  \item \texttt{radius}: $\mathbb{R+}$ for length scale. Velocity outside of \texttt{radius} is always zero.
-  \item \texttt{orient}: VectorT, unit vector describing the orientation of the eddy spin axis.
+  \item \texttt{intensity}: $\mathbb{R+}$, intensity of the eddy.
+  \item \texttt{length\_scale}: $\mathbb{R+}$ for length scale. Velocity outside of \texttt{length\_scale} is always zero.
+  \item \texttt{orientation}: VectorT, unit vector describing the orientationation of the eddy spin axis.
   \item \texttt{y\_arr}: \{$\mathbb{R}$\}, array of y-positions at each flow iteration.
   \item \texttt{z\_arr}: \{$\mathbb{R}$\}, array of z-positions at each flow iteration.
 \end{itemize}
@@ -568,12 +567,12 @@ None.
 
 \subsubsection{Access Routine Semantics}
 
-\noindent \texttt{init(init\_x, strength, radius, orient)}:\\
-Initialize the eddy object to give it strength, radius and orientation, and random initial position. The initial position is generated for 3 flow field iterations, so that wrap-around can be applied at inlet and outlet from the beginning.
+\noindent \texttt{init(init\_x, intensity, length\_scale, orientation)}:\\
+Initialize the eddy object to give it intensity, length\_scale and orientationation, and random initial position. The initial position is generated for 3 flow field iterations, so that wrap-around can be applied at inlet and outlet from the beginning.
 \begin{itemize}
 \item transition: 
   \begin{itemize}
-  \item \texttt{strength, radius, orient} := as inputted
+  \item \texttt{intensity, length\_scale, orientation} := as inputted
   \item \texttt{init\_x} := \texttt{rand(0, field\_dimensions[0])}
   \item \texttt{y[0], y[1], y[2]} := \{\texttt{rand(0, field\_dimensions[1])}\}
   \item \texttt{z[0], z[1], z[2]} := \{\texttt{rand(0, field\_dimensions[2])}\}
@@ -600,7 +599,7 @@ Initialize the eddy object to give it strength, radius and orientation, and rand
 \noindent \texttt{get\_vel(rel\_position)}:\\
 Get the velocity influence due to this eddy at a given position relative to the eddy center.
 \begin{itemize}
-  \item output: out := computed from \texttt{rel\_position} with \texttt{strength, radius, orient} and \texttt{ShapeFunction.active(rel\_position, radius)}, see [SRS: TM1, GM1]
+  \item output: out := computed from \texttt{rel\_position} with \texttt{intensity, length\_scale, orientation} and \texttt{ShapeFunction.active(rel\_position, length\_scale)}, see [SRS: TM1, GM1]
 \end{itemize}
 
 \noindent \texttt{dump()}:
@@ -637,10 +636,10 @@ None.
 \hline
 \texttt{set\_active} & \texttt{active\_func} Function & - & - \\
 % \texttt{save} & \texttt{profile\_name} str & - & -  \\
-\texttt{active}& \texttt{rel\_position} VectorT,\newline\texttt{radius} $\mathbb{R}$ & \texttt{shape\_val} $\mathbb{R}$ & - \\
-\texttt{squared}& \texttt{rel\_position} VectorT,\newline\texttt{radius} $\mathbb{R}$ & \texttt{shape\_val} $\mathbb{R}$ & - \\
-\texttt{gaussian}& \texttt{rel\_position} VectorT,\newline\texttt{radius} $\mathbb{R}$ & \texttt{shape\_val} $\mathbb{R}$ & - \\
-\texttt{...}& \texttt{rel\_position} VectorT,\newline\texttt{radius} $\mathbb{R}$ & \texttt{shape\_val} $\mathbb{R}$ & - \\
+\texttt{active}& \texttt{rel\_position} VectorT,\newline\texttt{length\_scale} $\mathbb{R}$ & \texttt{shape\_val} $\mathbb{R}$ & - \\
+\texttt{squared}& \texttt{rel\_position} VectorT,\newline\texttt{length\_scale} $\mathbb{R}$ & \texttt{shape\_val} $\mathbb{R}$ & - \\
+\texttt{gaussian}& \texttt{rel\_position} VectorT,\newline\texttt{length\_scale} $\mathbb{R}$ & \texttt{shape\_val} $\mathbb{R}$ & - \\
+\texttt{...}& \texttt{rel\_position} VectorT,\newline\texttt{length\_scale} $\mathbb{R}$ & \texttt{shape\_val} $\mathbb{R}$ & - \\
 \hline
 \end{tabular}
 \end{center}
@@ -671,17 +670,17 @@ None.
   \item output: out := \texttt{init\_x}
 \end{itemize}
 
-\noindent \texttt{active(rel\_position, radius)}:
+\noindent \texttt{active(rel\_position, length\_scale)}:
 \begin{itemize}
   \item output: out := shape function value, depending on the active shape function.
 \end{itemize}
 
-\noindent \texttt{squared(rel\_position, radius)}:
+\noindent \texttt{squared(rel\_position, length\_scale)}:
 \begin{itemize}
-  \item output: out := shape function value computed by taking the distance from the rel\_position to the center \texttt{mag(rel\_position)}, and \texttt{radius} (or length sclae) of the eddy. See [SRS: TM1].
+  \item output: out := shape function value computed by taking the distance from the rel\_position to the center \texttt{mag(rel\_position)}, and \texttt{length\_scale} (or length sclae) of the eddy. See [SRS: TM1].
 \end{itemize}
 
-\noindent \texttt{gaussian(rel\_position, radius)}:
+\noindent \texttt{gaussian(rel\_position, length\_scale)}:
 \begin{itemize}
   \item output: out := Use a different (gaussian) equation to get the above value, as may be preferred by some researchers.
 \end{itemize}
