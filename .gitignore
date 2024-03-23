@@ -282,3 +282,7 @@ TSWLatexianTemp*
 .vscode/
 
 Thumbs.db
+
+# python
+**/__pycache__/
+.pytest_cache/
