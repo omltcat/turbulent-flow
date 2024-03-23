@@ -1,29 +1,61 @@
 import pytest
 import os
-import modules.file_io
+import modules.file_io as file_io
 
-def test_file_io():
-    type = "profiles"
-    name = "file_io_test"
-    content = {"test": "string", "data": [1, 2, 3]}
 
+def test_file_io_read():
+    file_type = "profiles"
+    name = "center_upright"
+
+    # Read the file and check the content
+    try:
+        content = file_io.read(file_type, name)
+    except file_io.FileNotExist:
+        pytest.fail(f"File not found at ./{file_type}/{name}.json")
+
+    assert content['eddy_types'][0]['orient']['y'] == 1
+
+
+def test_file_io_write():
     # Test writing to the file
+    file_type = "profiles"
+    name = "__test__"
+    content = {"key": "value", "list": [1, 2, 3]}
     try:
-        modules.file_io.write(type, name, content)
-    except modules.file_io.FailToWrite:
-        pytest.fail(f"Failed to write to file ./{type}/{name}.json")
+        file_io.write(file_type, name, content, indent=4)
+    except file_io.FailToWrite:
+        pytest.fail(f"Failed to write to file ./{file_type}/{name}.json")
 
-    # Read the file and compare the content
     try:
-        written_content = modules.file_io.read(type, name)
-    except modules.file_io.FileNotExist:
-        pytest.fail(f"File not found at ./{type}/{name}.json")
+        content_read = file_io.read(file_type, name)
+    except file_io.FileNotExist:
+        pytest.fail(f"File not found at ./{file_type}/{name}.json")
 
-    assert written_content == content
+    assert content == content_read
 
-    # Delete the file
+    # Clean up
+    os.remove(f"./src/{file_type}/{name}.json")
+
+
+def test_file_io_read_fail():
+    type = "profiles"
+    name = "__not_exist__"
+
+    # Read the file and check the content
     try:
-        file_path = f"./{type}/{name}.json"
-        os.remove(file_path)
-    except OSError:
-        pytest.fail(f"Failed to delete file {file_path}")
+        _ = file_io.read(type, name)
+        pytest.fail('Should have raised FileNotExist')
+    except file_io.FileNotExist:
+        return
+
+
+def test_file_io_write_fail():
+    # Test writing to the file
+    file_type = "__not_exist__"
+    name = "__test__"
+    content = {"key": "value", "list": [1, 2, 3]}
+    try:
+        file_io.write(file_type, name, content, indent=4)
+        pytest.fail('Should have raised FailToWrite')
+    except file_io.FailToWrite:
+        return
