@@ -380,7 +380,7 @@ None.
 \noindent \texttt{load(profile\_name)}:\\
 Load a saved eddy profile from file, which contains the one or more eddy types, their parameters (intensity magnitude and length-scale) and weights (for random generation).
 \begin{itemize}
-\item transition: \texttt{params, weights} := \texttt{fileIO.read(`profile', profile\_name)}
+\item transition: \texttt{params, weights} := \texttt{file\_io.read(`profile', profile\_name)}
 \item exception: exc := (\texttt{params} is not \{{\{$\mathbb{R+}$, $\mathbb{R+}$\}}\} or \texttt{weights} is not type \{$\mathbb{R+}$\} $\Rightarrow$ \texttt{InvalidProfile})
 % \item output: out := \texttt{encode(\{VectorT\})}, velocity vectors at all the queried points in one JSON string.
 \end{itemize}
@@ -475,13 +475,13 @@ Initialize the flow field with given eddy profile. Randomly generate eddies base
 
 \noindent \texttt{load(field\_name)}:
 \begin{itemize}
-  \item transition: all state variables reconstructed from \texttt{fileIO.read(`field', field\_name)}.
+  \item transition: all state variables reconstructed from \texttt{file\_io.read(`field', field\_name)}.
 \end{itemize}
 
 \noindent \texttt{save(new\_name?)}:
 \begin{itemize}
   \item transition: \texttt{name} := \texttt{new\_name} if provided, otherwise name remains the same.
-  \item output: out := Record (dict) with all current state variables. Each EddyT in \texttt{eddies} is also converted to a Record. So that \texttt{fileIO.write(`field', Record)} can be called to serialized the current state of the flow field into a JSON string for saving.
+  \item output: out := Record (dict) with all current state variables. Each EddyT in \texttt{eddies} is also converted to a Record. So that \texttt{file\_io.write(`field', Record)} can be called to serialized the current state of the flow field into a JSON string for saving.
 \end{itemize}
 
 \noindent \texttt{sum\_vel(position, time)}:\\
@@ -695,7 +695,7 @@ None.
 \section{MIS of File I/O Module} \label{mFile} 
 
 \subsection{Module}
-\texttt{fileIO}
+\texttt{file\_io}
 
 \subsection{Uses}
 \begin{itemize}
@@ -715,7 +715,7 @@ None.
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
 \texttt{read} & \texttt{type} str,\newline\texttt{name} str & Record or Array & FileNotExist \\
-\texttt{write} & \texttt{type} str,\newline\texttt{content} Record or Array & - & FailToWrite \\
+\texttt{write} & \texttt{type} str,\newline\texttt{name} str,\newline\texttt{content} Record or Array & - & FailToWrite \\
 \hline
 \end{tabular}
 \end{center}
@@ -745,7 +745,7 @@ None.
 \item exception: exc := (file cannot be found at \texttt{./<type>/<name>.json} $\Rightarrow$ FileNotExist)
 \end{itemize}
 
-\noindent \texttt{write(type, content)}:
+\noindent \texttt{write(type, name, content)}:
 \begin{itemize}
 \item transition: write the serialized JSON string to the file on disk.
 \item exception: exc := (file cannot be written to disk $\Rightarrow$ FailToWrite)
