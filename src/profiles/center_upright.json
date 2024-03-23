@@ -3,9 +3,9 @@
     "eddy_types": [
         {
             "weight": 1,
-            "radius": 1,
-            "strength": 5,
-            "orient": {
+            "length_scale": 1,
+            "intensity": 5,
+            "orientation": {
                 "x": 0,
                 "y": 1,
                 "z": 0

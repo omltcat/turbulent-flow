@@ -13,7 +13,7 @@ def test_file_io_read():
     except file_io.FileNotExist:
         pytest.fail(f"File not found at ./{file_type}/{name}.json")
 
-    assert content['eddy_types'][0]['orient']['y'] == 1
+    assert content['eddy_types'][0]['orientation']['y'] == 1
 
 
 def test_file_io_write():
