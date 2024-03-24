@@ -2,7 +2,7 @@
 ## Notations
 | Symbol | Explanation |
 |--------|---------|
-| $\mathbf{x}$ | Position vector in $ \begin{bmatrix}x \\\ y \\\ z\end{bmatrix} $<br> **Bold** font means vector|
+| $\mathbf{x}$ | Position vector in $[x, y, z]$<br> **Bold** font means vector|
 | $\mathbf{x}^k$ | Position of eddy $k$-th <br> Superscript $k$ means eddy specific|
 
 ## Fluctuation and Shape Function
