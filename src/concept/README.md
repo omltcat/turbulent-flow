@@ -7,6 +7,7 @@
 
 ## Fluctuation and Shape Function
 Current shape function used by Nikita in MATLAB code:
+
 $$
 q(d^k) = 3.6276e^{-0.5\pi(d^k)^2}
 $$
@@ -14,11 +15,13 @@ $$
 He has he own reasoning for the number 3.6276. We can document this with his work. Since the program allows user-defined shape function, this can be one of them.
 
 The shape function should be used to plug into velocity fluctuation function in the form of:
+
 $$
 \mathbf{u}' = \sum_{k=1}^Nq(d^k)\mathbf{r}^k\times\boldsymbol{\alpha}^k
 $$
 
 For spherical eddy:
+
 $$
 \mathbf{r}^k = \frac{\mathbf{x}-\mathbf{x}^k}{\sigma^k}
 $$
@@ -34,6 +37,7 @@ $$
 $$
 
 In Nikita's code, when all eddies are pointing up (0, 0, 1) initially, this is handles as:
+
 $$
 d^k = \sqrt{\frac{(x-x^k)^2}{\sigma^k_r}+\frac{(y-y^k)^2}{\sigma^k_r}+\frac{(z-z^k_3)^2}{\sigma^k_a}}
 $$
