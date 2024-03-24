@@ -5,6 +5,11 @@
 | $\mathbf{x}$ | Position vector in $[x, y, z]$<br> **Bold** font means vector|
 | $\mathbf{x}^k$ | Position of eddy $k$-th <br> Superscript $k$ means eddy specific|
 
+- Vector components:
+    - $x$ = flow direction
+    - $y$ = spanwise direction
+    - $z$ = vertical direction
+
 ## Fluctuation and Shape Function
 Current shape function used by Nikita in MATLAB code:
 
@@ -14,16 +19,31 @@ $$
 
 He has he own reasoning for the number 3.6276. We can document this with his work. Since the program allows user-defined shape function, this can be one of them.
 
-The shape function should be used to plug into velocity fluctuation function in the form of:
+The shape function should be used to plug into velocity fluctuation function in the form of (in the papers):
 
 $$
-\mathbf{u}' = \sum_{k=1}^Nq(d^k)\mathbf{r}^k\times\boldsymbol{\alpha}^k
+\mathbf{u}'_\beta(\mathbf{x}) = \sum_{k=1}^Nq_\beta(\mathbf{x}, \mathbf{x}^k, \sigma^k)\epsilon_{\beta j l}r^k_j\alpha^k_l
+$$
+
+Which is in Levi-Civita Symbol form over the indices $\beta, j, l$, corresponding to x, y, z respectively. For simplicity, let's put it in cross product form:
+
+$$
+\mathbf{u}'(\mathbf{x}) = \sum_{k=1}^Nq(\mathbf{x}, \mathbf{x}^k, \sigma^k)\mathbf{r}^k\times\boldsymbol{\alpha}^k
+$$
+
+which we really only need $d^k$ instead of $\mathbf{x}, \mathbf{x}^k$ in the shape function:
+
+$$
+\mathbf{u}'(\mathbf{x}) = \sum_{k=1}^Nq(d^k, \sigma^k)\mathbf{r}^k\times\boldsymbol{\alpha}^k
 $$
 
 For spherical eddy:
 
 $$
-\mathbf{r}^k = \frac{\mathbf{x}-\mathbf{x}^k}{\sigma^k}
+\begin{align*}
+\mathbf{r}^k &= \frac{\mathbf{x}-\mathbf{x}^k}{\sigma^k}\\
+d^k &= |\mathbf{r}^k|
+\end{align*}
 $$
 
 ### To be implemented:
@@ -57,3 +77,13 @@ $$
 $$
 
 Where $\mathbf{x}_3$ is the z-component (scalar) of the a position. $\sigma^k_r$ and $\sigma^k_a$ are the radial and axial length-scale . -->
+
+
+## Eddy Profiles
+| Symbol | Variable Name | Required | Explanation |
+|--------|---------------|----------| ------------|
+| $(N/V_b)$ | `density` | √ | Number of eddies per unit volume |
+| $\sigma$ | `length_scale` | √ | Length scale of the eddy |
+| $\|\boldsymbol{\alpha}\|$ |`intensity` | √ |  Magnitude of intensity vector |
+| $\boldsymbol{\alpha}/\|\boldsymbol{\alpha}\|$ |`orientation` |   |  Unit vector direction of intensity vector |
+| $\mathbf{x}^k$ | `center` |   | Center position of eddy |

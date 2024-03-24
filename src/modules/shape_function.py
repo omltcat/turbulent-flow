@@ -2,9 +2,8 @@ import numpy as np
 from typing import Callable, Union
 
 
-def active(rel_pos: np.ndarray, length_scale: float):
-    d = np.linalg.norm(rel_pos)/length_scale
-    return active_function(d, length_scale)
+def active(dk: float, length_scale: float):
+    return active_function(dk, length_scale)
 
 
 def set_active(func: Union[Callable, str]):
@@ -21,20 +20,19 @@ def set_active(func: Union[Callable, str]):
     active_function = func
 
 
-def quadratic(d, sigma):
-    cutoff = 1.0
-    if d > cutoff:
+def quadratic(dk, length_scale):
+    if dk > 1.0:
         return 0
     else:
-        return sigma * (1 - d**2)
+        return length_scale * (1 - dk**2)
 
 
-def exp_2pi(d, sigma):
-    cutoff = 2.0
-    if d > cutoff:
+def gaussian(dk, length_scale):
+    # This value determines cutoff distance
+    if dk > 2.0:
         return 0
     else:
-        return 2 * np.pi * np.exp(-4.5 * d**2)
+        return 3.6276 * np.exp(-0.5*np.pi * dk**2)
 
 
-active_function = quadratic
+active_function = gaussian
