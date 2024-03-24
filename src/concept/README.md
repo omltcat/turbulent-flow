@@ -8,6 +8,8 @@
 ## Fluctuation and Shape Function
 Current shape function used by Nikita in MATLAB code:
 
+$$\begin{bmatrix}x\\y\\z\end{bmatrix}$$
+
 $$
 q(d^k) = 3.6276e^{-0.5\pi(d^k)^2}
 $$
