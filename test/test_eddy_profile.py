@@ -1,4 +1,5 @@
 import pytest
+import numpy as np
 import modules.eddy_profile as eddy_profile
 import modules.file_io as file_io
 import os
@@ -12,7 +13,14 @@ def test_eddy_profile():
     except eddy_profile.InvalidProfile:
         pytest.fail(f"Failed to create EddyProfile with {name}")
 
-    assert profile.get_params()[0]['orientation']['z'] == 1
+    assert profile.get_settings() == {}
+    assert profile.get_params()[0]['orientation'][2] == 1
+    assert profile.get_variant_count() == 1
+    assert profile.get_density(0) == 0.1
+    assert profile.get_length_scale(0) == 1
+    assert profile.get_intensity(0) == 1.15
+    assert np.array_equal(profile.get_orientation(0), [0, 0, 1])
+    assert np.array_equal(profile.get_center(0), [0, 0, 0])
 
 
 def test_eddy_profile_invalid():
@@ -40,7 +48,7 @@ def test_eddy_profile_invalid():
     # Length scale is not a positive number
     content = {"variants": [{
         "density": 1,
-        "length_scale": -1,
+        "length_scale": 'string',
         }]}
     file_io.write("profiles", name, content)
     with pytest.raises(eddy_profile.InvalidProfile):
@@ -50,7 +58,50 @@ def test_eddy_profile_invalid():
     content = {"variants": [{
         "density": 1,
         "length_scale": 1,
-        "intensity": -1,
+        }]}
+    file_io.write("profiles", name, content)
+    with pytest.raises(eddy_profile.InvalidProfile):
+        _ = eddy_profile.EddyProfile(name)
+
+    # Orientation is not a list
+    content = {"variants": [{
+        "density": 1,
+        "length_scale": 1,
+        "intensity": 1,
+        "orientation": 'string',
+        }]}
+    file_io.write("profiles", name, content)
+    with pytest.raises(eddy_profile.InvalidProfile):
+        _ = eddy_profile.EddyProfile(name)
+
+    # Orientation is not a list of 3 numbers
+    content = {"variants": [{
+        "density": 1,
+        "length_scale": 1,
+        "intensity": 1,
+        "orientation": [1, 2],
+        }]}
+    file_io.write("profiles", name, content)
+    with pytest.raises(eddy_profile.InvalidProfile):
+        _ = eddy_profile.EddyProfile(name)
+
+    # Orientation is a zero vector
+    content = {"variants": [{
+        "density": 1,
+        "length_scale": 1,
+        "intensity": 1,
+        "orientation": [0, 0, 0],
+        }]}
+    file_io.write("profiles", name, content)
+    with pytest.raises(eddy_profile.InvalidProfile):
+        _ = eddy_profile.EddyProfile(name)
+
+    # Center is not a list
+    content = {"variants": [{
+        "density": 1,
+        "length_scale": 1,
+        "intensity": 1,
+        "center": 'string',
         }]}
     file_io.write("profiles", name, content)
     with pytest.raises(eddy_profile.InvalidProfile):
