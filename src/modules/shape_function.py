@@ -1,6 +1,11 @@
 import numpy as np
 from typing import Callable, Union
 
+CUTOFF_1 = 1.0
+CUTOFF_2 = 2.0
+HALF_PI = 0.5 * np.pi
+C = 3.6276
+
 
 def active(dk: float, length_scale: float):
     return active_function(dk, length_scale)
@@ -28,11 +33,11 @@ def quadratic(dk, length_scale):
 
 
 def gaussian(dk, length_scale):
-    # This value determines cutoff distance
-    if dk > 2.0:
-        return 0
-    else:
-        return 3.6276 * np.exp(-0.5*np.pi * dk**2)
+    return np.where(
+        dk < CUTOFF_2,
+        C * np.exp(-HALF_PI * dk**2),
+        0
+    )
 
 
 active_function = gaussian

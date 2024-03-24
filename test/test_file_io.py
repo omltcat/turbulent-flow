@@ -3,20 +3,20 @@ import os
 import modules.file_io as file_io
 
 
-def test_file_io_read():
-    file_type = "profiles"
-    name = "center_upright"
+# def test_file_io_read():
+#     file_type = "profiles"
+#     name = "center_upright"
 
-    # Read the file and check the content
-    try:
-        content = file_io.read(file_type, name)
-    except file_io.FileNotExist:
-        pytest.fail(f"File not found at ./{file_type}/{name}.json")
+#     # Read the file and check the content
+#     try:
+#         content = file_io.read(file_type, name)
+#     except file_io.FileNotExist:
+#         pytest.fail(f"File not found at ./{file_type}/{name}.json")
 
-    assert content['variants'][0]['orientation'] == [0, 0, 1]
+#     assert content['variants'][0]['orientation'] == [0, 0, 1]
 
 
-def test_file_io_write():
+def test_file_io():
     # Test writing to the file
     file_type = "profiles"
     name = "__test__"

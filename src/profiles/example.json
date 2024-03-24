@@ -1,0 +1,15 @@
+{
+    "settings": {},
+    "variants": [
+        {
+            "density": 0.1,
+            "intensity": 1.15,
+            "length_scale": 1
+        },
+        {
+            "density": 1.2,
+            "intensity": 0.9,
+            "length_scale": 0.2
+        }
+    ]
+}

@@ -1,5 +1,5 @@
 from typing import List, Dict
-import numpy as np
+# import numpy as np
 import modules.file_io as file_io
 import modules.utils as utils
 
@@ -29,18 +29,18 @@ class EddyProfile:
             if not utils.is_positive(variant.get('intensity')):
                 raise InvalidProfile('Eddy intensity must be a positive number')
 
-            if variant.get('orientation') is not None:
-                if not isinstance(variant['orientation'], list) or len(variant['orientation']) != 3:
-                    raise InvalidProfile('Eddy orientation must be a list of 3 numbers for x, y, z')
-                norm = np.linalg.norm(variant['orientation'])
-                if norm == 0:
-                    raise InvalidProfile('Eddy orientation must not be a zero vector')
-                variant['orientation'] = np.array(variant['orientation']) / norm
+            # if variant.get('orientation') is not None:
+            #     if not isinstance(variant['orientation'], list) or len(variant['orientation']) != 3:
+            #         raise InvalidProfile('Eddy orientation must be a list of 3 numbers for x, y, z')
+            #     norm = np.linalg.norm(variant['orientation'])
+            #     if norm == 0:
+            #         raise InvalidProfile('Eddy orientation must not be a zero vector')
+            #     variant['orientation'] = np.array(variant['orientation']) / norm
 
-            if variant.get('center') is not None:
-                if not isinstance(variant['center'], list) or len(variant['center']) != 3:
-                    raise InvalidProfile('Eddy center must be a list of 3 numbers for x, y, z')
-                variant['center'] = np.array(variant['center'])
+            # if variant.get('center') is not None:
+            #     if not isinstance(variant['center'], list) or len(variant['center']) != 3:
+            #         raise InvalidProfile('Eddy center must be a list of 3 numbers for x, y, z')
+            #     variant['center'] = np.array(variant['center'])
 
     def get_settings(self):
         return self.settings
@@ -60,8 +60,8 @@ class EddyProfile:
     def get_intensity(self, index: int):
         return self.variants[index]['intensity']
 
-    def get_orientation(self, index: int):
-        return self.variants[index].get('orientation', None)
+    # def get_orientation(self, index: int):
+    #     return self.variants[index].get('orientation', None)
 
-    def get_center(self, index: int):
-        return self.variants[index].get('center', None)
+    # def get_center(self, index: int):
+    #     return self.variants[index].get('center', None)
