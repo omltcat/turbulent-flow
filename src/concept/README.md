@@ -2,16 +2,11 @@
 ## Notations
 | Symbol | Explanation |
 |--------|---------|
-| $\mathbf{x}$ | Position vector in $\begin{bmatrix}x\\y\\z\end{bmatrix}$<br> **Bold** font means vector|
+| $\mathbf{x}$ | Position vector in $ \begin{bmatrix}x \\\ y \\\ z\end{bmatrix} $<br> **Bold** font means vector|
 | $\mathbf{x}^k$ | Position of eddy $k$-th <br> Superscript $k$ means eddy specific|
 
 ## Fluctuation and Shape Function
 Current shape function used by Nikita in MATLAB code:
-
-$$
-\begin{bmatrix}x \\\ y \\\ z \end{bmatrix}
-$$
-
 
 $$
 q(d^k) = 3.6276e^{-0.5\pi(d^k)^2}
