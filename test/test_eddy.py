@@ -1,6 +1,6 @@
 import numpy as np
 from modules.eddy import Eddy
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 
 TOL = 1e-8
@@ -53,6 +53,7 @@ def test_eddy():
     z = np.zeros(SAMPLES) + center[2]
     pos_samples = np.column_stack((x, y, z))
     vels = np.array([eddy.get_vel(pos, 1, 0) for pos in pos_samples])
+    assert np.isclose(np.linalg.norm(np.sum(vels, axis=0)), 0, atol=TOL)
 
     # plt.plot(x, vels[:, 0])
     # plt.plot(x, vels[:, 1])
@@ -60,29 +61,29 @@ def test_eddy():
     # plt.grid()
     # plt.show()
 
-    points = np.linspace(-length_scale*3, length_scale*3, 50)
-    X, Y = np.meshgrid(points+center[0], points+center[1])
+    # points = np.linspace(-length_scale*3, length_scale*3, 50)
+    # X, Y = np.meshgrid(points+center[0], points+center[1])
 
-    # Initialize arrays for the velocity field
-    Vx = np.zeros_like(X)
-    Vy = np.zeros_like(Y)
+    # # Initialize arrays for the velocity field
+    # Vx = np.zeros_like(X)
+    # Vy = np.zeros_like(Y)
 
-    # Compute the velocity field
-    for i in range(X.shape[0]):
-        for j in range(X.shape[1]):
-            v = eddy.get_vel(np.array([X[i, j], Y[i, j], center[2]]), 1, 0)
-            Vx[i, j] = v[0]
-            Vy[i, j] = v[1]
+    # # Compute the velocity field
+    # for i in range(X.shape[0]):
+    #     for j in range(X.shape[1]):
+    #         v = eddy.get_vel(np.array([X[i, j], Y[i, j], center[2]]), 1, 0)
+    #         Vx[i, j] = v[0]
+    #         Vy[i, j] = v[1]
 
-    # Create a 2D plot
-    fig, ax = plt.subplots()
+    # # Create a 2D plot
+    # fig, ax = plt.subplots()
 
-    # Plot the vector field
-    ax.quiver(X, Y, Vx, Vy, scale=50)
+    # # Plot the vector field
+    # ax.quiver(X, Y, Vx, Vy, scale=50)
 
-    # Set the limits of the plot to match the range of the meshgrid
-    ax.set_xlim([center[0]-length_scale*3, center[0]+length_scale*3])
-    ax.set_ylim([center[1]-length_scale*3, center[1]+length_scale*3])
+    # # Set the limits of the plot to match the range of the meshgrid
+    # ax.set_xlim([center[0]-length_scale*3, center[0]+length_scale*3])
+    # ax.set_ylim([center[1]-length_scale*3, center[1]+length_scale*3])
 
-    # Show the plot
-    plt.show()
+    # # Show the plot
+    # plt.show()

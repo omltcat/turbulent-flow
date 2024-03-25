@@ -68,6 +68,24 @@ class Eddy:
                     vel = vel + q * np.cross(r, self.orientation*self.get_intensity()) if d > 0 else vel
         return vel
 
+    def get_vel_mesh(self, pos: np.ndarray, iter: int, offset: float):
+        vel = np.zeros(3)
+        for i in LOOP_IJK:
+            center = self.get_center(iter+i)
+            center[0] += offset
+            center[0] += self.field[0] * i
+            base_y = center[1]
+            base_z = center[2]
+            for j in LOOP_IJK:
+                center[1] = base_y + j * self.field[1]
+                for k in LOOP_IJK:
+                    center[2] = base_z + k * self.field[2]
+                    r = (pos - center) / self.get_length_scale()
+                    d = np.linalg.norm(r)
+                    q = shape_function.active(d, self.get_length_scale())
+                    vel = vel + q * np.cross(r, self.orientation*self.get_intensity()) if d > 0 else vel
+        return vel
+
     def set_orientation(self, orientation: np.ndarray):
         if len(orientation) != 3:
             raise ValueError('Eddy orientation must be a list of 3 numbers for x, y, z')

@@ -47,7 +47,7 @@ d^k &= |\mathbf{r}^k|
 $$
 
 ### To be implemented:
-Non-spherical eddy has two length-scales: radial $\sigma^k_r$ and axial $\sigma^k_a$. These are local to the eddy orientation. A gamma $\gamma$ value determine how "tall" or "fat" an eddy is. 
+Non-spherical eddy has two length-scales: radial $\sigma^k_r$ and axial $\sigma^k_a$. These are local to the eddy orientation. A gamma $\gamma$ value determine how "tall" or "fat" an eddy is . 
 
 $$
 \begin{align*}
