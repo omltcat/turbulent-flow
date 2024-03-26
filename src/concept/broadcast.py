@@ -35,20 +35,29 @@ x_parts = np.array_split(x_coords, 4)
 y_parts = np.array_split(y_coords, 4)
 z_parts = np.array_split(z_coords, 4)
 
-# Create a meshgrid of x, y, and z coordinates
-positions = np.transpose(np.meshgrid(x_parts[0], y_parts[0], z_parts[0]), (1, 2, 3, 0))
+cx, cy, cz = 2, 2, 2
 
-print(positions.shape)
+# Create a meshgrid of x, y, and z coordinates
+positions = np.transpose(np.meshgrid(x_parts[cx], y_parts[cy], z_parts[cz]), (1, 2, 3, 0))
+
 print("Time taken for creating positions: ", time.time() - start_time)
 
 
-# Calculate the distance of each center from the boundaries of the box
-dist_x = np.minimum(centers[:, 0] + Lx/2, Lx/2 - centers[:, 0])
-dist_y = np.minimum(centers[:, 1] + Ly/2, Ly/2 - centers[:, 1])
-dist_z = np.minimum(centers[:, 2] + Lz/2, Lz/2 - centers[:, 2])
+# Get the minimum and maximum coordinates of the current part box
+min_x, max_x = x_parts[cx][0], x_parts[cx][-1]
+min_y, max_y = y_parts[cy][0], y_parts[cy][-1]
+min_z, max_z = z_parts[cz][0], z_parts[cz][-1]
+
+print("Min x: ", min_x)
+print("Max x: ", max_x)
+
+# Calculate the distance of each center from the boundaries of the current part box
+dist_x = np.minimum(centers[:, 0] - min_x, max_x - centers[:, 0])
+dist_y = np.minimum(centers[:, 1] - min_y, max_y - centers[:, 1])
+dist_z = np.minimum(centers[:, 2] - min_z, max_z - centers[:, 2])
 
 # Find the centers that are inside or touching the box
-mask = np.logical_and.reduce([dist_x >= length_scale, dist_y >= length_scale, dist_z >= length_scale])
+mask = np.logical_and(dist_x >= -length_scale, dist_y >= -length_scale, dist_z >= -length_scale)
 
 # Apply the mask to get the centers that are inside or touching the box
 centers = centers[mask]
