@@ -2,6 +2,28 @@
 
 import time
 import numpy as np
+from itertools import combinations, product
+import matplotlib.pyplot as plt
+
+
+def expanded_inbounds(centers, length_scales, low_bounds, high_bounds=None):
+    if high_bounds is None:
+        high_bounds = -low_bounds
+
+    length_scales = length_scales.reshape(-1, 1)
+    low_bounds = low_bounds.reshape(-1, 3)
+    high_bounds = high_bounds.reshape(-1, 3)
+    print("Centers: ", centers.shape)
+    print("Length scales: ", length_scales.shape)
+    print("High bounds: ", high_bounds.shape)
+    print("Low bounds: ", low_bounds.shape)
+    # print("High bounds expanded: ", (high_bounds + length_scales))
+    # print("High bounds comparison: ", (centers < high_bounds + length_scales))
+    return np.all(
+        (centers > low_bounds - length_scales)
+        & (centers < high_bounds + length_scales),
+        axis=-1,
+    )
 
 
 def my_function(x):
@@ -11,15 +33,16 @@ def my_function(x):
 
 # Define the number of centers
 start_time = time.time()
-NUM_CENTERS = 1000
+NUM_CENTERS = 20
 
 # Create random centers, length_scale, and orientations of the spheres
 centers = (
     np.random.rand(NUM_CENTERS, 3) * 200 - 100
 )  # Random centers in the range [-10, 10]
-length_scale = (
-    np.random.rand(NUM_CENTERS) * 10
+length_scales = (
+    np.random.rand(NUM_CENTERS) * 200
 )  # Random length scales in the range [0, 10]
+length_scales = np.repeat(5, NUM_CENTERS)
 orientations = np.random.rand(NUM_CENTERS, 3)  # Random orientations in the range [0, 1]
 print("Time taken for creating eddies: ", time.time() - start_time)
 
@@ -38,52 +61,43 @@ y_coords = np.linspace(-Ly / 2, Ly / 2, Ny)
 z_coords = np.linspace(-Lz / 2, Lz / 2, Nz)
 
 # Divide the coordinates into 4 parts
-x_parts = np.array_split(x_coords, 4)
-y_parts = np.array_split(y_coords, 4)
-z_parts = np.array_split(z_coords, 4)
+x_parts = np.array_split(x_coords, 2)
+y_parts = np.array_split(y_coords, 2)
+z_parts = np.array_split(z_coords, 2)
 
-cx, cy, cz = 2, 2, 2
+cx, cy, cz = 0, 0, 0
 
 # Create a meshgrid of x, y, and z coordinates
 positions = np.transpose(
     np.meshgrid(x_parts[cx], y_parts[cy], z_parts[cz]), (1, 2, 3, 0)
 )
+print("Positions: ", positions.shape)
 
 print("Time taken for creating positions: ", time.time() - start_time)
 
 
 # Get the minimum and maximum coordinates of the current part box
-min_x, max_x = x_parts[cx][0], x_parts[cx][-1]
-min_y, max_y = y_parts[cy][0], y_parts[cy][-1]
-min_z, max_z = z_parts[cz][0], z_parts[cz][-1]
-
-print("Min x: ", min_x)
-print("Max x: ", max_x)
-
-# Calculate the distance of each center from the boundaries of the current part box
-dist_x = np.minimum(centers[:, 0] - min_x, max_x - centers[:, 0])
-dist_y = np.minimum(centers[:, 1] - min_y, max_y - centers[:, 1])
-dist_z = np.minimum(centers[:, 2] - min_z, max_z - centers[:, 2])
+low_bounds = positions[0, 0, 0]
+high_bounds = positions[-1, -1, -1]
 
 # Find the centers that are inside or touching the box
-mask = np.logical_and(
-    dist_x >= -length_scale, dist_y >= -length_scale, dist_z >= -length_scale
-)
+mask = expanded_inbounds(centers, length_scales, low_bounds, high_bounds)
+print("Mask: ", mask)
 
 # Apply the mask to get the centers that are inside or touching the box
 centers = centers[mask]
-length_scale = length_scale[mask]
+length_scales = length_scales[mask]
 orientations = orientations[mask]
 print("Centers: ", centers.shape)
 
 # Reshape the centers, length_scale, and orientations arrays to allow broadcasting
 centers = centers.reshape(-1, 1, 1, 1, 3)
-length_scale = length_scale.reshape(-1, 1, 1, 1, 1)
+length_scales = length_scales.reshape(-1, 1, 1, 1, 1)
 orientations = orientations.reshape(-1, 1, 1, 1, 3)
 
 # Calculate the relative position vectors
 start_time = time.time()
-rk = positions - centers / length_scale
+rk = positions - centers / length_scales
 print(
     "Time taken for calculating relative position vectors: ", time.time() - start_time
 )
@@ -114,3 +128,40 @@ print("Time taken for applying function: ", time.time() - start_time)
 start_time = time.time()
 sum_result = np.sum(result, axis=0)
 print("Time taken for summing up results: ", time.time() - start_time)
+
+
+# Reshape centers to 2D
+centers_2d = centers.reshape(-1, 3)
+
+# Create a new figure
+fig = plt.figure()
+
+# Add a 3D subplot
+ax = fig.add_subplot(111, projection="3d")
+
+# Plot the centers
+ax.scatter(centers_2d[:, 0], centers_2d[:, 1], centers_2d[:, 2], color="blue")
+
+# Create a list of all corners of the box
+corners = (
+    np.array([p for p in product([0, 1], repeat=3)]) * (high_bounds - low_bounds)
+    + low_bounds
+)
+
+# Plot the lines connecting the corners to form the box
+for s, e in combinations(corners, 2):
+    if (
+        np.linalg.norm(s - e) == high_bounds[0] - low_bounds[0]
+        or np.linalg.norm(s - e) == high_bounds[1] - low_bounds[1]
+        or np.linalg.norm(s - e) == high_bounds[2] - low_bounds[2]
+    ):
+        ax.plot(*zip(s, e), color="r")
+
+
+# Set the labels
+ax.set_xlabel("X")
+ax.set_ylabel("Y")
+ax.set_zlabel("Z")
+
+# Show the plot
+plt.show()

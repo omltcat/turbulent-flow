@@ -25,3 +25,37 @@ def random_unit_vector():
     z = np.cos(theta)
 
     return np.array([x, y, z])
+
+
+def expanded_inbounds(
+    centers: np.ndarray,
+    length_scales: np.ndarray,
+    low_bounds=None | np.ndarray,
+    high_bounds=None | np.ndarray,
+):
+    """
+    Check for eddies either within the bounds of box, or outside but partially touching the box.
+
+    Parameters:
+    centers (np.ndarray): Centers of the eddies.
+    length_scales (np.ndarray): Length scales of the eddies.
+    low_bounds (np.ndarray): [x, y, z] lower bounds of the box.
+    high_bounds (np.ndarray): [x, y, z] upper bounds of the box.
+
+    Returns:
+    np.ndarray: Boolean array indicating if the eddies are within the bounds of the box.
+    """
+
+    if low_bounds is None:
+        low_bounds = -high_bounds
+    elif high_bounds is None:
+        high_bounds = -low_bounds
+
+    length_scales = length_scales.reshape(-1, 1)
+    low_bounds = low_bounds.reshape(-1, 3)
+    high_bounds = high_bounds.reshape(-1, 3)
+    return np.all(
+        (centers > low_bounds - length_scales)
+        & (centers < high_bounds + length_scales),
+        axis=-1,
+    )
