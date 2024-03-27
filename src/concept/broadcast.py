@@ -1,34 +1,41 @@
-import numpy as np
+"""POC of broadcasting in numpy"""
+
 import time
+import numpy as np
 
 
 def my_function(x):
+    """Placeholder function"""
     return x
 
 
 # Define the number of centers
 start_time = time.time()
-num_centers = 1000
+NUM_CENTERS = 1000
 
 # Create random centers, length_scale, and orientations of the spheres
-centers = np.random.rand(num_centers, 3) * 200 - 100  # Random centers in the range [-10, 10]
-length_scale = np.random.rand(num_centers) * 10  # Random length scales in the range [0, 10]
-orientations = np.random.rand(num_centers, 3)  # Random orientations in the range [0, 1]
+centers = (
+    np.random.rand(NUM_CENTERS, 3) * 200 - 100
+)  # Random centers in the range [-10, 10]
+length_scale = (
+    np.random.rand(NUM_CENTERS) * 10
+)  # Random length scales in the range [0, 10]
+orientations = np.random.rand(NUM_CENTERS, 3)  # Random orientations in the range [0, 1]
 print("Time taken for creating eddies: ", time.time() - start_time)
 
 print("Centers: ", centers.shape)
 
 # Define the range and step size
 Lx, Ly, Lz = 200, 200, 200
-step = 1
+STEP = 1
 
 # Calculate the number of points
-Nx, Ny, Nz = int(Lx/step)+1, int(Ly/step)+1, int(Lz/step)+1
+Nx, Ny, Nz = int(Lx / STEP) + 1, int(Ly / STEP) + 1, int(Lz / STEP) + 1
 
 # Generate arrays of x, y, and z coordinates
-x_coords = np.linspace(-Lx/2, Lx/2, Nx)
-y_coords = np.linspace(-Ly/2, Ly/2, Ny)
-z_coords = np.linspace(-Lz/2, Lz/2, Nz)
+x_coords = np.linspace(-Lx / 2, Lx / 2, Nx)
+y_coords = np.linspace(-Ly / 2, Ly / 2, Ny)
+z_coords = np.linspace(-Lz / 2, Lz / 2, Nz)
 
 # Divide the coordinates into 4 parts
 x_parts = np.array_split(x_coords, 4)
@@ -38,7 +45,9 @@ z_parts = np.array_split(z_coords, 4)
 cx, cy, cz = 2, 2, 2
 
 # Create a meshgrid of x, y, and z coordinates
-positions = np.transpose(np.meshgrid(x_parts[cx], y_parts[cy], z_parts[cz]), (1, 2, 3, 0))
+positions = np.transpose(
+    np.meshgrid(x_parts[cx], y_parts[cy], z_parts[cz]), (1, 2, 3, 0)
+)
 
 print("Time taken for creating positions: ", time.time() - start_time)
 
@@ -57,7 +66,9 @@ dist_y = np.minimum(centers[:, 1] - min_y, max_y - centers[:, 1])
 dist_z = np.minimum(centers[:, 2] - min_z, max_z - centers[:, 2])
 
 # Find the centers that are inside or touching the box
-mask = np.logical_and(dist_x >= -length_scale, dist_y >= -length_scale, dist_z >= -length_scale)
+mask = np.logical_and(
+    dist_x >= -length_scale, dist_y >= -length_scale, dist_z >= -length_scale
+)
 
 # Apply the mask to get the centers that are inside or touching the box
 centers = centers[mask]
@@ -72,8 +83,10 @@ orientations = orientations.reshape(-1, 1, 1, 1, 3)
 
 # Calculate the relative position vectors
 start_time = time.time()
-rk = (positions - centers) / length_scale
-print("Time taken for calculating relative position vectors: ", time.time() - start_time)
+rk = positions - centers / length_scale
+print(
+    "Time taken for calculating relative position vectors: ", time.time() - start_time
+)
 
 # Calculate the Euclidean distance
 start_time = time.time()
