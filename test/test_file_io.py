@@ -51,7 +51,7 @@ def test_file_io_read_fail():
 
 def test_file_io_write_fail():
     # Test writing to the file
-    file_type = "__not_exist__"
+    file_type = "__:::////__"
     name = "__test__"
     content = {"key": "value", "list": [1, 2, 3]}
     try:

@@ -1,5 +1,5 @@
 from typing import List, Dict
-# import numpy as np
+import numpy as np
 import modules.file_io as file_io
 import modules.utils as utils
 
@@ -58,7 +58,22 @@ class EddyProfile:
         return self.variants[index]['length_scale']
 
     def get_intensity(self, index: int):
-        return self.variants[index]['intensity']
+        return self.variants[index]["intensity"]
+
+    def get_density_array(self):
+        return np.array(
+            [variant["density"] for variant in self.variants]
+        )
+
+    def get_length_scale_array(self):
+        return np.array(
+            [variant["length_scale"] for variant in self.variants]
+        )
+
+    def get_intensity_array(self):
+        return np.array(
+            [variant["intensity"] for variant in self.variants]
+        )
 
     # def get_orientation(self, index: int):
     #     return self.variants[index].get('orientation', None)

@@ -24,7 +24,7 @@ class Eddy:
         self.get_center(2)
 
         # Set orientation
-        self.orientation = utils.random_unit_vector()
+        self.orientation = utils.random_unit_vectors(1)
 
     def get_variant(self):
         return self.variants[self.variant_index]

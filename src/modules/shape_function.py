@@ -1,8 +1,6 @@
 import numpy as np
 from typing import Callable, Union
 
-CUTOFF_1 = 1.0
-CUTOFF_2 = 2.0
 HALF_PI = 0.5 * np.pi
 C = 3.6276
 
@@ -25,19 +23,35 @@ def set_active(func: Union[Callable, str]):
     active_function = func
 
 
+def set_cutoff(value: float):
+    global cutoff
+    cutoff = value
+
+
+def get_cutoff():
+    return cutoff
+
+
 def quadratic(dk, length_scale):
-    if dk > 1.0:
-        return 0
-    else:
-        return length_scale * (1 - dk**2)
+    return np.where(
+        dk < 1.0,
+        length_scale * (1 - dk) ** 2,
+        0
+    )
 
 
 def gaussian(dk, length_scale):
+    global cutoff
     return np.where(
-        dk < CUTOFF_2,
+        dk < cutoff,
         C * np.exp(-HALF_PI * dk**2),
         0
     )
 
 
+def gaussian_no_cut(dk, length_scale):
+    return C * np.exp(-HALF_PI * dk**2)
+
+
 active_function = gaussian
+cutoff = 2.0
