@@ -42,20 +42,22 @@ class Query:
                 )
             except Exception as e:
                 return f"Error calculating velocity in meshgrid: {e}"
-
-            plot: dict = request.get("plot", None)
-            if plot is not None:
-                try:
-                    _ = visualize.plot_mesh(
-                        vel,
-                        low_bounds,
-                        high_bounds,
-                        **plot,
-                    )
-                except Exception as e:
-                    return f"Error plotting meshgrid: {e}"
-
-            return vel
+    
+            if params.get("do_return", True):
+                plot: dict = request.get("plot", None)
+                if plot is not None:
+                    try:
+                        _ = visualize.plot_mesh(
+                            vel,
+                            low_bounds,
+                            high_bounds,
+                            **plot,
+                        )
+                    except Exception as e:
+                        return f"Error plotting meshgrid: {e}"
+                return vel
+            else:
+                return "Meshgrid velocity calculation complete"
 
         if request.get("mode") == "points":
             coords: list = params.get("coords", None)
@@ -74,5 +76,5 @@ class Query:
                 return velocities
             except Exception as e:
                 return f"Error calculating velocity at points: {e}"
-
+        print(request)
         return "Invalid request mode"

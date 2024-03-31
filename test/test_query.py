@@ -22,12 +22,12 @@ def setup_module():
             {"density": 0.005, "intensity": 1.2, "length_scale": 1.5},
         ],
     }
-    field_name = 'test_field'
+    field_name = "test_field"
     file_io.write("profiles", profile_name, content)
     profile = EddyProfile(profile_name)
     field = FlowField(profile, field_name, [10, 10, 5])
     query = Query(field)
-    yield
+
     os.remove(f"src/profiles/{profile_name}.json")
 
 
@@ -39,31 +39,31 @@ def test_query_meshgrid():
             "high_bounds": [5, 5, 0],
             "step_size": 0.2,
             "chunk_size": 5,
-            "t": 0
+            "t": 0,
         },
-        "plot": {
-            "axis": "z",
-            "index": 0,
-            "save": "__test_fig__",
-            "size": [640, 480]
-        }
+        "plot": {"axis": "z", "index": 0, "save": "__test_fig__", "size": [640, 480]},
     }
     request = "__test_mesh__"
     file_io.write("queries", "__test_mesh__", content, format="json")
     response = query.handle_request(request=request, format="file")
     assert isinstance(response, np.ndarray), f"{response}"
 
-    content['params']["low_bounds"] = [-1, 2, -1]
-    content['params']["high_bounds"] = [1, 2, 1]
+    content["params"]["low_bounds"] = [-1, 2, -1]
+    content["params"]["high_bounds"] = [1, 2, 1]
     content["plot"]["axis"] = "y"
     response = query.handle_request(request=json.dumps(content))
     assert isinstance(response, np.ndarray), f"{response}"
 
-    content['params']["low_bounds"] = [-1, -1, -1]
-    content['params']["high_bounds"] = [1, 1, 1]
+    content["params"]["low_bounds"] = [-1, -1, -1]
+    content["params"]["high_bounds"] = [1, 1, 1]
     content["plot"]["axis"] = "x"
     response = query.handle_request(request=json.dumps(content))
     assert isinstance(response, np.ndarray), f"{response}"
+
+    content["params"]["do_return"] = False
+    del content["plot"]
+    response = query.handle_request(request=json.dumps(content))
+    assert "Meshgrid velocity calculation complete" in response, f"{response}"
 
     # Clean up
     os.remove(f"src/queries/{request}.json")
@@ -74,12 +74,12 @@ def test_query_points():
         "mode": "points",
         "params": {
             "coords": [[0, 1, 0], [2, 1.5, 2.1]],
-        }
+        },
     }
     response = query.handle_request(request=json.dumps(content))
     assert isinstance(response, np.ndarray), f"{response}"
 
-    del content['params']["coords"]
+    del content["params"]["coords"]
     response = query.handle_request(request=json.dumps(content))
     assert isinstance(response, np.ndarray), f"{response}"
 
@@ -96,7 +96,7 @@ def test_query_meshgrid_exceptions():
     assert "Invalid request" in response, f"{response}"
 
     # Invalid meshgrid params
-    content = json.dumps({"mode": "meshgrid", "params": {'low_bounds': [-100, 0, 0]}})
+    content = json.dumps({"mode": "meshgrid", "params": {"low_bounds": [-100, 0, 0]}})
     response = query.handle_request(request=content)
     assert "Error calculating velocity" in response, f"{response}"
 
@@ -107,7 +107,7 @@ def test_query_points_exceptions():
         "mode": "points",
         "params": {
             "coords": "invalid",
-        }
+        },
     }
     response = query.handle_request(request=json.dumps(content))
     assert "Invalid request parameters" in response, f"{response}"
@@ -120,10 +120,7 @@ def test_query_points_exceptions():
 
 def test_query_mode_exceptions():
     # Invalid mode
-    content = {
-        "mode": "invalid",
-        "params": {}
-    }
+    content = {"mode": "invalid", "params": {}}
     response = query.handle_request(request=json.dumps(content))
     assert "Invalid request mode" in response, f"{response}"
 
@@ -140,7 +137,7 @@ def test_query_plot_exceptions():
         "plot": {
             "axis": "z",
             "index": 10,
-        }
+        },
     }
     response = query.handle_request(request=json.dumps(content))
     assert "Invalid plot index '10'" in response, f"{response}"
@@ -155,7 +152,41 @@ def test_query_plot_exceptions():
         },
         "plot": {
             "axis": "invalid",
-        }
+        },
     }
     response = query.handle_request(request=json.dumps(content))
     assert "Invalid plot axis" in response, f"{response}"
+
+
+@pytest.mark.skip(reason="Performance benchmark, not meant to finish")
+def test_query_performance():
+    # Eddy profile
+    profile_name = "__test__"
+    content = {
+        "settings": {},
+        "variants": [
+            {"density": 1000, "intensity": 0.8, "length_scale": 0.05},
+            {"density": 10, "intensity": 1, "length_scale": 0.2},
+            {"density": 0.5, "intensity": 1.1, "length_scale": 0.5},
+            {"density": 0.005, "intensity": 1.2, "length_scale": 1.5},
+        ],
+    }
+    file_io.write("profiles", profile_name, content)
+    profile = EddyProfile(profile_name)
+    field = FlowField(profile, "test_field", [20, 20, 20])
+    query = Query(field)
+
+    # Meshgrid query
+    content = {
+        "mode": "meshgrid",
+        "params": {
+            "step_size": 0.02,
+            "chunk_size": 5,
+            "t": 0,
+            "do_return": False,
+            "do_cache": True,
+        },
+    }
+    response = query.handle_request(request=json.dumps(content))
+    if isinstance(response, str):
+        print(response)

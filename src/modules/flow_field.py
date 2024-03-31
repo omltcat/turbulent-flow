@@ -293,7 +293,7 @@ class FlowField:
             if do_return:
                 vel[xc[0] : xc[-1] + 1, :, :, :] = vel_i
             if do_cache:
-                file_io.write(CACHE_DIR, f"x_{i}", vel, CACHE_FORMAT)
+                file_io.write(CACHE_DIR, f"x_{i}", vel_i, CACHE_FORMAT)
         pbar.close()
 
         if do_return:
