@@ -63,7 +63,7 @@ def test_eddy_profile_invalid():
     content = {"variants": [{
         "density": 1,
         "length_scale": 'string',
-        }]}
+    }]}
     file_io.write("profiles", name, content)
     with pytest.raises(eddy_profile.InvalidProfile):
         _ = eddy_profile.EddyProfile(name)
@@ -72,7 +72,7 @@ def test_eddy_profile_invalid():
     content = {"variants": [{
         "density": 1,
         "length_scale": 1,
-        }]}
+    }]}
     file_io.write("profiles", name, content)
     with pytest.raises(eddy_profile.InvalidProfile):
         _ = eddy_profile.EddyProfile(name)

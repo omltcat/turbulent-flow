@@ -101,8 +101,9 @@ def test_flow_field():
     # Test flow field creation
     field_name = "test_field"
     dimensions = np.array([20, 20, 20])
-    avg_vel = 2
-    field = FlowField(profile, field_name, dimensions, avg_vel)
+    field = FlowField(profile, field_name, dimensions)
+
+    field.set_avg_vel(2.0)
 
     volume = np.prod(dimensions)
     variant_quantity = np.array(
@@ -200,6 +201,13 @@ def test_flow_field():
 
     # Clean up
     os.remove(f"src/profiles/{profile_name}.json")
+
+
+def test_flow_field_load():
+    field: FlowField = FlowField.load("test_field")
+    assert field.name == "test_field"
+    assert field.dimensions[0] == 20
+    assert field.variant_length_scale[0] == 0.1
 
 
 def test_flow_field_init_exceptions():
@@ -305,6 +313,30 @@ def test_flow_field_mesh_exceptions():
             chunk_size=5,
             t=-1,
         )
+
+    # Clean up
+    os.remove(f"src/profiles/{profile_name}.json")
+
+
+def test_flow_field_set_exceptions():
+    profile_name = "__test__"
+    content = {
+        "settings": {},
+        "variants": [
+            {"density": 20, "intensity": 0.8, "length_scale": 0.1},
+        ],
+    }
+    file_io.write("profiles", profile_name, content)
+    profile = EddyProfile(profile_name)
+
+    field_name = "test_field"
+    dimensions = np.array([20, 20, 20])
+    avg_vel = 2
+    field = FlowField(profile, field_name, dimensions, avg_vel)
+
+    # Test for invalid average velocity
+    with pytest.raises(ValueError):
+        field.set_avg_vel(-2)
 
     # Clean up
     os.remove(f"src/profiles/{profile_name}.json")

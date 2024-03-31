@@ -288,3 +288,4 @@ Thumbs.db
 .pytest_cache/
 .coverage
 .cache
+*.pkl

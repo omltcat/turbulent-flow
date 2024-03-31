@@ -12,7 +12,12 @@ def test_shape_function():
     q = shape_function.active(4, length_scale)
     assert q == 0
 
-    shape_function.set_active('quadratic')
+    shape_function.set_cutoff(5)
+    q = shape_function.active(4, length_scale)
+    assert q > 0
+    assert shape_function.get_cutoff() == 5
+
+    shape_function.set_active(shape_function.quadratic)
     q = shape_function.active(0.5, length_scale)
     assert q > 0
 

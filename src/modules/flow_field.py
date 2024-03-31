@@ -12,6 +12,8 @@ from modules.eddy_profile import EddyProfile
 
 WRAP_ITER = [-1, 0, 1]  # Iterations to wrap around the flow field, do not change
 CUTOFF = 1.2 * shape_function.get_cutoff()  # has to be greater than 1
+CACHE_DIR = ".cache"
+CACHE_FORMAT = "npy"
 
 
 class FlowField:
@@ -25,9 +27,34 @@ class FlowField:
         profile: EddyProfile,
         name: str,
         dimensions: np.ndarray | list,
-        avg_vel: float,
+        avg_vel: float = 0.0,
     ):
-        """Initialize the flow field with the given parameters."""
+        """
+        Generate a new flow field.
+
+        Note that this object only contains the eddy positions and properties, not a specific meshgrid.
+        That is privided by the when querying with `sum_vel_mesh` method.
+
+        Dimensions are in the form of `[x, y, z]`.
+        - `x` is the direction of the flow
+        - `y` is the direction of the width
+        - `z` is the direction of the height
+
+        Coordinates are centered at `[0, 0, 0]`
+
+        Bounds are from `-dimensions/2` to `dimensions/2`
+
+        Parameters
+        ----------
+        `profile` : EddyProfile
+            Eddy profile object
+        `name` : str
+            Name of the flow field
+        `dimensions` : np.ndarray or list
+            Dimensions of the the form of `[x, y, z]`
+        `avg_vel` : float, optional (default: `0.0`)
+            Average flow velocity to move the eddies
+        """
         if isinstance(dimensions, list):
             dimensions = np.array(dimensions)
 
@@ -41,14 +68,10 @@ class FlowField:
         if not utils.is_not_negative(avg_vel):
             raise ValueError("Average velocity must be a non-negative number")
         self.profile = profile
-        self.name = name
+        self.name = str(name)
         self.dimensions = dimensions
         self.avg_vel = avg_vel
 
-        self.new()
-
-    def new(self):
-        """Generate a new flow field based on the given parameters."""
         # Get differnet eddy variants
         self.variant_density = self.profile.get_density_array()
         self.variant_length_scale = self.profile.get_length_scale_array()
@@ -87,6 +110,8 @@ class FlowField:
             self.variant_intensity, self.variant_quantity
         ).reshape(-1, 1)
 
+        self.save()
+
         print("Total eddies: ", self.N)
 
     def get_eddy_centers(self, fi: int):
@@ -99,6 +124,16 @@ class FlowField:
         """Set random y and z coordinates for eddies in a new flow iteration."""
         self.y[fi] = np.random.uniform(self.low_bounds[1], self.high_bounds[1], self.N)
         self.z[fi] = np.random.uniform(self.low_bounds[2], self.high_bounds[2], self.N)
+
+    def set_avg_vel(self, avg_vel: float):
+        """Set the average velocity of the flow field."""
+        if not utils.is_not_negative(avg_vel):
+            raise ValueError("Average velocity must be a non-negative number")
+        self.avg_vel = avg_vel
+
+    def save(self):
+        """Save the flow field to a file."""
+        file_io.write("fields", self.name, self, "obj")
 
     def sum_vel_mesh(
         self,
@@ -174,7 +209,7 @@ class FlowField:
         if do_return:
             try:
                 vel = np.zeros((len(x_coords), len(y_coords), len(z_coords), 3))
-            except MemoryError as e:
+            except MemoryError as e:  # pragma: no cover
                 raise MemoryError(
                     f"{e}\nNot enough memory to allocate velocity field. "
                     "Consider using a larger step size or focus on a smaller region."
@@ -182,7 +217,7 @@ class FlowField:
             vel[..., 0] = self.avg_vel
 
         # Divide the coordinates into chunks
-        if chunk_size == 0:
+        if chunk_size == 0:     # pragma: no cover
             chunk_size = np.max([len(x_coords), len(y_coords), len(z_coords)])
             # chunk_size = 1
         x_chunks = self.chunk_split(np.arange(len(x_coords)), chunk_size)
@@ -190,7 +225,7 @@ class FlowField:
         z_chunks = self.chunk_split(np.arange(len(z_coords)), chunk_size)
 
         # Clear previous chunk cache
-        file_io.clear_cache("chunks")
+        file_io.clear(CACHE_DIR)
 
         # Get all eddies and their wrapped-around copies
         centers, alpha, sigma = self.get_wrap_arounds(t, high_bounds, low_bounds)
@@ -207,7 +242,7 @@ class FlowField:
             },
         }
 
-        file_io.write(".cache/chunks", "__info__", chunk_info)
+        file_io.write(CACHE_DIR, "__info__", chunk_info, "json")
 
         # Calculate the velocity field for each chunk
         margins = sigma * CUTOFF
@@ -251,12 +286,11 @@ class FlowField:
                         y_coords[yc],
                         z_coords[zc],
                     )
-                    # file_io.write_cache("chunks", f"{i}_{j}_{k}", vel)
                     pbar.update(1)
             if do_return:
                 vel[xc[0] : xc[-1] + 1, :, :, :] = vel_i
             if do_cache:
-                file_io.write_cache("chunks", f"x_{i}", vel)
+                file_io.write(CACHE_DIR, f"x_{i}", vel, CACHE_FORMAT)
         pbar.close()
 
         if do_return:
@@ -286,7 +320,7 @@ class FlowField:
         # Calculate the relative position vectors and normalize
         try:
             rk = (positions - chunk_centers) / chunk_sigma
-        except MemoryError as e:
+        except MemoryError as e:    # pragma: no cover
             raise MemoryError(
                 f"{e}\nNot enough memory to calculate meshgrid-eddy relations. Consider decrease chunk size."
             ) from e
@@ -396,3 +430,8 @@ class FlowField:
             chunks[-2] = np.append(chunks[-2], chunks[-1])
             chunks.pop(-1)
         return chunks
+
+    @classmethod
+    def load(cls, name: str):
+        """Load a flow field from a file."""
+        return file_io.read("fields", name, "obj")

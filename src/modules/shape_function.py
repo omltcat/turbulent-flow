@@ -49,9 +49,5 @@ def gaussian(dk, length_scale):
     )
 
 
-def gaussian_no_cut(dk, length_scale):
-    return C * np.exp(-HALF_PI * dk**2)
-
-
 active_function = gaussian
 cutoff = 2.0

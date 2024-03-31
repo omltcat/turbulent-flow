@@ -1,11 +1,12 @@
 import os
 import json
 import numpy as np
+import pickle
 
 DIR = os.path.join(os.path.dirname(__file__), "..")
 
 
-class FileNotExist(Exception):
+class FailToRead(Exception):
     pass
 
 
@@ -13,43 +14,40 @@ class FailToWrite(Exception):
     pass
 
 
-def read(type, name):
+def read(sub_dir, name, format="json"):
     try:
-        with open(f"{DIR}/{type}/{name}.json", "r") as file:
-            return json.load(file)
-    except FileNotFoundError:
-        raise FileNotExist(f"File not found at ./{type}/{name}.json")
-
-
-def write(type, name, content, indent=None):
-    try:
-        os.makedirs(f"{DIR}/{type}", exist_ok=True)
-        with open(f"{DIR}/{type}/{name}.json", "w") as file:
-            json.dump(content, file, indent=indent)
+        if format == "json":
+            with open(f"{DIR}/{sub_dir}/{name}.{format}", "r") as file:
+                return json.load(file)
+        if format == "npy":
+            return np.load(f"{DIR}/{sub_dir}/{name}.{format}")
+        if format == "obj":
+            with open(f"{DIR}/{sub_dir}/{name}.pkl", "rb") as file:
+                return pickle.load(file)
     except Exception as e:
-        raise FailToWrite(f"Failed to write to file: {e}")
+        raise FailToRead(f"Cannot read {sub_dir} file '{name}': {e}")
 
 
-def read_cache(type, name):
+def write(sub_dir, name, content, format='json', indent=None):
     try:
-        return np.load(f"{DIR}/.cache/{type}/{name}.npy")
-    except FileNotFoundError:
-        raise FileNotExist(f"File not found at ./.cache/{type}/{name}.npy")
+        os.makedirs(f"{DIR}/{sub_dir}", exist_ok=True)
+        if format == "json":
+            with open(f"{DIR}/{sub_dir}/{name}.json", "w") as file:
+                json.dump(content, file, indent=indent)
+        if format == "npy":
+            np.save(f"{DIR}/{sub_dir}/{name}.npy", content)
+        if format == "obj":
+            with open(f"{DIR}/{sub_dir}/{name}.pkl", "wb") as file:
+                pickle.dump(content, file)
+    except IOError as e:
+        raise FailToWrite(f"Cannot write file: {e}")
 
 
-def write_cache(type, name, content):
+def clear(sub_dir):
     try:
-        os.makedirs(f"{DIR}/.cache/{type}", exist_ok=True)
-        np.save(f"{DIR}/.cache/{type}/{name}.npy", content)
-        # print(f"Cache saved: {name}.npy")
-    except Exception as e:
-        raise FailToWrite(f"Failed to write to file: {e}")
-
-
-def clear_cache(type):
-    try:
-        os.makedirs(f"{DIR}/.cache/{type}", exist_ok=True)
-        for file in os.listdir(f"{DIR}/.cache/{type}"):
-            os.remove(f"{DIR}/.cache/{type}/{file}")
-    except Exception as e:
-        raise FailToWrite(f"Failed to clear cache: {e}")
+        os.makedirs(f"{DIR}/{sub_dir}", exist_ok=True)
+        for file in os.listdir(f"{DIR}/{sub_dir}"):
+            if os.path.isfile(f"{DIR}/{sub_dir}/{file}"):
+                os.remove(f"{DIR}/{sub_dir}/{file}")
+    except IOError as e:
+        raise FailToWrite(f"Cannot clear directory: {e}")
