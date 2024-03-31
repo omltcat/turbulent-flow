@@ -46,15 +46,45 @@ def test_eddy_generation():
     field.y[2] = np.array([0])
     field.z[2] = np.array([0])
 
-    # Orient eddy to along x-axis
-    field.alpha[0] = np.array([1, 0, 0])
+    # Orient eddy to along z-axis
+    field.alpha[0] = np.array([0, 0, 1])
 
+    # Get velocities at t=0, xyz=0
+    vel_000 = field.sum_vel_mesh(
+        t=0,
+        step_size=0.02,
+        chunk_size=5,
+        low_bounds=[0, 0, 0],
+        high_bounds=[0, 0, 0],
+    ).squeeze()
+    print(vel_000)
+    assert np.isclose(np.linalg.norm(vel_000), 0, rtol=RTOL)
+
+    # Get velocities at t=0, x=1.2 and x=-1.2
+    vel_pos12 = field.sum_vel_mesh(
+        t=0,
+        step_size=0.02,
+        chunk_size=5,
+        low_bounds=[1.2, 0, 0],
+        high_bounds=[1.2, 0, 0],
+    ).squeeze()
+    vel_neg12 = field.sum_vel_mesh(
+        t=0,
+        step_size=0.02,
+        chunk_size=5,
+        low_bounds=[-1.2, 0, 0],
+        high_bounds=[-1.2, 0, 0],
+    ).squeeze()
+    print(vel_pos12, vel_neg12)
+    assert np.isclose(np.linalg.norm(vel_pos12 + vel_neg12), 0, rtol=RTOL)
+
+    # Get velocities at t=0, z=0
     vel_t0 = field.sum_vel_mesh(
         t=0,
         step_size=0.02,
         chunk_size=5,
-        low_bounds=[0, -10, -10],
-        high_bounds=[0, 10, 10],
+        low_bounds=[-10, -10, 0],
+        high_bounds=[10, 10, 0],
     )
 
     # Calculate number of samples
@@ -72,7 +102,7 @@ def test_eddy_generation():
     magnitude = np.linalg.norm(vel_t0, axis=-1)
     # Create a 2D heatmap for the chosen z value
     im = plt.imshow(
-        magnitude[0, :, :].T,
+        magnitude[:, :, 0].T,
         cmap="coolwarm",
         interpolation="nearest",
         extent=[-10, 10, -10, 10],
@@ -164,7 +194,7 @@ def test_flow_field():
         low_bounds=[10, -10, -10],
         high_bounds=[10, 10, 10],
         t=10,
-        do_cache=True
+        do_cache=True,
     )
 
     # Due to average flow velocity, these two should be the same
@@ -231,7 +261,7 @@ def test_flow_field_init_exceptions():
 
     # Test for invalid dimensions type
     with pytest.raises(ValueError):
-        FlowField(profile, field_name, ['a', 2, 3], avg_vel)
+        FlowField(profile, field_name, ["a", 2, 3], avg_vel)
 
     # Test for negative dimensions
     with pytest.raises(ValueError):
