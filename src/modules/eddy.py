@@ -1,3 +1,7 @@
+"""
+Eddy module: NOT IN USE
+Implemented within FlowField class for better performance
+"""
 from typing import List, Dict
 import numpy as np
 import modules.utils as utils
@@ -9,7 +13,7 @@ LOOP_IJK = [-1, 0, 1]
 class Eddy:
     field = np.array([10, 10, 10])
     half_field = field / 2
-    variants:  List[Dict] = []
+    variants: List[Dict] = []
 
     def __init__(self, variant_index: int):
         self.variant_index = variant_index
@@ -30,10 +34,10 @@ class Eddy:
         return self.variants[self.variant_index]
 
     def get_length_scale(self):
-        return self.variants[self.variant_index]['length_scale']
+        return self.variants[self.variant_index]["length_scale"]
 
     def get_intensity(self):
-        return self.variants[self.variant_index]['intensity']
+        return self.variants[self.variant_index]["intensity"]
 
     def get_orientation(self):
         return self.orientation
@@ -53,7 +57,7 @@ class Eddy:
     def get_vel(self, pos: np.ndarray, iter: int, offset: float):
         vel = np.zeros(3)
         for i in LOOP_IJK:
-            center = self.get_center(iter+i)
+            center = self.get_center(iter + i)
             center[0] += offset
             center[0] += self.field[0] * i
             base_y = center[1]
@@ -65,13 +69,17 @@ class Eddy:
                     r = (pos - center) / self.get_length_scale()
                     d = np.linalg.norm(r)
                     q = shape_function.active(d, self.get_length_scale())
-                    vel = vel + q * np.cross(r, self.orientation*self.get_intensity()) if d > 0 else vel
+                    vel = (
+                        vel + q * np.cross(r, self.orientation * self.get_intensity())
+                        if d > 0
+                        else vel
+                    )
         return vel
 
     def get_vel_mesh(self, pos: np.ndarray, iter: int, offset: float):
         vel = np.zeros(3)
         for i in LOOP_IJK:
-            center = self.get_center(iter+i)
+            center = self.get_center(iter + i)
             center[0] += offset
             center[0] += self.field[0] * i
             base_y = center[1]
@@ -83,15 +91,19 @@ class Eddy:
                     r = (pos - center) / self.get_length_scale()
                     d = np.linalg.norm(r)
                     q = shape_function.active(d, self.get_length_scale())
-                    vel = vel + q * np.cross(r, self.orientation*self.get_intensity()) if d > 0 else vel
+                    vel = (
+                        vel + q * np.cross(r, self.orientation * self.get_intensity())
+                        if d > 0
+                        else vel
+                    )
         return vel
 
     def set_orientation(self, orientation: np.ndarray):
         if len(orientation) != 3:
-            raise ValueError('Eddy orientation must be a list of 3 numbers for x, y, z')
+            raise ValueError("Eddy orientation must be a list of 3 numbers for x, y, z")
         norm = np.linalg.norm(orientation)
         if norm == 0:
-            raise ValueError('Eddy orientation must not be a zero vector')
+            raise ValueError("Eddy orientation must not be a zero vector")
         self.orientation = np.array(orientation) / norm
 
     @classmethod

@@ -189,6 +189,9 @@ class FlowField:
         if not np.all(low_bounds <= high_bounds):
             raise ValueError("Low bounds cannot be greater than high bounds")
 
+        if np.any(low_bounds < self.low_bounds) or np.any(high_bounds > self.high_bounds):
+            raise ValueError("Bounds must be within the flow field")
+
         if not utils.is_positive(step_size):
             raise ValueError("Step size must be a positive number")
 

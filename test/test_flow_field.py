@@ -292,6 +292,15 @@ def test_flow_field_mesh_exceptions():
             high_bounds=[-10, 10, 10],
         )
 
+    # Test for out of bounds
+    with pytest.raises(ValueError):
+        field.sum_vel_mesh(
+            step_size=1,
+            chunk_size=5,
+            low_bounds=[-10, -10, -10],
+            high_bounds=[-10, 50, 10],
+        )
+
     # Test for invalid chunk_size
     with pytest.raises(ValueError):
         field.sum_vel_mesh(
