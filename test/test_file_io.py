@@ -42,11 +42,8 @@ def test_file_io_read_fail():
     name = "__not_exist__"
 
     # Read the file and check the content
-    try:
+    with pytest.raises(file_io.FailToRead):
         _ = file_io.read(sub_dir, name)
-        pytest.fail('Should have raised FailToRead')
-    except file_io.FailToRead:
-        return
 
 
 def test_file_io_read_fail_format():
@@ -56,12 +53,12 @@ def test_file_io_read_fail_format():
 
     # Write the file
     file_io.write(sub_dir, name, content)
-    try:
+    with pytest.raises(file_io.FailToRead):
         _ = file_io.read(sub_dir, name)
-        pytest.fail('Should have raised FailToRead')
-    except file_io.FailToRead:
-        os.remove(f"./src/{sub_dir}/{name}.json")
-        return
+    os.remove(f"./src/{sub_dir}/{name}.json")
+
+    with pytest.raises(file_io.FailToRead):
+        _ = file_io.read(sub_dir, name, format="invalid")
 
 
 def test_file_io_write_fail():
@@ -69,17 +66,14 @@ def test_file_io_write_fail():
     sub_dir = "__:::////__"
     name = "__test__"
     content = {"key": "value", "list": [1, 2, 3]}
-    try:
+    with pytest.raises(file_io.FailToWrite):
         file_io.write(sub_dir, name, content, indent=4)
-        pytest.fail('Should have raised FailToWrite')
-    except file_io.FailToWrite:
-        return
+
+    with pytest.raises(file_io.FailToWrite):
+        file_io.write('profiles', name, content, format="invalid")
 
 
 def test_file_io_clear_fail():
     sub_dir = "__:::////__"
-    try:
+    with pytest.raises(file_io.FailToWrite):
         file_io.clear(sub_dir)
-        pytest.fail('Should have raised FailToWrite')
-    except file_io.FailToWrite:
-        return
