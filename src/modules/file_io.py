@@ -18,7 +18,10 @@ def read(sub_dir, name, format="json"):
     try:
         if format == "json":
             with open(f"{DIR}/{sub_dir}/{name}.{format}", "r") as file:
-                return json.load(file)
+                data = json.load(file)
+                if not isinstance(data, dict):
+                    raise ValueError("Not a JSON object, please check provided examples")
+                return data
         if format == "npy":
             return np.load(f"{DIR}/{sub_dir}/{name}.{format}")
         if format == "obj":

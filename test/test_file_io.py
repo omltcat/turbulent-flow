@@ -49,6 +49,21 @@ def test_file_io_read_fail():
         return
 
 
+def test_file_io_read_fail_format():
+    sub_dir = "profiles"
+    name = "__not_dict__"
+    content = "not a dict"
+
+    # Write the file
+    file_io.write(sub_dir, name, content)
+    try:
+        _ = file_io.read(sub_dir, name)
+        pytest.fail('Should have raised FailToRead')
+    except file_io.FailToRead:
+        os.remove(f"./src/{sub_dir}/{name}.json")
+        return
+
+
 def test_file_io_write_fail():
     # Test writing to the file
     sub_dir = "__:::////__"

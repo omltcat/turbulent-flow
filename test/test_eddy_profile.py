@@ -41,7 +41,7 @@ def test_eddy_profile_invalid():
     # Test invalid profile
     name = "__invalid__"
 
-    # Eddy typy not a list
+    # Eddy type not a list
     content = {"variants": {}}
     file_io.write("profiles", name, content)
     with pytest.raises(eddy_profile.InvalidProfile):
