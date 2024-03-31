@@ -5,6 +5,10 @@ def is_positive(number):
     return isinstance(number, (int, float)) and number > 0
 
 
+def is_not_negative(number):
+    return isinstance(number, (int, float)) and number >= 0
+
+
 def stoch_round(numbers):
     """Stochastic rounding"""
     fractional, whole = np.modf(numbers)
