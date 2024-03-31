@@ -289,3 +289,4 @@ Thumbs.db
 .coverage
 .cache
 *.pkl
+src/plots
