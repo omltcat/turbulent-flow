@@ -9,10 +9,10 @@ class InvalidProfile(Exception):
 
 
 class EddyProfile:
-    def __init__(self, name):
+    def __init__(self, name: str):
         data: dict = file_io.read('profiles', name)
 
-        self.name: str = name
+        self.name = name
         self.settings: dict = data.get('settings', {})
         self.variants: List[Dict] = data.get('variants', [])
 

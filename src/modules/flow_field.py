@@ -201,7 +201,7 @@ class FlowField:
             )
 
         if not utils.is_not_negative(t):
-            raise ValueError("Time non-negative number, by default 0.0")
+            raise ValueError("Time must be non-negative number, by default 0.0")
 
         # Generate arrays of x, y, and z coordinates
         x_coords = self.step_coords(low_bounds[0], high_bounds[0], step_size)
