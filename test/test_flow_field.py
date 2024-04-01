@@ -13,7 +13,8 @@ import matplotlib.pyplot as plt
 RTOL = 1e-5
 
 
-@pytest.mark.skip(reason="Single eddy, only for development purposes.")
+@pytest.mark.slow
+@pytest.mark.unit
 def test_eddy_generation():
     # Test profile
     profile_name = "__test__"
@@ -112,7 +113,7 @@ def test_eddy_generation():
     plt.show()
 
 
-# @pytest.mark.skip(reason="Slow test, skipped to save time during devlopment.")
+@pytest.mark.unit
 def test_flow_field():
     # Test profile
     profile_name = "__test__"
@@ -233,6 +234,7 @@ def test_flow_field():
     os.remove(f"src/profiles/{profile_name}.json")
 
 
+@pytest.mark.unit
 def test_flow_field_load():
     field: FlowField = FlowField.load("test_field")
     assert field.name == "test_field"
@@ -240,6 +242,7 @@ def test_flow_field_load():
     assert field.variant_length_scale[0] == 0.1
 
 
+@pytest.mark.unit
 def test_flow_field_init_exceptions():
     profile_name = "__invalid__"
     content = {
@@ -279,6 +282,7 @@ def test_flow_field_init_exceptions():
     os.remove(f"src/profiles/{profile_name}.json")
 
 
+@pytest.mark.unit
 def test_flow_field_mesh_exceptions():
     profile_name = "__test__"
     content = {
@@ -357,6 +361,7 @@ def test_flow_field_mesh_exceptions():
     os.remove(f"src/profiles/{profile_name}.json")
 
 
+@pytest.mark.unit
 def test_flow_field_set_exceptions():
     profile_name = "__test__"
     content = {
@@ -381,7 +386,9 @@ def test_flow_field_set_exceptions():
     os.remove(f"src/profiles/{profile_name}.json")
 
 
-@pytest.mark.skip(reason="Use too much memory, known to work.")
+@pytest.mark.slow
+@pytest.mark.memory
+@pytest.mark.unit
 def test_flow_field_out_of_memory():
     profile_name = "__test__"
     content = {

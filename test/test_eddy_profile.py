@@ -5,6 +5,7 @@ import modules.file_io as file_io
 import os
 
 
+@pytest.mark.unit
 def test_eddy_profile():
     # Test valid profile
     name = "__valid__"
@@ -37,6 +38,7 @@ def test_eddy_profile():
     os.remove(f"./src/profiles/{name}.json")
 
 
+@pytest.mark.unit
 def test_eddy_profile_invalid():
     # Test invalid profile
     name = "__invalid__"

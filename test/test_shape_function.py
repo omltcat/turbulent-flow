@@ -2,6 +2,7 @@ import pytest
 import modules.shape_function as shape_function
 
 
+@pytest.mark.unit
 def test_shape_function():
     length_scale = 1.0
 
@@ -25,6 +26,7 @@ def test_shape_function():
     assert q == 0
 
 
+@pytest.mark.unit
 def test_shape_function_exceptions():
     with pytest.raises(ValueError):
         shape_function.set_active('non_existent_function')

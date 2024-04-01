@@ -31,6 +31,7 @@ def setup_module():
     os.remove(f"src/profiles/{profile_name}.json")
 
 
+@pytest.mark.unit
 def test_query_meshgrid():
     content = {
         "mode": "meshgrid",
@@ -69,6 +70,7 @@ def test_query_meshgrid():
     os.remove(f"src/queries/{request}.json")
 
 
+@pytest.mark.unit
 def test_query_points():
     content = {
         "mode": "points",
@@ -84,6 +86,7 @@ def test_query_points():
     assert isinstance(response, np.ndarray), f"{response}"
 
 
+@pytest.mark.unit
 def test_query_meshgrid_exceptions():
     # Not json string
     content = "invalid"
@@ -101,6 +104,7 @@ def test_query_meshgrid_exceptions():
     assert "Error calculating velocity" in response, f"{response}"
 
 
+@pytest.mark.unit
 def test_query_points_exceptions():
     # Invalid points params
     content = {
@@ -118,6 +122,7 @@ def test_query_points_exceptions():
     assert "Error calculating velocity at points" in response, f"{response}"
 
 
+@pytest.mark.unit
 def test_query_mode_exceptions():
     # Invalid mode
     content = {"mode": "invalid", "params": {}}
@@ -125,6 +130,7 @@ def test_query_mode_exceptions():
     assert "Invalid request mode" in response, f"{response}"
 
 
+@pytest.mark.unit
 def test_query_plot_exceptions():
     # Invalid plot params (index out of bounds)
     content = {
@@ -158,7 +164,9 @@ def test_query_plot_exceptions():
     assert "Invalid plot axis" in response, f"{response}"
 
 
-@pytest.mark.skip(reason="Performance benchmark, not meant to finish")
+@pytest.mark.slow
+@pytest.mark.benchmark
+@pytest.mark.unit
 def test_query_performance():
     # Eddy profile
     profile_name = "__test__"
@@ -181,11 +189,14 @@ def test_query_performance():
         "mode": "meshgrid",
         "params": {
             "step_size": 0.02,
+            # "low_bounds": [0, -10, -10],
+            # "high_bounds": [0, 10, 10],
             "chunk_size": 5,
             "t": 0,
-            "do_return": False,
-            "do_cache": True,
+            "do_return": True,
+            # "do_cache": True,
         },
+        "plot": {"axis": "x", "index": 0, "save": "__test_fig__", "size": [1280, 960]},
     }
     response = query.handle_request(request=json.dumps(content))
     if isinstance(response, str):

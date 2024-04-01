@@ -16,6 +16,7 @@ import modules.file_io as file_io
 #     assert content['variants'][0]['orientation'] == [0, 0, 1]
 
 
+@pytest.mark.unit
 def test_file_io():
     # Test writing to the file
     sub_dir = "profiles"
@@ -37,6 +38,7 @@ def test_file_io():
     os.remove(f"./src/{sub_dir}/{name}.json")
 
 
+@pytest.mark.unit
 def test_file_io_read_fail():
     sub_dir = "profiles"
     name = "__not_exist__"
@@ -46,6 +48,7 @@ def test_file_io_read_fail():
         _ = file_io.read(sub_dir, name)
 
 
+@pytest.mark.unit
 def test_file_io_read_fail_format():
     sub_dir = "profiles"
     name = "__not_dict__"
@@ -61,6 +64,7 @@ def test_file_io_read_fail_format():
         _ = file_io.read(sub_dir, name, format="invalid")
 
 
+@pytest.mark.unit
 def test_file_io_write_fail():
     # Test writing to the file
     sub_dir = "__:::////__"
@@ -73,6 +77,7 @@ def test_file_io_write_fail():
         file_io.write('profiles', name, content, format="invalid")
 
 
+@pytest.mark.unit
 def test_file_io_clear_fail():
     sub_dir = "__:::////__"
     with pytest.raises(file_io.FailToWrite):
