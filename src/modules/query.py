@@ -42,7 +42,7 @@ class Query:
                 )
             except Exception as e:
                 return f"Error calculating velocity in meshgrid: {e}"
-    
+
             if params.get("do_return", True):
                 plot: dict = request.get("plot", None)
                 if plot is not None:
@@ -64,7 +64,6 @@ class Query:
             if coords is None:
                 coords = [[0, 0, 0]]
             if not isinstance(coords, list) or len(coords) == 0:
-                print(coords)
                 return "Invalid request parameters, coords must be a list of 3D points"
 
             velocities = np.zeros((len(coords), 3))
@@ -76,5 +75,4 @@ class Query:
                 return velocities
             except Exception as e:
                 return f"Error calculating velocity at points: {e}"
-        print(request)
         return "Invalid request mode"
