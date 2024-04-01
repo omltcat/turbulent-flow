@@ -5,10 +5,6 @@ HALF_PI = 0.5 * np.pi
 C = 3.6276
 
 
-def active(dk: float, length_scale: float):
-    return active_function(dk, length_scale)
-
-
 def set_active(func: Union[Callable, str]):
     if isinstance(func, str):
         try:
@@ -19,8 +15,8 @@ def set_active(func: Union[Callable, str]):
     if not callable(func):
         raise ValueError("Argument must be a valid function or function name in string.")
 
-    global active_function
-    active_function = func
+    global active
+    active = func
 
 
 def set_cutoff(value: float):
@@ -40,14 +36,27 @@ def quadratic(dk, length_scale):
     )
 
 
+# @numba.jit(nopython=True)
 def gaussian(dk, length_scale):
-    global cutoff
+    """Gaussian shape function"""
     return np.where(
         dk < cutoff,
         C * np.exp(-HALF_PI * dk**2),
         0
     )
+    # Mathematically, this function is equivalent to:
+
+    #         ┌ C * e^(-π/2 * dk^2), if dk < cutoff
+    # q(dk) = ┤
+    #         └ 0, elsewhere
+
+    # where C = 3.6276, HALF_PI = π/2
+    # These are defined as constants at the top of this file, you can change it to a different value.
+    # You should use pre-calcuated constants because this function is called many times.
+    # It is faster not to recalculate these values every time.
+
+    # cutoff is set in the query file.
 
 
-active_function = gaussian
+active = gaussian
 cutoff = 2.0
