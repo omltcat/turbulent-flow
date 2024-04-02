@@ -23,6 +23,8 @@ class FlowField:
     Contains methods to calculate the velocity at any point in the field.
     """
 
+    verbose = True  # Show prints and progress bar
+
     def __init__(
         self,
         profile: EddyProfile,
@@ -113,7 +115,7 @@ class FlowField:
 
         # self.save()
 
-        print("Total eddies: ", self.N)
+        self.print("Total eddies: ", self.N)
 
     def get_eddy_centers(self, fi: int):
         """Get the x, y, and z coordinates of the eddies in a flow iteration."""
@@ -233,7 +235,7 @@ class FlowField:
 
         # Get all eddies and their wrapped-around copies
         centers, alpha, sigma = self.get_wrap_arounds(t, high_bounds, low_bounds)
-        print("Included eddies: ", centers.shape[0])
+        self.print("Included eddies: ", centers.shape[0])
         # Save chunk information for future loading
         chunk_info = {
             "low_bounds": low_bounds.tolist(),
@@ -250,8 +252,9 @@ class FlowField:
 
         # Calculate the velocity field for each chunk
         margins = sigma * CUTOFF
-        print("Chunks [x, y, z]: ", [len(x_chunks), len(y_chunks), len(z_chunks)])
-        pbar = tqdm(total=len(x_chunks) * len(y_chunks) * len(z_chunks))
+        self.print("Chunks [x, y, z]: ", [len(x_chunks), len(y_chunks), len(z_chunks)])
+        if self.verbose:
+            pbar = tqdm(total=len(x_chunks) * len(y_chunks) * len(z_chunks))
         for i, xc in enumerate(x_chunks):
             vel_i = np.zeros((len(xc), len(y_coords), len(z_coords), 3))
             vel_i[..., 0] = self.avg_vel
@@ -290,12 +293,15 @@ class FlowField:
                         y_coords[yc],
                         z_coords[zc],
                     )
-                    pbar.update(1)
+                    if self.verbose:
+                        pbar.update(1)
             if do_return:
                 vel[xc[0] : xc[-1] + 1, :, :, :] = vel_i
             if do_cache:
                 file_io.write(CACHE_DIR, f"x_{i}", vel_i, CACHE_FORMAT)
-        pbar.close()
+
+        if self.verbose:
+            pbar.close()
 
         if do_return:
             return vel
@@ -396,3 +402,9 @@ class FlowField:
     def load(cls, name: str):
         """Load a flow field from a file."""
         return file_io.read("fields", name, "obj")
+
+    @classmethod
+    def print(cls, *content):
+        """Print content if verbose is enabled."""
+        if cls.verbose:
+            print(*content)

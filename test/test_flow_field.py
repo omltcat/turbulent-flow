@@ -13,8 +13,16 @@ import matplotlib.pyplot as plt
 RTOL = 1e-5
 
 
+@pytest.fixture(scope="module", autouse=True)
+def setup_module():
+    FlowField.verbose = False
+    yield
+    FlowField.verbose = True
+
+
 @pytest.mark.slow
 @pytest.mark.unit
+@pytest.mark.poc
 def test_eddy_generation():
     # Test profile
     profile_name = "__test__"
@@ -58,7 +66,6 @@ def test_eddy_generation():
         low_bounds=[0, 0, 0],
         high_bounds=[0, 0, 0],
     ).squeeze()
-    print(vel_000)
     assert np.isclose(np.linalg.norm(vel_000), 0, rtol=RTOL)
 
     # Get velocities at t=0, x=1.2 and x=-1.2
@@ -76,7 +83,6 @@ def test_eddy_generation():
         low_bounds=[-1.2, 0, 0],
         high_bounds=[-1.2, 0, 0],
     ).squeeze()
-    print(vel_pos12, vel_neg12)
     assert np.isclose(np.linalg.norm(vel_pos12 + vel_neg12), 0, rtol=RTOL)
 
     # Get velocities at t=0, z=0
@@ -98,7 +104,7 @@ def test_eddy_generation():
 
     # Check average velocity fluctation is zero
     avg_fluct = np.sum(vel_t0 - np.array([avg_vel, 0, 0]), axis=(0, 1, 2)) / num_samples
-    print(avg_fluct)
+    assert np.linalg.norm(avg_fluct) < RTOL
 
     magnitude = np.linalg.norm(vel_t0, axis=-1)
     # Create a 2D heatmap for the chosen z value

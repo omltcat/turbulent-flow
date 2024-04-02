@@ -25,10 +25,15 @@ def setup_module():
     field_name = "test_field"
     file_io.write("profiles", profile_name, content)
     profile = EddyProfile(profile_name)
+    FlowField.verbose = False
     field = FlowField(profile, field_name, [10, 10, 5])
     query = Query(field)
 
     os.remove(f"src/profiles/{profile_name}.json")
+
+    yield
+
+    FlowField.verbose = True
 
 
 @pytest.mark.unit
@@ -169,6 +174,7 @@ def test_query_plot_exceptions():
 @pytest.mark.unit
 def test_query_performance():
     # Eddy profile
+    FlowField.verbose = True
     profile_name = "__test__"
     content = {
         "settings": {},
