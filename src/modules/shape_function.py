@@ -36,7 +36,6 @@ def quadratic(dk, length_scale):
     )
 
 
-# @numba.jit(nopython=True)
 def gaussian(dk, length_scale):
     """Gaussian shape function"""
     return np.where(
@@ -51,11 +50,13 @@ def gaussian(dk, length_scale):
     #         └ 0, elsewhere
 
     # where C = 3.6276, HALF_PI = π/2
-    # These are defined as constants at the top of this file, you can change it to a different value.
-    # You should use pre-calcuated constants because this function is called many times.
+    # These are defined as constants at the top of this file. You can use different values or define new ones.
+    # Use pre-calcuated constants when possible because this function is called many times.
     # It is faster not to recalculate these values every time.
 
-    # cutoff is set in the query file.
+    # Your inputs must include dk and length_scale (sigma), even if some shape functions may not use length_scale.
+
+    # You can choose what shape function and cutoff value to use in query arguments.
 
 
 active = gaussian

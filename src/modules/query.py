@@ -33,29 +33,29 @@ class Query:
         if mode == "meshgrid":
             low_bounds = params.get("low_bounds", None)
             high_bounds = params.get("high_bounds", None)
-            # step_size = params.get("step_size", None)
-            # chunk_size = params.get("chunk_size", None)
+
+            keys = ["low_bounds", "high_bounds", "step_size", "chunk_size", "t"]
+            args = {key: params[key] for key in keys if key in params}
 
             try:
                 vel = self.field.sum_vel_mesh(
-                    **params,
+                    **args,
                 )
             except Exception as e:
                 return f"Error calculating velocity in meshgrid: {e}"
 
-            if params.get("do_return", True):
-                plot: dict = request.get("plot", None)
-                if plot is not None:
-                    try:
-                        _ = visualize.plot_mesh(
-                            vel,
-                            low_bounds,
-                            high_bounds,
-                            **plot,
-                        )
-                    except Exception as e:
-                        return f"Error plotting meshgrid: {e}"
-                return vel
+            plot: dict = request.get("plot", None)
+            if plot is not None:
+                try:
+                    fig = visualize.plot_mesh(
+                        vel,
+                        low_bounds,
+                        high_bounds,
+                        **plot,
+                    )
+                except Exception as e:
+                    return f"Error plotting meshgrid: {e}"
+                return fig
             else:
                 return "Meshgrid velocity calculation complete"
 

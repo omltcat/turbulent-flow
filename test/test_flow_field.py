@@ -66,7 +66,7 @@ def test_eddy_generation():
         low_bounds=[0, 0, 0],
         high_bounds=[0, 0, 0],
     ).squeeze()
-    assert np.isclose(np.linalg.norm(vel_000), 0, rtol=RTOL)
+    assert np.isclose(np.linalg.norm(vel_000), avg_vel, rtol=RTOL)
 
     # Get velocities at t=0, x=1.2 and x=-1.2
     vel_pos12 = field.sum_vel_mesh(
@@ -83,15 +83,15 @@ def test_eddy_generation():
         low_bounds=[-1.2, 0, 0],
         high_bounds=[-1.2, 0, 0],
     ).squeeze()
-    assert np.isclose(np.linalg.norm(vel_pos12 + vel_neg12), 0, rtol=RTOL)
+    assert np.isclose(np.linalg.norm(vel_pos12 + vel_neg12) / 2, avg_vel, rtol=RTOL)
 
     # Get velocities at t=0, z=0
     vel_t0 = field.sum_vel_mesh(
         t=0,
         step_size=0.02,
         chunk_size=5,
-        low_bounds=[-10, -10, 0],
-        high_bounds=[10, 10, 0],
+        low_bounds=[0, -10, -10],
+        high_bounds=[0, 10, 10],
     )
 
     # Calculate number of samples
@@ -109,6 +109,57 @@ def test_eddy_generation():
     magnitude = np.linalg.norm(vel_t0, axis=-1)
     # Create a 2D heatmap for the chosen z value
     im = plt.imshow(
+        magnitude[0, :, :].T,
+        cmap="coolwarm",
+        interpolation="nearest",
+        extent=[-10, 10, -10, 10],
+        origin="lower",
+    )
+    plt.colorbar(im, label="Velocity magnitude (m/s)")
+    plt.show()
+
+    # Clean up
+    os.remove(f"src/profiles/{profile_name}.json")
+
+
+@pytest.mark.poc
+def test_flow_field_wrap():
+    # Test profile
+    profile_name = "__test__"
+    content = {
+        "settings": {},
+        "variants": [
+            {"density": 0.005, "intensity": 5, "length_scale": 4.0},
+        ],
+    }
+    file_io.write("profiles", profile_name, content)
+    profile = EddyProfile(profile_name)
+
+    # Create flow field
+    field_name = "one_eddy_wrap"
+    dimensions = np.array([20, 20, 20])
+    avg_vel = 1
+    field = FlowField(profile, field_name, dimensions, avg_vel)
+
+    # Remove additional eddies
+    field.N = 1
+    field.sigma = field.sigma[:1]
+    field.alpha = field.alpha[:1]
+    field.init_x = field.init_x[:1]
+    field.y = {k: v[:1] for k, v in field.y.items()}
+    field.z = {k: np.array([0]) for k, v in field.z.items()}
+
+    # Get velocities at t=0
+    vel_t0 = field.sum_vel_mesh(
+        low_bounds=[-10, -10, 0],
+        high_bounds=[10, 10, 0],
+        t=0,
+        step_size=0.1,
+    )
+
+    # Create a 2D heatmap for the chosen z value
+    magnitude = np.linalg.norm(vel_t0, axis=-1)
+    im = plt.imshow(
         magnitude[:, :, 0].T,
         cmap="coolwarm",
         interpolation="nearest",
@@ -117,6 +168,9 @@ def test_eddy_generation():
     )
     plt.colorbar(im, label="Velocity magnitude (m/s)")
     plt.show()
+
+    # Clean up
+    os.remove(f"src/profiles/{profile_name}.json")
 
 
 @pytest.mark.unit

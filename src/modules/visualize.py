@@ -48,7 +48,6 @@ def plot_mesh(
         origin="lower",
     )
     plt.colorbar(im, label="Velocity magnitude (m/s)")
-    # plt.show()
     if save:
         file_io.write(PLT_DIR, save, fig, format="png")
     return fig
