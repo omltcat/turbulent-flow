@@ -1,7 +1,8 @@
 import pytest
 import os
 import json
-import numpy as np
+# import numpy as np
+from matplotlib.figure import Figure
 from modules import file_io
 from modules.query import Query
 from modules.eddy_profile import EddyProfile
@@ -52,19 +53,19 @@ def test_query_meshgrid():
     request = "__test_mesh__"
     file_io.write("queries", "__test_mesh__", content, format="json")
     response = query.handle_request(request=request, format="file")
-    assert isinstance(response, np.ndarray), f"{response}"
+    assert isinstance(response, Figure), f"{response}"
 
     content["params"]["low_bounds"] = [-1, 2, -1]
     content["params"]["high_bounds"] = [1, 2, 1]
     content["plot"]["axis"] = "y"
     response = query.handle_request(request=json.dumps(content))
-    assert isinstance(response, np.ndarray), f"{response}"
+    assert isinstance(response, Figure), f"{response}"
 
     content["params"]["low_bounds"] = [-1, -1, -1]
     content["params"]["high_bounds"] = [1, 1, 1]
     content["plot"]["axis"] = "x"
     response = query.handle_request(request=json.dumps(content))
-    assert isinstance(response, np.ndarray), f"{response}"
+    assert isinstance(response, Figure), f"{response}"
 
     content["params"]["do_return"] = False
     del content["plot"]
@@ -84,11 +85,11 @@ def test_query_points():
         },
     }
     response = query.handle_request(request=json.dumps(content))
-    assert isinstance(response, np.ndarray), f"{response}"
+    assert "Points velocity calculation complete" in response, f"{response}"
 
     del content["params"]["coords"]
     response = query.handle_request(request=json.dumps(content))
-    assert isinstance(response, np.ndarray), f"{response}"
+    assert "Points velocity calculation complete" in response, f"{response}"
 
 
 @pytest.mark.unit

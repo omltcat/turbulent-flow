@@ -1,5 +1,6 @@
 import json
 import numpy as np
+from datetime import datetime
 from modules import file_io
 from modules.flow_field import FlowField
 from modules import visualize
@@ -44,6 +45,14 @@ class Query:
             except Exception as e:
                 return f"Error calculating velocity in meshgrid: {e}"
 
+            if isinstance(vel, np.ndarray):
+                try:
+                    current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    filename = f"{self.field.name}_meshgrid_{current_time}"
+                    file_io.write("results", filename, vel, format="npy")
+                except Exception as e:
+                    return f"Error saving result: {e}"
+
             plot: dict = request.get("plot", None)
             if plot is not None:
                 try:
@@ -72,7 +81,14 @@ class Query:
                     velocities[i] = self.field.sum_vel_mesh(
                         low_bounds=coord, high_bounds=coord, t=params.get("t", 0)
                     )
-                return velocities
             except Exception as e:
                 return f"Error calculating velocity at points: {e}"
+            if isinstance(velocities, np.ndarray):
+                try:
+                    current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    filename = f"{self.field.name}_points_{current_time}"
+                    file_io.write("results", filename, velocities, format="npy")
+                except Exception as e:
+                    return f"Error saving result: {e}"
+            return "Points velocity calculation complete"
         return "Invalid request mode"
