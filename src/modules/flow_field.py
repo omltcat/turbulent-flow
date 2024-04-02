@@ -111,7 +111,7 @@ class FlowField:
             self.variant_intensity, self.variant_quantity
         ).reshape(-1, 1)
 
-        self.save()
+        # self.save()
 
         print("Total eddies: ", self.N)
 

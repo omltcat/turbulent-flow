@@ -133,15 +133,24 @@ def test_flow_field():
     field_name = "test_field"
     dimensions = np.array([20, 20, 20])
     field = FlowField(profile, field_name, dimensions)
+    field.save()
 
+    # Test flow field load
+    field: FlowField = FlowField.load("test_field")
+    assert field.name == "test_field"
+    assert field.dimensions[0] == 20
+    assert field.variant_length_scale[0] == 0.1
+
+    # Test set average velocity
     field.set_avg_vel(2.0)
+    assert field.avg_vel == 2.0
 
+    # Correct number of eddies
     volume = np.prod(dimensions)
     variant_quantity = np.array(
         [v["density"] * volume for v in content["variants"]], dtype=int
     )
 
-    # Correct number of eddies
     assert np.isclose(field.N, np.sum(variant_quantity), 1)
 
     # Correct variant quantities and length scales
@@ -232,14 +241,7 @@ def test_flow_field():
 
     # Clean up
     os.remove(f"src/profiles/{profile_name}.json")
-
-
-@pytest.mark.unit
-def test_flow_field_load():
-    field: FlowField = FlowField.load("test_field")
-    assert field.name == "test_field"
-    assert field.dimensions[0] == 20
-    assert field.variant_length_scale[0] == 0.1
+    os.remove(f"src/fields/{field_name}.pkl")
 
 
 @pytest.mark.unit
