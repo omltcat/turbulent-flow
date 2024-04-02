@@ -286,3 +286,8 @@ Thumbs.db
 # python
 **/__pycache__/
 .pytest_cache/
+.coverage*
+.cache
+*.pkl
+src/plots
+.*.json
