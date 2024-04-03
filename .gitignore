@@ -291,3 +291,4 @@ Thumbs.db
 *.pkl
 src/plots
 .*.json
+src/results/*
