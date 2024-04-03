@@ -190,6 +190,7 @@ def test_query_performance():
     profile = EddyProfile(profile_name)
     field = FlowField(profile, "test_field", [20, 20, 20])
     query = Query(field)
+    os.remove(f"src/profiles/{profile_name}.json")
 
     # Meshgrid query
     content = {
