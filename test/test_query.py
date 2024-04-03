@@ -1,5 +1,6 @@
 import pytest
 import os
+import glob
 import json
 # import numpy as np
 from matplotlib.figure import Figure
@@ -35,6 +36,8 @@ def setup_module():
     yield
 
     FlowField.verbose = True
+    for file in glob.glob(f"src/results/{field_name}_*.npy"):
+        os.remove(file)
 
 
 @pytest.mark.unit

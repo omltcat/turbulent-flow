@@ -9,6 +9,8 @@ from modules import visualize
 class Query:
     _instance = None
 
+    save_results = True
+
     def __new__(cls, *args, **kwargs):
         if not isinstance(cls._instance, cls):
             cls._instance = super(Query, cls).__new__(cls)
@@ -45,7 +47,7 @@ class Query:
             except Exception as e:
                 return f"Error calculating velocity in meshgrid: {e}"
 
-            if isinstance(vel, np.ndarray):
+            if isinstance(vel, np.ndarray) and self.save_results:
                 try:
                     current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
                     filename = f"{self.field.name}_meshgrid_{current_time}"
