@@ -1,20 +1,20 @@
-import numpy as np
+import cupy as cp
 import timeit
 
 
 def random_unit_vectors(n):
-    phi = 2 * np.pi * np.random.rand(n)
-    costheta = 2 * np.random.rand(n) - 1
-    theta = np.arccos(costheta)
-    x = np.sin(theta) * np.cos(phi)
-    y = np.sin(theta) * np.sin(phi)
-    z = np.cos(theta)
-    return np.stack((x, y, z), axis=-1)
+    phi = 2 * cp.pi * cp.random.rand(n)
+    costheta = 2 * cp.random.rand(n) - 1
+    theta = cp.arccos(costheta)
+    x = cp.sin(theta) * cp.cos(phi)
+    y = cp.sin(theta) * cp.sin(phi)
+    z = cp.cos(theta)
+    return cp.stack((x, y, z), axis=-1)
 
 
 def random_unit_vectors_normal(n):
-    points = np.random.normal(size=(n, 3))
-    return points / np.linalg.norm(points, axis=1, keepdims=True)
+    points = cp.random.normal(size=(n, 3))
+    return points / cp.linalg.norm(points, axis=1, keepdims=True)
 
 
 n = 1000000  # Number of vectors to generate

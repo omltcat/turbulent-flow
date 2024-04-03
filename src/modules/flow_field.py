@@ -4,7 +4,7 @@ Turbulent Flow Field Module
 
 # import time
 from tqdm import tqdm
-import numpy as np
+import cupy as cp
 from modules import utils
 from modules import file_io
 from modules import shape_function
@@ -29,7 +29,7 @@ class FlowField:
         self,
         profile: EddyProfile,
         name: str,
-        dimensions: np.ndarray | list,
+        dimensions: cp.ndarray | list,
         avg_vel: float = 0.0,
     ):
         """
@@ -53,20 +53,20 @@ class FlowField:
             Eddy profile object
         `name` : str
             Name of the flow field
-        `dimensions` : np.ndarray or list
+        `dimensions` : cp.ndarray or list
             Dimensions of the the form of `[x, y, z]`
         `avg_vel` : float, optional (default: `0.0`)
             Average flow velocity to move the eddies
         """
         if isinstance(dimensions, list):
-            dimensions = np.array(dimensions)
+            dimensions = cp.array(dimensions)
 
         # Check for invalid inputs
-        if not isinstance(dimensions, np.ndarray) or dimensions.shape != (3,):
+        if not isinstance(dimensions, cp.ndarray) or dimensions.shape != (3,):
             raise ValueError("Dimensions must be a 3D numpy array")
-        elif not np.all(np.isreal(dimensions)):
+        elif not cp.all(cp.isreal(dimensions)):
             raise ValueError("Dimensions must be real numbers")
-        if np.any(dimensions <= 0):
+        if cp.any(dimensions <= 0):
             raise ValueError("Dimensions must be positive")
         if not utils.is_not_negative(avg_vel):
             raise ValueError("Average velocity must be a non-negative number")
@@ -80,37 +80,37 @@ class FlowField:
         self.variant_length_scale = self.profile.get_length_scale_array()
         self.variant_intensity = self.profile.get_intensity_array()
 
-        if np.any(self.variant_length_scale * 2 > np.min(self.dimensions)):
+        if cp.any(self.variant_length_scale * 2 > cp.min(self.dimensions)):
             raise ValueError(
                 "Eddy length scales are too large compared to field dimensions"
             )
 
         # Total volume of the flow field
-        volume = np.prod(self.dimensions)
+        volume = cp.prod(self.dimensions)
 
         # Number of eddies of each variant due to density
         self.variant_quantity = utils.stoch_round(self.variant_density * volume)
 
         # Total number of eddies
-        self.N = np.sum(self.variant_quantity)
+        self.N = int(cp.sum(self.variant_quantity))
 
         # Length scales of each eddy
-        self.sigma = np.repeat(self.variant_length_scale, self.variant_quantity)
+        self.sigma = cp.repeat(self.variant_length_scale, self.variant_quantity.tolist())
 
         # Boundaries of the flow field
         self.low_bounds = -self.dimensions / 2
         self.high_bounds = self.dimensions / 2
 
         # Random center positions of the eddies
-        self.init_x = np.random.uniform(self.low_bounds[0], self.high_bounds[0], self.N)
+        self.init_x = cp.random.uniform(self.low_bounds[0], self.high_bounds[0], self.N)
         self.y = {}
         self.z = {}
         self.set_rand_eddy_yz(0)
         self.set_rand_eddy_yz(1)
         self.set_rand_eddy_yz(2)
 
-        self.alpha = utils.random_unit_vectors(self.N) * np.repeat(
-            self.variant_intensity, self.variant_quantity
+        self.alpha = utils.random_unit_vectors(self.N) * cp.repeat(
+            self.variant_intensity, self.variant_quantity.tolist()
         ).reshape(-1, 1)
 
         # self.save()
@@ -121,12 +121,12 @@ class FlowField:
         """Get the x, y, and z coordinates of the eddies in a flow iteration."""
         if fi not in self.y:
             self.set_rand_eddy_yz(fi)
-        return np.stack((self.init_x, self.y[fi], self.z[fi]), axis=-1)
+        return cp.stack((self.init_x, self.y[fi], self.z[fi]), axis=-1)
 
     def set_rand_eddy_yz(self, fi: int):
         """Set random y and z coordinates for eddies in a new flow iteration."""
-        self.y[fi] = np.random.uniform(self.low_bounds[1], self.high_bounds[1], self.N)
-        self.z[fi] = np.random.uniform(self.low_bounds[2], self.high_bounds[2], self.N)
+        self.y[fi] = cp.random.uniform(self.low_bounds[1], self.high_bounds[1], self.N)
+        self.z[fi] = cp.random.uniform(self.low_bounds[2], self.high_bounds[2], self.N)
 
     def set_avg_vel(self, avg_vel: float):
         """Set the average velocity of the flow field."""
@@ -140,8 +140,8 @@ class FlowField:
 
     def sum_vel_mesh(
         self,
-        low_bounds: np.ndarray | list = None,
-        high_bounds: np.ndarray | list = None,
+        low_bounds: cp.ndarray | list = None,
+        high_bounds: cp.ndarray | list = None,
         step_size: float = 0.2,
         chunk_size: int = 5,
         t: float = 0,
@@ -153,9 +153,9 @@ class FlowField:
 
         Parameters
         ----------
-        `low_bounds` : np.ndarray or list, optional
+        `low_bounds` : cp.ndarray or list, optional
             Lower bounds of the meshgrid, by default low bounds of the whole field
-        `high_bounds` : np.ndarray or list, optional
+        `high_bounds` : cp.ndarray or list, optional
             Upper bounds of the meshgrid, by default high bounds of the whole field
         `step_size` : float, optional
             Step size of the meshgrid, by default 0.2
@@ -170,7 +170,7 @@ class FlowField:
 
         Returns
         -------
-        `vel`: np.ndarray
+        `vel`: cp.ndarray
             Velocity field for the meshgrid
         """
         if low_bounds is None:
@@ -178,21 +178,21 @@ class FlowField:
         if high_bounds is None:
             high_bounds = self.high_bounds
         if isinstance(low_bounds, list) and isinstance(high_bounds, list):
-            high_bounds = np.array(high_bounds)
-            low_bounds = np.array(low_bounds)
+            high_bounds = cp.array(high_bounds)
+            low_bounds = cp.array(low_bounds)
 
         if not (
-            isinstance(low_bounds, np.ndarray) and isinstance(high_bounds, np.ndarray)
+            isinstance(low_bounds, cp.ndarray) and isinstance(high_bounds, cp.ndarray)
         ):
             raise ValueError("Bounds must be lists or numpy arrays")
 
         if not (low_bounds.shape == (3,) and high_bounds.shape == (3,)):
             raise ValueError("Bounds must contain 3 elements (x, y, z) each")
 
-        if not np.all(low_bounds <= high_bounds):
+        if not cp.all(low_bounds <= high_bounds):
             raise ValueError("Low bounds cannot be greater than high bounds")
 
-        if np.any(low_bounds < self.low_bounds) or np.any(high_bounds > self.high_bounds):
+        if cp.any(low_bounds < self.low_bounds) or cp.any(high_bounds > self.high_bounds):
             raise ValueError("Bounds must be within the flow field")
 
         if not utils.is_positive(step_size):
@@ -214,7 +214,7 @@ class FlowField:
         # Initialize the velocity field if a return is needed
         if do_return:
             try:
-                vel = np.zeros((len(x_coords), len(y_coords), len(z_coords), 3))
+                vel = cp.zeros((len(x_coords), len(y_coords), len(z_coords), 3))
             except MemoryError as e:  # pragma: no cover
                 raise MemoryError(
                     f"{e}\nNot enough memory to allocate velocity field. "
@@ -224,11 +224,11 @@ class FlowField:
 
         # Divide the coordinates into chunks
         if chunk_size == 0:     # pragma: no cover
-            chunk_size = np.max([len(x_coords), len(y_coords), len(z_coords)])
+            chunk_size = cp.max([len(x_coords), len(y_coords), len(z_coords)])
             # chunk_size = 1
-        x_chunks = self.chunk_split(np.arange(len(x_coords)), chunk_size)
-        y_chunks = self.chunk_split(np.arange(len(y_coords)), chunk_size)
-        z_chunks = self.chunk_split(np.arange(len(z_coords)), chunk_size)
+        x_chunks = self.chunk_split(cp.arange(len(x_coords)), chunk_size)
+        y_chunks = self.chunk_split(cp.arange(len(y_coords)), chunk_size)
+        z_chunks = self.chunk_split(cp.arange(len(z_coords)), chunk_size)
 
         # Clear previous chunk cache
         file_io.clear(CACHE_DIR)
@@ -256,7 +256,7 @@ class FlowField:
         if self.verbose:
             pbar = tqdm(total=len(x_chunks) * len(y_chunks) * len(z_chunks))
         for i, xc in enumerate(x_chunks):
-            vel_i = np.zeros((len(xc), len(y_coords), len(z_coords), 3))
+            vel_i = cp.zeros((len(xc), len(y_coords), len(z_coords), 3))
             vel_i[..., 0] = self.avg_vel
             mask = self.within_margin(
                 centers[:, 0], margins, x_coords[xc[0]], x_coords[xc[-1]]
@@ -308,7 +308,7 @@ class FlowField:
 
     def get_iter(self, t: float):
         """Get the current flow iteration based on the time passed."""
-        return round(self.avg_vel * t / self.dimensions[0]) + 1
+        return round(float(self.avg_vel * t / self.dimensions[0])) + 1
 
     def get_offset(self, t: float):
         """Get the x-offset of the flow field based on the time passed."""
@@ -318,7 +318,7 @@ class FlowField:
         return offset
 
     def get_wrap_arounds(
-        self, t: float, high_bounds: np.ndarray, low_bounds: np.ndarray
+        self, t: float, high_bounds: cp.ndarray, low_bounds: cp.ndarray
     ):
         """
         Get all eddies and their wrapped-around copies if any.
@@ -329,9 +329,9 @@ class FlowField:
         offset = self.get_offset(t)
 
         # Get all eddies and their wrapped-around copies if any
-        wrapped_centers = [np.empty(0)] * 27
-        wrapped_alpha = [np.empty(0)] * 27
-        wrapped_sigma = [np.empty(0)] * 27
+        wrapped_centers = [cp.empty(0)] * 27
+        wrapped_alpha = [cp.empty(0)] * 27
+        wrapped_sigma = [cp.empty(0)] * 27
         w = 0
         # Wrap around for the x coordinates
         margin = self.sigma * CUTOFF
@@ -341,8 +341,8 @@ class FlowField:
             # Wrap around for the y and z coordinates
             for j in WRAP_ITER:
                 for k in WRAP_ITER:
-                    centers_wrap = centers + np.array(
-                        [0, j * self.dimensions[1], k * self.dimensions[2]]
+                    centers_wrap = centers + cp.array(
+                        [0, j * self.dimensions[1].get(), k * self.dimensions[2].get()]
                     )
                     mask = self.within_margin(
                         centers_wrap[:, 1], margin, low_bounds[1], high_bounds[1]
@@ -364,16 +364,16 @@ class FlowField:
                     wrapped_sigma[w] = self.sigma[mask]
                     w += 1
 
-        wrapped_centers = np.concatenate(wrapped_centers)
-        wrapped_alpha = np.concatenate(wrapped_alpha)
-        wrapped_sigma = np.concatenate(wrapped_sigma)
+        wrapped_centers = cp.concatenate(wrapped_centers)
+        wrapped_alpha = cp.concatenate(wrapped_alpha)
+        wrapped_sigma = cp.concatenate(wrapped_sigma)
 
         return wrapped_centers, wrapped_alpha, wrapped_sigma
 
     def within_margin(
         self,
-        values: np.ndarray,
-        margins: np.ndarray,
+        values: cp.ndarray,
+        margins: cp.ndarray,
         low_bound: float,
         high_bound: float,
     ):
@@ -385,16 +385,16 @@ class FlowField:
 
     def step_coords(self, low_bounds, high_bounds, step_size):
         """Generate an array of coordinates with a given step size."""
-        coords = np.arange(low_bounds, high_bounds + step_size, step_size)
+        coords = cp.arange(low_bounds, high_bounds + step_size, step_size)
         return coords[:-1] if coords[-1] > high_bounds else coords
 
-    def chunk_split(self, array: np.ndarray, chunk_size):
+    def chunk_split(self, array: cp.ndarray, chunk_size):
         """Split an array into chunks of a given size."""
         if len(array) == 1:
             return [array]
         chunks = [array[i : i + chunk_size] for i in range(0, len(array), chunk_size)]
         if len(chunks[-1]) == 1:
-            chunks[-2] = np.append(chunks[-2], chunks[-1])
+            chunks[-2] = cp.append(chunks[-2], chunks[-1])
             chunks.pop(-1)
         return chunks
 

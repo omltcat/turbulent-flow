@@ -1,4 +1,4 @@
-import numpy as np
+import cupy as cp
 
 
 def is_positive(number):
@@ -11,18 +11,18 @@ def is_not_negative(number):
 
 def stoch_round(numbers):
     """Stochastic rounding"""
-    fractional, whole = np.modf(numbers)
-    return whole.astype(int) + (np.random.rand(*numbers.shape) < fractional)
+    fractional, whole = cp.modf(numbers)
+    return whole.astype(int) + (cp.random.rand(*numbers.shape) < fractional)
 
 
 def random_unit_vectors(n):
     # Generate random directions.
-    phi = 2 * np.pi * np.random.rand(n)  # Azimuthal angles
-    theta = np.arccos(2 * np.random.rand(n) - 1)  # Polar angles
+    phi = 2 * cp.pi * cp.random.rand(n)  # Azimuthal angles
+    theta = cp.arccos(2 * cp.random.rand(n) - 1)  # Polar angles
 
     # Convert to Cartesian coordinates.
-    x = np.sin(theta) * np.cos(phi)
-    y = np.sin(theta) * np.sin(phi)
-    z = np.cos(theta)
+    x = cp.sin(theta) * cp.cos(phi)
+    y = cp.sin(theta) * cp.sin(phi)
+    z = cp.cos(theta)
 
-    return np.stack((x, y, z), axis=-1)
+    return cp.stack((x, y, z), axis=-1)

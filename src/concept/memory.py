@@ -1,14 +1,14 @@
-import numpy as np
+import cupy as cp
 
 
 def random_unit_vectors(n):
-    phi = 2 * np.pi * np.random.rand(n)
-    costheta = 2 * np.random.rand(n) - 1
-    theta = np.arccos(costheta)
-    x = np.sin(theta) * np.cos(phi)
-    y = np.sin(theta) * np.sin(phi)
-    z = np.cos(theta)
-    return np.stack((x, y, z), axis=-1)
+    phi = 2 * cp.pi * cp.random.rand(n)
+    costheta = 2 * cp.random.rand(n) - 1
+    theta = cp.arccos(costheta)
+    x = cp.sin(theta) * cp.cos(phi)
+    y = cp.sin(theta) * cp.sin(phi)
+    z = cp.cos(theta)
+    return cp.stack((x, y, z), axis=-1)
 
 
 # Total number of vectors to generate
@@ -25,4 +25,4 @@ for i in range(num_chunks):
     vectors = random_unit_vectors(chunk_n)
 
     # Save the chunk to a file
-    np.save(f"vectors_chunk_{i}.npy", vectors)
+    cp.save(f"vectors_chunk_{i}.npy", vectors)

@@ -1,7 +1,7 @@
 """POC of broadcasting in numpy"""
 
 import time
-import numpy as np
+import cupy as cp
 from itertools import combinations, product
 import matplotlib.pyplot as plt
 
@@ -19,7 +19,7 @@ def expanded_inbounds(centers, length_scales, low_bounds, high_bounds=None):
     print("Low bounds: ", low_bounds.shape)
     # print("High bounds expanded: ", (high_bounds + length_scales))
     # print("High bounds comparison: ", (centers < high_bounds + length_scales))
-    return np.all(
+    return cp.all(
         (centers > low_bounds - length_scales)
         & (centers < high_bounds + length_scales),
         axis=-1,
@@ -37,13 +37,13 @@ NUM_CENTERS = 20
 
 # Create random centers, length_scale, and orientations of the spheres
 centers = (
-    np.random.rand(NUM_CENTERS, 3) * 200 - 100
+    cp.random.rand(NUM_CENTERS, 3) * 200 - 100
 )  # Random centers in the range [-10, 10]
 length_scales = (
-    np.random.rand(NUM_CENTERS) * 200
+    cp.random.rand(NUM_CENTERS) * 200
 )  # Random length scales in the range [0, 10]
-length_scales = np.repeat(5, NUM_CENTERS)
-orientations = np.random.rand(NUM_CENTERS, 3)  # Random orientations in the range [0, 1]
+length_scales = cp.repeat(5, NUM_CENTERS)
+orientations = cp.random.rand(NUM_CENTERS, 3)  # Random orientations in the range [0, 1]
 print("Time taken for creating eddies: ", time.time() - start_time)
 
 print("Centers: ", centers.shape)
@@ -56,20 +56,20 @@ STEP = 1
 Nx, Ny, Nz = int(Lx / STEP) + 1, int(Ly / STEP) + 1, int(Lz / STEP) + 1
 
 # Generate arrays of x, y, and z coordinates
-x_coords = np.linspace(-Lx / 2, Lx / 2, Nx)
-y_coords = np.linspace(-Ly / 2, Ly / 2, Ny)
-z_coords = np.linspace(-Lz / 2, Lz / 2, Nz)
+x_coords = cp.linspace(-Lx / 2, Lx / 2, Nx)
+y_coords = cp.linspace(-Ly / 2, Ly / 2, Ny)
+z_coords = cp.linspace(-Lz / 2, Lz / 2, Nz)
 
 # Divide the coordinates into 4 parts
-x_parts = np.array_split(x_coords, 2)
-y_parts = np.array_split(y_coords, 2)
-z_parts = np.array_split(z_coords, 2)
+x_parts = cp.array_split(x_coords, 2)
+y_parts = cp.array_split(y_coords, 2)
+z_parts = cp.array_split(z_coords, 2)
 
 cx, cy, cz = 0, 0, 0
 
 # Create a meshgrid of x, y, and z coordinates
-positions = np.transpose(
-    np.meshgrid(x_parts[cx], y_parts[cy], z_parts[cz]), (1, 2, 3, 0)
+positions = cp.transpose(
+    cp.meshgrid(x_parts[cx], y_parts[cy], z_parts[cz]), (1, 2, 3, 0)
 )
 print("Positions: ", positions.shape)
 
@@ -104,7 +104,7 @@ print(
 
 # Calculate the Euclidean distance
 start_time = time.time()
-dk = np.sqrt(np.sum(rk**2, axis=-1))
+dk = cp.sqrt(cp.sum(rk**2, axis=-1))
 print("Time taken for calculating distances: ", time.time() - start_time)
 
 # Create a mask for those nodes where dk <= 1
@@ -113,10 +113,10 @@ print("Time taken for calculating distances: ", time.time() - start_time)
 # Calculate the cross product between the normalized relative position vectors and the orientations
 # only for those nodes where dk <= 1
 start_time = time.time()
-cross_product = np.empty_like(rk)
+cross_product = cp.empty_like(rk)
 # for i in range(len(centers)):
-#     cross_product[i][mask[i]] = np.cross(rk[i][mask[i]], orientations[i])
-cross_product = np.cross(rk, orientations)
+#     cross_product[i][mask[i]] = cp.cross(rk[i][mask[i]], orientations[i])
+cross_product = cp.cross(rk, orientations)
 print("Time taken for calculating cross product: ", time.time() - start_time)
 
 # Apply the function to the cross product of the nodes that are inside the spheres
@@ -126,7 +126,7 @@ print("Time taken for applying function: ", time.time() - start_time)
 
 # Sum up the results for all points at each grid node
 start_time = time.time()
-sum_result = np.sum(result, axis=0)
+sum_result = cp.sum(result, axis=0)
 print("Time taken for summing up results: ", time.time() - start_time)
 
 
@@ -144,16 +144,16 @@ ax.scatter(centers_2d[:, 0], centers_2d[:, 1], centers_2d[:, 2], color="blue")
 
 # Create a list of all corners of the box
 corners = (
-    np.array([p for p in product([0, 1], repeat=3)]) * (high_bounds - low_bounds)
+    cp.array([p for p in product([0, 1], repeat=3)]) * (high_bounds - low_bounds)
     + low_bounds
 )
 
 # Plot the lines connecting the corners to form the box
 for s, e in combinations(corners, 2):
     if (
-        np.linalg.norm(s - e) == high_bounds[0] - low_bounds[0]
-        or np.linalg.norm(s - e) == high_bounds[1] - low_bounds[1]
-        or np.linalg.norm(s - e) == high_bounds[2] - low_bounds[2]
+        cp.linalg.norm(s - e) == high_bounds[0] - low_bounds[0]
+        or cp.linalg.norm(s - e) == high_bounds[1] - low_bounds[1]
+        or cp.linalg.norm(s - e) == high_bounds[2] - low_bounds[2]
     ):
         ax.plot(*zip(s, e), color="r")
 

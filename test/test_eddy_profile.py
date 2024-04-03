@@ -1,5 +1,5 @@
 import pytest
-# import numpy as np
+# import cupy as cp
 import modules.eddy_profile as eddy_profile
 import modules.file_io as file_io
 import os
@@ -31,8 +31,8 @@ def test_eddy_profile():
     assert profile.get_density(0) == 0.1
     assert profile.get_length_scale(0) == 1
     assert profile.get_intensity(0) == 1.15
-    # assert np.array_equal(profile.get_orientation(0), [0, 0, 1])
-    # assert np.array_equal(profile.get_center(0), [5, 5, 5])
+    # assert cp.array_equal(profile.get_orientation(0), [0, 0, 1])
+    # assert cp.array_equal(profile.get_center(0), [5, 5, 5])
 
     # Cleanup
     os.remove(f"./src/profiles/{name}.json")

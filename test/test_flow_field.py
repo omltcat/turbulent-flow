@@ -1,5 +1,5 @@
 import os
-import numpy as np
+import cupy as cp
 import modules.file_io as file_io
 from modules.eddy_profile import EddyProfile
 from modules.flow_field import FlowField
@@ -37,7 +37,7 @@ def test_eddy_generation():
 
     # Create flow field
     field_name = "one_eddy"
-    dimensions = np.array([20, 20, 20])
+    dimensions = cp.array([20, 20, 20])
     avg_vel = 0
     field = FlowField(profile, field_name, dimensions, avg_vel)
 
@@ -47,16 +47,16 @@ def test_eddy_generation():
     field.alpha = field.alpha[:1]
 
     # Move the eddy to the center at t=0
-    field.init_x = np.array([0])
-    field.y[0] = np.array([0])
-    field.z[0] = np.array([0])
-    field.y[1] = np.array([0])
-    field.z[1] = np.array([0])
-    field.y[2] = np.array([0])
-    field.z[2] = np.array([0])
+    field.init_x = cp.array([0])
+    field.y[0] = cp.array([0])
+    field.z[0] = cp.array([0])
+    field.y[1] = cp.array([0])
+    field.z[1] = cp.array([0])
+    field.y[2] = cp.array([0])
+    field.z[2] = cp.array([0])
 
     # Orient eddy to along z-axis
-    field.alpha[0] = np.array([0, 0, 1])
+    field.alpha[0] = cp.array([0, 0, 1])
 
     # Get velocities at t=0, xyz=0
     vel_000 = field.sum_vel_mesh(
@@ -66,7 +66,7 @@ def test_eddy_generation():
         low_bounds=[0, 0, 0],
         high_bounds=[0, 0, 0],
     ).squeeze()
-    assert np.isclose(np.linalg.norm(vel_000), avg_vel, rtol=RTOL)
+    assert cp.isclose(cp.linalg.norm(vel_000), avg_vel, rtol=RTOL)
 
     # Get velocities at t=0, x=1.2 and x=-1.2
     vel_pos12 = field.sum_vel_mesh(
@@ -83,7 +83,7 @@ def test_eddy_generation():
         low_bounds=[-1.2, 0, 0],
         high_bounds=[-1.2, 0, 0],
     ).squeeze()
-    assert np.isclose(np.linalg.norm(vel_pos12 + vel_neg12) / 2, avg_vel, rtol=RTOL)
+    assert cp.isclose(cp.linalg.norm(vel_pos12 + vel_neg12) / 2, avg_vel, rtol=RTOL)
 
     # Get velocities at t=0, z=0
     vel_t0 = field.sum_vel_mesh(
@@ -95,18 +95,18 @@ def test_eddy_generation():
     )
 
     # Calculate number of samples
-    num_samples = np.prod(vel_t0.shape[:-1])
+    num_samples = cp.prod(vel_t0.shape[:-1])
 
     # vel_t0[:, 80, 0] = 10
 
     # Check zero velocity in z direction
-    # assert np.isclose(np.sum(vel_t0[:, :, 0]), 0, rtol=RTOL)
+    # assert cp.isclose(cp.sum(vel_t0[:, :, 0]), 0, rtol=RTOL)
 
     # Check average velocity fluctation is zero
-    avg_fluct = np.sum(vel_t0 - np.array([avg_vel, 0, 0]), axis=(0, 1, 2)) / num_samples
-    assert np.linalg.norm(avg_fluct) < RTOL
+    avg_fluct = cp.sum(vel_t0 - cp.array([avg_vel, 0, 0]), axis=(0, 1, 2)) / num_samples
+    assert cp.linalg.norm(avg_fluct) < RTOL
 
-    magnitude = np.linalg.norm(vel_t0, axis=-1)
+    magnitude = cp.linalg.norm(vel_t0, axis=-1)
     # Create a 2D heatmap for the chosen z value
     im = plt.imshow(
         magnitude[0, :, :].T,
@@ -137,7 +137,7 @@ def test_flow_field_wrap():
 
     # Create flow field
     field_name = "one_eddy_wrap"
-    dimensions = np.array([20, 20, 20])
+    dimensions = cp.array([20, 20, 20])
     avg_vel = 1
     field = FlowField(profile, field_name, dimensions, avg_vel)
 
@@ -147,7 +147,7 @@ def test_flow_field_wrap():
     field.alpha = field.alpha[:1]
     field.init_x = field.init_x[:1]
     field.y = {k: v[:1] for k, v in field.y.items()}
-    field.z = {k: np.array([0]) for k, v in field.z.items()}
+    field.z = {k: cp.array([0]) for k, v in field.z.items()}
 
     # Get velocities at t=0
     vel_t0 = field.sum_vel_mesh(
@@ -158,7 +158,7 @@ def test_flow_field_wrap():
     )
 
     # Create a 2D heatmap for the chosen z value
-    magnitude = np.linalg.norm(vel_t0, axis=-1)
+    magnitude = cp.linalg.norm(vel_t0, axis=-1)
     im = plt.imshow(
         magnitude[:, :, 0].T,
         cmap="coolwarm",
@@ -191,7 +191,7 @@ def test_flow_field():
 
     # Test flow field creation
     field_name = "test_field"
-    dimensions = np.array([20, 20, 20])
+    dimensions = cp.array([20, 20, 20])
     field = FlowField(profile, field_name, dimensions)
     field.save()
 
@@ -206,32 +206,32 @@ def test_flow_field():
     assert field.avg_vel == 2.0
 
     # Correct number of eddies
-    volume = np.prod(dimensions)
-    variant_quantity = np.array(
+    volume = cp.prod(dimensions)
+    variant_quantity = cp.array(
         [v["density"] * volume for v in content["variants"]], dtype=int
     )
 
-    assert np.isclose(field.N, np.sum(variant_quantity), 1)
+    assert cp.isclose(field.N, cp.sum(variant_quantity), 1)
 
     # Correct variant quantities and length scales
-    assert np.isclose(
-        np.sum(field.sigma),
-        np.sum(profile.get_length_scale_array() * variant_quantity),
+    assert cp.isclose(
+        cp.sum(field.sigma),
+        cp.sum(profile.get_length_scale_array() * variant_quantity),
         rtol=RTOL,
     )
 
     # Correct variant intensities
-    assert np.isclose(
-        np.linalg.norm(field.alpha[variant_quantity[0] - 1]),
+    assert cp.isclose(
+        cp.linalg.norm(field.alpha[variant_quantity[0] - 1]),
         profile.get_intensity(0),
         rtol=RTOL,
     )
 
     # Many random orientations should cancel out alpha
-    if np.sum(variant_quantity) > 1000:
-        total_intensity = np.sum(profile.get_intensity_array() * variant_quantity)
-        assert np.isclose(
-            np.linalg.norm(np.sum(field.alpha, axis=0)) / total_intensity,
+    if cp.sum(variant_quantity) > 1000:
+        total_intensity = cp.sum(profile.get_intensity_array() * variant_quantity)
+        assert cp.isclose(
+            cp.linalg.norm(cp.sum(field.alpha, axis=0)) / total_intensity,
             0,
             atol=RTOL * total_intensity,
         )
@@ -242,8 +242,8 @@ def test_flow_field():
     assert field.get_iter(5.1) == 2
 
     assert field.get_offset(0) == 0
-    assert np.isclose(field.get_offset(5), field.dimensions[0] / 2, rtol=RTOL)
-    assert np.isclose(
+    assert cp.isclose(field.get_offset(5), field.dimensions[0] / 2, rtol=RTOL)
+    assert cp.isclose(
         field.get_offset(4.9),
         -field.get_offset(5.1),
         rtol=RTOL,
@@ -268,7 +268,7 @@ def test_flow_field():
     )
 
     # Due to average flow velocity, these two should be the same
-    diff_sum = np.sum(np.linalg.norm(vel_t0_xneg10 - vel_t10_x10, axis=-1))
+    diff_sum = cp.sum(cp.linalg.norm(vel_t0_xneg10 - vel_t10_x10, axis=-1))
     assert diff_sum < RTOL
 
     # # Test for zero average velocity fluctuation
@@ -278,17 +278,17 @@ def test_flow_field():
     #     t=20,
     # )
     # # Calculate number of samples
-    # num_samples = np.prod(vel_t20.shape[:-1])
+    # num_samples = cp.prod(vel_t20.shape[:-1])
 
     # # Velocity fluctuation
-    # vel_fluct = vel_t20 - np.array([avg_vel, 0, 0])
+    # vel_fluct = vel_t20 - cp.array([avg_vel, 0, 0])
 
     # # Check for zero average velocity fluctuation
-    # avg_fluct = np.sum(vel_fluct, axis=(0, 1, 2)) / num_samples
-    # assert np.linalg.norm(avg_fluct) < 0.01
+    # avg_fluct = cp.sum(vel_fluct, axis=(0, 1, 2)) / num_samples
+    # assert cp.linalg.norm(avg_fluct) < 0.01
 
     # # Create a 2D heatmap for at t=0, x=0
-    # magnitude = np.linalg.norm(vel_fluct - np.array([avg_vel, 0, 0]), axis=-1)
+    # magnitude = cp.linalg.norm(vel_fluct - cp.array([avg_vel, 0, 0]), axis=-1)
     # im = plt.imshow(
     #     magnitude[0, :, :],
     #     cmap="coolwarm",
@@ -317,7 +317,7 @@ def test_flow_field_init_exceptions():
     profile = EddyProfile(profile_name)
 
     field_name = "test_field"
-    dimensions = np.array([20, 20, 20])
+    dimensions = cp.array([20, 20, 20])
     avg_vel = 2
 
     # Test for invalid dimensions shape
@@ -357,7 +357,7 @@ def test_flow_field_mesh_exceptions():
     profile = EddyProfile(profile_name)
 
     field_name = "test_field"
-    dimensions = np.array([20, 20, 20])
+    dimensions = cp.array([20, 20, 20])
     avg_vel = 2
     field = FlowField(profile, field_name, dimensions, avg_vel)
 
@@ -436,7 +436,7 @@ def test_flow_field_set_exceptions():
     profile = EddyProfile(profile_name)
 
     field_name = "test_field"
-    dimensions = np.array([20, 20, 20])
+    dimensions = cp.array([20, 20, 20])
     avg_vel = 2
     field = FlowField(profile, field_name, dimensions, avg_vel)
 
@@ -463,7 +463,7 @@ def test_flow_field_out_of_memory():
     profile = EddyProfile(profile_name)
 
     field_name = "test_field"
-    dimensions = np.array([20, 20, 20])
+    dimensions = cp.array([20, 20, 20])
     avg_vel = 2
     field = FlowField(profile, field_name, dimensions, avg_vel)
 

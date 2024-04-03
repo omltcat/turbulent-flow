@@ -1,7 +1,7 @@
-import numpy as np
+import cupy as cp
 from typing import Callable, Union
 
-HALF_PI = 0.5 * np.pi
+HALF_PI = 0.5 * cp.pi
 C = 3.6276
 
 
@@ -29,7 +29,7 @@ def get_cutoff():
 
 
 def quadratic(dk, length_scale):
-    return np.where(
+    return cp.where(
         dk < 1.0,
         length_scale * (1 - dk) ** 2,
         0
@@ -38,9 +38,9 @@ def quadratic(dk, length_scale):
 
 def gaussian(dk, length_scale):
     """Gaussian shape function"""
-    return np.where(
+    return cp.where(
         dk < cutoff,
-        C * np.exp(-HALF_PI * dk**2),
+        C * cp.exp(-HALF_PI * dk**2),
         0
     )
     # Mathematically, this function is equivalent to:

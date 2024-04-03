@@ -1,10 +1,10 @@
-import numpy as np
+import cupy as cp
 
 # Create the first array with shape (5, 5, 1, 3)
-first_array = np.zeros((5, 5, 1, 3))
+first_array = cp.zeros((5, 5, 1, 3))
 
 # Create the second array with shape (2, 2, 1, 3)
-second_array = np.ones((2, 2, 1, 3))
+second_array = cp.ones((2, 2, 1, 3))
 
 # Choose the start indices for each dimension
 start_i, start_j, start_k, start_l = 1, 1, 0, 0

@@ -1,4 +1,4 @@
-import numpy as np
+import cupy as cp
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
@@ -8,9 +8,9 @@ PLT_DIR = "plots"
 
 
 def plot_mesh(
-    vel: np.ndarray,
-    low_bounds: np.ndarray,
-    high_bounds: np.ndarray,
+    vel: cp.ndarray,
+    low_bounds: cp.ndarray | list,
+    high_bounds: cp.ndarray | list,
     axis: str = "x",
     index: int = 0,
     save: str = None,
@@ -36,12 +36,12 @@ def plot_mesh(
             f"Invalid plot index '{index}': meshgrid has only {layers} layers in {axis}-axis"
         )
 
-    magnitude = np.linalg.norm(vel, axis=-1)
+    magnitude = cp.linalg.norm(vel, axis=-1)
 
     fig: Figure = plt.figure(figsize=(size[0] / 100, size[1] / 100))
     ax: Axes = fig.add_subplot(111)
     im = ax.imshow(
-        magnitude.T,
+        magnitude.T.get(),
         cmap="coolwarm",
         interpolation="nearest",
         extent=extent,

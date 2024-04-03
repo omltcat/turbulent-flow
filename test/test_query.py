@@ -1,7 +1,7 @@
 import pytest
 import os
 import json
-# import numpy as np
+# import cupy as cp
 from matplotlib.figure import Figure
 from modules import file_io
 from modules.query import Query
@@ -190,6 +190,7 @@ def test_query_performance():
     profile = EddyProfile(profile_name)
     field = FlowField(profile, "test_field", [20, 20, 20])
     query = Query(field)
+    os.remove(f"src/profiles/{profile_name}.json")
 
     # Meshgrid query
     content = {

@@ -1,5 +1,5 @@
 import json
-import numpy as np
+import cupy as cp
 from datetime import datetime
 from modules import file_io
 from modules.flow_field import FlowField
@@ -45,7 +45,7 @@ class Query:
             except Exception as e:
                 return f"Error calculating velocity in meshgrid: {e}"
 
-            if isinstance(vel, np.ndarray):
+            if isinstance(vel, cp.ndarray):
                 try:
                     current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
                     filename = f"{self.field.name}_meshgrid_{current_time}"
@@ -75,7 +75,7 @@ class Query:
             if not isinstance(coords, list) or len(coords) == 0:
                 return "Invalid request parameters, coords must be a list of 3D points"
 
-            velocities = np.zeros((len(coords), 3))
+            velocities = cp.zeros((len(coords), 3))
             try:
                 for i, coord in enumerate(coords):
                     velocities[i] = self.field.sum_vel_mesh(
@@ -83,7 +83,7 @@ class Query:
                     )
             except Exception as e:
                 return f"Error calculating velocity at points: {e}"
-            if isinstance(velocities, np.ndarray):
+            if isinstance(velocities, cp.ndarray):
                 try:
                     current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
                     filename = f"{self.field.name}_points_{current_time}"

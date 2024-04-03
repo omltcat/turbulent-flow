@@ -1,4 +1,5 @@
 import pytest
+import cupy as cp
 import modules.shape_function as shape_function
 
 
@@ -7,22 +8,22 @@ def test_shape_function():
     length_scale = 1.0
 
     shape_function.set_active('gaussian')
-    q = shape_function.active(1.5, length_scale)
+    q = shape_function.active(cp.array(1.5), length_scale)
     assert q > 0
 
-    q = shape_function.active(4, length_scale)
+    q = shape_function.active(cp.array(4), length_scale)
     assert q == 0
 
     shape_function.set_cutoff(5)
-    q = shape_function.active(4, length_scale)
+    q = shape_function.active(cp.array(4), length_scale)
     assert q > 0
     assert shape_function.get_cutoff() == 5
 
     shape_function.set_active(shape_function.quadratic)
-    q = shape_function.active(0.5, length_scale)
+    q = shape_function.active(cp.array(0.5), length_scale)
     assert q > 0
 
-    q = shape_function.active(1.5, length_scale)
+    q = shape_function.active(cp.array(1.5), length_scale)
     assert q == 0
 
 

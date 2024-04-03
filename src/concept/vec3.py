@@ -1,10 +1,10 @@
-import numpy as np
+import cupy as cp
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 # Create an array of 3D vectors
-X, Y, Z = np.meshgrid(np.linspace(-1, 1, 10), np.linspace(-1, 1, 10), np.linspace(-1, 1, 10))
-U, V, W = np.sin(np.pi * X) * np.cos(np.pi * Y) * np.cos(np.pi * Z), -np.cos(np.pi * X) * np.sin(np.pi * Y) * np.cos(np.pi * Z), (np.sqrt(2.0 / 3.0) * np.cos(np.pi * X) * np.cos(np.pi * Y) * np.sin(np.pi * Z))
+X, Y, Z = cp.meshgrid(cp.linspace(-1, 1, 10), cp.linspace(-1, 1, 10), cp.linspace(-1, 1, 10))
+U, V, W = cp.sin(cp.pi * X) * cp.cos(cp.pi * Y) * cp.cos(cp.pi * Z), -cp.cos(cp.pi * X) * cp.sin(cp.pi * Y) * cp.cos(cp.pi * Z), (cp.sqrt(2.0 / 3.0) * cp.cos(cp.pi * X) * cp.cos(cp.pi * Y) * cp.sin(cp.pi * Z))
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')

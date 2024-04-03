@@ -1,6 +1,6 @@
 import os
 import json
-import numpy as np
+import cupy as cp
 import pickle
 
 DIR = os.path.join(os.path.dirname(__file__), "..")
@@ -23,7 +23,7 @@ def read(sub_dir: str, name: str, format="json"):
                     raise ValueError("Not a JSON object, please check provided examples")
                 return data
         if format == "npy":
-            return np.load(f"{DIR}/{sub_dir}/{name}.{format}")
+            return cp.load(f"{DIR}/{sub_dir}/{name}.{format}")
         if format == "obj":
             with open(f"{DIR}/{sub_dir}/{name}.pkl", "rb") as file:
                 return pickle.load(file)
@@ -36,7 +36,7 @@ def write(sub_dir: str, name: str, content, format='json', indent=None):
     try:
         os.makedirs(f"{DIR}/{sub_dir}", exist_ok=True)
         if format == "npy":
-            return np.save(f"{DIR}/{sub_dir}/{name}.npy", content)
+            return cp.save(f"{DIR}/{sub_dir}/{name}.npy", content)
         if format == "json":
             with open(f"{DIR}/{sub_dir}/{name}.json", "w") as file:
                 return json.dump(content, file, indent=indent)
