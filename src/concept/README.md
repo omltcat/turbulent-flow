@@ -85,5 +85,36 @@ Where $\mathbf{x}_3$ is the z-component (scalar) of the a position. $\sigma^k_r$
 | $(N/V_b)$ | `density` | √ | Number of eddies per unit volume |
 | $\sigma$ | `length_scale` | √ | Length scale of the eddy |
 | $\|\boldsymbol{\alpha}\|$ |`intensity` | √ |  Magnitude of intensity vector |
-| $\boldsymbol{\alpha}/\|\boldsymbol{\alpha}\|$ |`orientation` |   |  Unit vector direction of intensity vector |
-| $\mathbf{x}^k$ | `center` |   | Center position of eddy |
+
+## Non Spherical Eddy
+Axial and radial length-scales:
+$$
+\begin{align*}
+\sigma_{ka} &= \gamma^{2/3}\sigma_k\\
+\sigma_{kr} &= \gamma^{-1/3}\sigma_k\\
+\end{align*}
+$$
+
+Orientation of eddy (unit vector):
+$$
+\begin{align*}
+\hat{\boldsymbol{\alpha}} &= \frac{\boldsymbol{\alpha}}{\|\boldsymbol{\alpha}\|}\\
+\end{align*}
+$$
+
+Relative position vector between $\mathbf{x}$ and eddy center, with axial and radial components:
+$$
+\begin{align*}
+\mathbf{x}' &= \mathbf{x}-\mathbf{x_k}\\
+\mathbf{x}'_a &= \mathbf{x}'\cdot\hat{\boldsymbol{\alpha}}\hat{\boldsymbol{\alpha}}\\
+\mathbf{x}'_r &= \mathbf{x}'-\mathbf{x}'_a\\
+\end{align*}
+$$
+
+$\mathbf{r}_k$ vector and $d_k$:
+$$
+\begin{align*}
+\mathbf{r}_k &= \frac{\mathbf{x}'_r}{\sigma_{kr}}+\frac{\mathbf{x}'_a}{\sigma_{ka}}\\
+d_k &= \|\mathbf{r}_k\|\\
+\end{align*}
+$$

@@ -79,6 +79,7 @@ class FlowField:
         self.variant_density = self.profile.get_density_array()
         self.variant_length_scale = self.profile.get_length_scale_array()
         self.variant_intensity = self.profile.get_intensity_array()
+        self.variant_gamma = self.profile.get_gamma_array()
 
         if np.any(self.variant_length_scale * 2 > np.min(self.dimensions)):
             raise ValueError(
@@ -383,12 +384,14 @@ class FlowField:
         """
         return (values < high_bound + margins) & (values > low_bound - margins)
 
-    def step_coords(self, low_bounds, high_bounds, step_size):
+    @classmethod
+    def step_coords(cls, low_bounds, high_bounds, step_size):
         """Generate an array of coordinates with a given step size."""
         coords = np.arange(low_bounds, high_bounds + step_size, step_size)
         return coords[:-1] if coords[-1] > high_bounds else coords
 
-    def chunk_split(self, array: np.ndarray, chunk_size):
+    @classmethod
+    def chunk_split(cls, array: np.ndarray, chunk_size):
         """Split an array into chunks of a given size."""
         if len(array) == 1:
             return [array]

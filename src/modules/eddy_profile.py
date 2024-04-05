@@ -75,6 +75,11 @@ class EddyProfile:
             [variant["intensity"] for variant in self.variants]
         )
 
+    def get_gamma_array(self):
+        return np.array(
+            [variant["gamma"] for variant in self.variants]
+        )
+
     # def get_orientation(self, index: int):
     #     return self.variants[index].get('orientation', None)
 
