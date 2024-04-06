@@ -38,9 +38,9 @@ sigma_r = gamma ** (-1 / 3) * sigma
 sigma = np.maximum(sigma_a, sigma_r)
 
 # Generate arrays of x, y, and z coordinates
-low_bounds = np.array([-5.0, -5.0, -5.0])
-high_bounds = np.array([5.0, 5.0, 5.0])
-step_size = 1
+low_bounds = np.array([-4.0, -4.0, -4.0])
+high_bounds = np.array([4.0, 4.0, 4.0])
+step_size = 0.5
 
 x_coords = step_coords(low_bounds[0], high_bounds[0], step_size)
 y_coords = step_coords(low_bounds[1], high_bounds[1], step_size)
@@ -91,7 +91,7 @@ w = vel_fluct[..., 2]
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection="3d")
-ax.quiver(x, y, z, u, v, w, length=0.2, normalize=True)
+ax.quiver(x, y, z, u, v, w, length=0.5)
 ax.set_xlim(low_bounds[0], high_bounds[0])
 ax.set_ylim(low_bounds[1], high_bounds[1])
 ax.set_zlim(low_bounds[2], high_bounds[2])
