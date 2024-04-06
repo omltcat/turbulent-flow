@@ -1,5 +1,5 @@
 ## Python Installation
-This program requires Python 3.11 or later. Using a virtual environment manager (such as conda) is highly recommended. If you already know how to handle python versions and environments, please skip to [Installing Dependencies](#installing-dependencies).
+This program requires Python 3.11 or later. Using a virtual environment manager (such as conda) is highly recommended. The following instructions are for people new to Python or VS Code. If you already know how to handle Python versions and environments, please skip to [Installing Dependencies](#installing-dependencies).
 ### Installing Conda
 > **What is conda?**  
 > Each python project you may want to run on your computer can have its specific python version and library dependency requirements (look at the first sentence in the paragraph above!). If you try to cram everything into one python installation, you will soon run into conflicts.  
@@ -52,12 +52,17 @@ Then switch to the new environment with
 ```powershell
 conda activate eddy
 ```
-You should now see `(eddy)` at the beginning of the command line.
+You should now see `(eddy)` at the beginning of the command line if it is successfully activated.
+
+> Note: VS Code will try to automatically activate the "eddy" environment when you open the project folder in the future. However, sometimes it fails to do so. You can always manually activate it with the command above.
 
 ### VS Code Python Extension
 On the Extensions tab on the left, search for "Python" and install the one by Microsoft.
 
-Now, open any python file in the project folder. You should see a menu at the top of the file asking you to select a python interpreter. Select the one with "eddy" in its name. You can also do this from the bottom right corner of the VS Code window.
+Now, open any Python file in the project folder. You should see a menu at the top of the file asking you to select a Python interpreter. Select the one with "eddy" in its name. You can also do this from the bottom right corner of the VS Code window.
+
+> Note: Selecting Python interpreter here and activating conda environment in the terminal are two independent actions. You should make sure both are set correctly.  
+> ***Hopefully***, they will both be set automatically from now on. But please double-check each time you reopen VS Code.
 
 ### Installing Dependencies
 Currently, this program only requires `numpy`, `matplotlib` and `tqdm` to use.  
