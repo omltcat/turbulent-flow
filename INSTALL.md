@@ -3,7 +3,7 @@ This program requires Python 3.11 or later. Using a virtual environment manager 
 ### Installing Conda
 > **What is conda?**  
 > Each python project you may want to run on your computer can have its specific python version and library dependency requirements (look at the first sentence in the paragraph above!). If you try to cram everything into one python installation, you will soon run into conflicts.  
->Conda is a package manager that allows you to create isolated environments for each project. You only install the required version of python and libraries for that project and nothing more, keeping everything lean and clean!
+> Conda is a package manager that allows you to create isolated environments for each project. You only install the required version of python and libraries for that project and nothing more, keeping everything lean and clean!
 
 
 Download the latest version of Miniconda from its [official website](https://docs.anaconda.com/free/miniconda/index.html#latest-miniconda-installer-links) for your operating system.
@@ -59,7 +59,7 @@ You should now see `(eddy)` at the beginning of the command line if it is succes
 ### VS Code Python Extension
 On the Extensions tab on the left, search for "Python" and install the one by Microsoft.
 
-Now, open any Python file in the project folder. You should see a menu at the top of the file asking you to select a Python interpreter. Select the one with "eddy" in its name. You can also do this from the bottom right corner of the VS Code window.
+Now, open any Python file in the project folder. If you try to click the "Run" button on the top right, a pop-up will appear, asking you for a Python interpreter. Select the one with "eddy" in its name. You can also do this from the bottom right corner of the VS Code window.
 
 > Note: Selecting Python interpreter here and activating conda environment in the terminal are two independent actions. You should make sure both are set correctly.  
 > ***Hopefully***, they will both be set automatically from now on. But please double-check each time you reopen VS Code.
