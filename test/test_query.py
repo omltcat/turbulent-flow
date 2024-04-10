@@ -1,5 +1,6 @@
 import pytest
 import os
+import glob
 import json
 # import numpy as np
 from matplotlib.figure import Figure
@@ -35,6 +36,8 @@ def setup_module():
     yield
 
     FlowField.verbose = True
+    for file in glob.glob(f"src/results/{field_name}_*.npy"):
+        os.remove(file)
 
 
 @pytest.mark.unit
@@ -190,6 +193,7 @@ def test_query_performance():
     profile = EddyProfile(profile_name)
     field = FlowField(profile, "test_field", [20, 20, 20])
     query = Query(field)
+    os.remove(f"src/profiles/{profile_name}.json")
 
     # Meshgrid query
     content = {
