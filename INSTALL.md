@@ -59,7 +59,7 @@ You should now see `(eddy)` at the beginning of the command line if it is succes
 ### VS Code Python Extension
 On the Extensions tab on the left, search for "Python" and install the one by Microsoft.
 
-Now, open any Python file in the project folder. If you try to click the "Run" button on the top right, a pop-up will appear, asking you for a Python interpreter. Select the one with "eddy" in its name. You can also do this from the bottom right corner of the VS Code window.
+Now, open any Python file in the project folder. If you try to click the "Run" button on the top right, a pop-up will appear, asking you for a Python interpreter. Select the one with "eddy" in its name. You can also do this from the bottom right corner of the VS Code window. *If nothing is listed, restart VS Code so it can detect the new conda changes*.
 
 > Note: Selecting Python interpreter here and activating conda environment in the terminal are two independent actions. You should make sure both are set correctly.  
 > ***Hopefully***, they will both be set automatically from now on. But please double-check each time you reopen VS Code.
