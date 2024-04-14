@@ -39,6 +39,7 @@ def plot_mesh(
     fig : Figure
         Matplotlib figure object.
     """
+    # Check the input parameters
     try:
         if axis == "x":
             layers = vel.shape[0]
@@ -59,8 +60,10 @@ def plot_mesh(
             f"Invalid plot index '{index}': meshgrid has only {layers} layers in {axis}-axis"
         )
 
+    # Calculate the velocity magnitude
     magnitude = np.linalg.norm(vel, axis=-1)
 
+    # Plot the meshgrid
     fig: Figure = plt.figure(figsize=(size[0] / 100, size[1] / 100))
     ax: Axes = fig.add_subplot(111)
     im = ax.imshow(

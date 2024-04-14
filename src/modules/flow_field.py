@@ -35,7 +35,8 @@ class FlowField:
         """
         Generate a new flow field.
 
-        Note that this object only contains the eddy positions and properties, not a specific meshgrid.
+        Note that this object only contains the eddy positions and properties,
+        not a specific meshgrid.
         That is privided by the when querying with `sum_vel_mesh` method.
 
         Dimensions are in the form of `[x, y, z]`.
@@ -257,7 +258,7 @@ class FlowField:
 
         file_io.write(CACHE_DIR, "__info__", chunk_info, "json")
 
-        # Calculate the velocity field for each chunk
+        # Calculate the velocity field for each chunk, slicing by x, y, and z
         margins = sigma * CUTOFF
         self.print("Chunks [x, y, z]: ", [len(x_chunks), len(y_chunks), len(z_chunks)])
         if self.verbose:
@@ -272,7 +273,7 @@ class FlowField:
             sigma_i = sigma[mask]
             alpha_i = alpha[mask]
             margins_i = margins[mask]
-            for j, yc in enumerate(y_chunks):
+            for _, yc in enumerate(y_chunks):
                 mask = self.within_margin(
                     centers_i[:, 1], margins_i, y_coords[yc[0]], y_coords[yc[-1]]
                 )
@@ -280,7 +281,7 @@ class FlowField:
                 sigma_j = sigma_i[mask]
                 alpha_j = alpha_i[mask]
                 margins_j = margins_i[mask]
-                for k, zc in enumerate(z_chunks):
+                for _, zc in enumerate(z_chunks):
                     mask = self.within_margin(
                         centers_j[:, 2], margins_j, z_coords[zc[0]], z_coords[zc[-1]]
                     )

@@ -8,12 +8,14 @@ from modules import shape_function
 
 
 def main(args=None):
+    # Parse command line arguments
     parser = argparse.ArgumentParser(
         description="Turbulent Flow Synthetic Eddy Generator"
     )
 
     subparsers = parser.add_subparsers(dest="command")
 
+    # New field subparser
     new_parser = subparsers.add_parser(
         "new", help="Create a new field, show help: 'new -h'."
     )
@@ -42,6 +44,7 @@ def main(args=None):
         help="Average flow velocity in x direction (default: 0.0)",
     )
 
+    # Query field subparser
     query_parser = subparsers.add_parser(
         "query", help="Query velocities on an existing field, show help: 'query -h'."
     )
@@ -68,6 +71,7 @@ def main(args=None):
         help="Cutoff value in shape function, mutiples of length-scale (default: 2.0)",
     )
 
+    # Parse arguments
     args = parser.parse_args(args)
 
     if hasattr(args, 'n'):
@@ -75,6 +79,7 @@ def main(args=None):
     if hasattr(args, 'q'):
         args.q = args.q.replace(".json", "")
 
+    # Create new field
     if args.command == "new":
         try:
             profile = EddyProfile(args.p)
@@ -86,6 +91,7 @@ def main(args=None):
             print(f"Error creating new field: {e}")
         print(f"New field '{args.n}' created and saved successfully")
 
+    # Query exiting field
     if args.command == "query":
         try:
             field = FlowField.load(args.n)

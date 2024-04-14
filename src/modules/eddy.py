@@ -1,4 +1,8 @@
-"""Library eddy related functions."""
+"""
+Library eddy related functions.
+
+Currently only supports spherical isotropic eddies.
+"""
 import numpy as np
 from modules import shape_function
 
@@ -11,7 +15,29 @@ def sum_vel_chunk(
     y_coords: np.ndarray,
     z_coords: np.ndarray,
 ):
-    """Calculate the velocity field due to each eddy within a chunk."""
+    """
+    Calculate the velocity field due to each eddy within a chunk.
+
+    Parameters
+    ----------
+    centers : np.ndarray
+        Array of eddy centers.
+    sigma : np.ndarray
+        Array of eddy length scales.
+    alpha : np.ndarray
+        Array of eddy intensities.
+    x_coords : np.ndarray
+        Array of x coordinates spanning the chunk.
+    y_coords : np.ndarray
+        Array of y coordinates spanning the chunk.
+    z_coords : np.ndarray
+        Array of z coordinates spanning the chunk.
+
+    Returns
+    -------
+    np.ndarray
+        Array of velocity fluctuations due to each eddy within the chunk.
+    """
     # Create a meshgrid of x, y, and z coordinates
     # start_time = time.time()
     positions = np.stack(
