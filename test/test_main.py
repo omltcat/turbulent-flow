@@ -34,6 +34,7 @@ def setup_module():
     yield
     os.remove("src/profiles/main_test_profile.json")
     os.remove("src/queries/main_test_query.json")
+    os.remove("src/fields/main_test_field.pkl")
     for file in glob.glob("src/results/main_test_*.npy"):
         os.remove(file)
     for file in glob.glob("src/plots/main_test_*.png"):
