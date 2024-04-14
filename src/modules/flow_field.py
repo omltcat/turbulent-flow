@@ -106,8 +106,15 @@ class FlowField:
         self.y = {}
         self.z = {}
         self.set_rand_eddy_yz(0)
-        self.set_rand_eddy_yz(1)
-        self.set_rand_eddy_yz(2)
+
+        # if avg_vel is zero, wrap around in x will be the same method as in y and z (exact coordinates)
+        if self.avg_vel == 0:
+            self.y[1] = self.y[0]
+            self.z[1] = self.z[0]
+        # if avg_vel is not zero, wrap around in x will have random y and z to avoid periodicity
+        else:
+            self.set_rand_eddy_yz(1)
+            self.set_rand_eddy_yz(2)
 
         self.alpha = utils.random_unit_vectors(self.N) * np.repeat(
             self.variant_intensity, self.variant_quantity
