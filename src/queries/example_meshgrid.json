@@ -1,16 +1,15 @@
 {
     "mode": "meshgrid",
     "params": {
-        "low_bounds": [-10, -10, -10],
-        "high_bounds": [10, 10, 10],
+        "low_bounds": [-10, -10, 0],
+        "high_bounds": [10, 10, 0],
         "step_size": 0.02,
         "chunk_size": 5,
-        "t": 0
+        "time": 0
     },
     "plot": {
         "axis": "z",
         "index": 0,
-        "save": "meshgrid_z_0",
         "size": [1280, 960]
     }
 }

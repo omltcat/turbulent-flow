@@ -50,7 +50,7 @@ def test_query_meshgrid():
             "high_bounds": [5, 5, 0],
             "step_size": 0.2,
             "chunk_size": 5,
-            "t": 0,
+            "time": 0,
         },
         "plot": {"axis": "z", "index": 0, "size": [640, 480]},
     }
@@ -199,7 +199,7 @@ def test_query_performance():
             # "low_bounds": [0, -10, -10],
             # "high_bounds": [0, 10, 10],
             "chunk_size": 5,
-            "t": 0,
+            "time": 0,
             "do_return": True,
             # "do_cache": True,
         },

@@ -152,7 +152,7 @@ class FlowField:
         high_bounds: np.ndarray | list = None,
         step_size: float = 0.2,
         chunk_size: int = 5,
-        t: float = 0,
+        time: float = 0,
         do_return: bool = True,
         do_cache: bool = False,
     ):
@@ -211,7 +211,7 @@ class FlowField:
                 "Chunk size not be negative. Use zero for no chunking (Potentially SLOW and HIGH memory usage!!!)"
             )
 
-        if not utils.is_not_negative(t):
+        if not utils.is_not_negative(time):
             raise ValueError("Time must be non-negative number, by default 0.0")
 
         # Generate arrays of x, y, and z coordinates
@@ -242,7 +242,7 @@ class FlowField:
         file_io.clear(CACHE_DIR)
 
         # Get all eddies and their wrapped-around copies
-        centers, alpha, sigma = self.get_wrap_arounds(t, high_bounds, low_bounds)
+        centers, alpha, sigma = self.get_wrap_arounds(time, high_bounds, low_bounds)
         self.print("Included eddies: ", centers.shape[0])
         # Save chunk information for future loading
         chunk_info = {

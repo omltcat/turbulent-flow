@@ -70,7 +70,7 @@ class Query:
             low_bounds = params.get("low_bounds", None)
             high_bounds = params.get("high_bounds", None)
 
-            kwargs = utils.filter_keys(params, ["low_bounds", "high_bounds", "step_size", "chunk_size", "t"])
+            kwargs = utils.filter_keys(params, ["low_bounds", "high_bounds", "step_size", "chunk_size", "time"])
 
             # Calculate velocity in meshgrid
             try:
@@ -121,7 +121,7 @@ class Query:
             try:
                 for i, coord in enumerate(coords):
                     velocities[i] = self.field.sum_vel_mesh(
-                        low_bounds=coord, high_bounds=coord, t=params.get("t", 0)
+                        low_bounds=coord, high_bounds=coord, time=params.get("time", 0)
                     )
             except Exception as e:
                 raise Exception(f"Error calculating velocity at points: {e}")

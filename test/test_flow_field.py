@@ -60,7 +60,7 @@ def test_eddy_generation():
 
     # Get velocities at t=0, xyz=0
     vel_000 = field.sum_vel_mesh(
-        t=0,
+        time=0,
         step_size=0.02,
         chunk_size=5,
         low_bounds=[0, 0, 0],
@@ -70,14 +70,14 @@ def test_eddy_generation():
 
     # Get velocities at t=0, x=1.2 and x=-1.2
     vel_pos12 = field.sum_vel_mesh(
-        t=0,
+        time=0,
         step_size=0.02,
         chunk_size=5,
         low_bounds=[1.2, 0, 0],
         high_bounds=[1.2, 0, 0],
     ).squeeze()
     vel_neg12 = field.sum_vel_mesh(
-        t=0,
+        time=0,
         step_size=0.02,
         chunk_size=5,
         low_bounds=[-1.2, 0, 0],
@@ -87,7 +87,7 @@ def test_eddy_generation():
 
     # Get velocities at t=0, z=0
     vel_t0 = field.sum_vel_mesh(
-        t=0,
+        time=0,
         step_size=0.02,
         chunk_size=5,
         low_bounds=[0, -10, -10],
@@ -153,7 +153,7 @@ def test_flow_field_wrap():
     vel_t0 = field.sum_vel_mesh(
         low_bounds=[-10, -10, 0],
         high_bounds=[10, 10, 0],
-        t=0,
+        time=0,
         step_size=0.1,
     )
 
@@ -255,7 +255,7 @@ def test_flow_field():
         chunk_size=5,
         low_bounds=[-10, -10, -10],
         high_bounds=[-10, 10, 10],
-        t=0,
+        time=0,
     )
 
     vel_t10_x10 = field.sum_vel_mesh(
@@ -263,7 +263,7 @@ def test_flow_field():
         chunk_size=5,
         low_bounds=[10, -10, -10],
         high_bounds=[10, 10, 10],
-        t=10,
+        time=10,
         do_cache=True,
     )
 
@@ -416,7 +416,7 @@ def test_flow_field_mesh_exceptions():
         field.sum_vel_mesh(
             step_size=1,
             chunk_size=5,
-            t=-1,
+            time=-1,
         )
 
     # Clean up
@@ -472,7 +472,7 @@ def test_flow_field_out_of_memory():
         field.sum_vel_mesh(
             step_size=0.001,
             chunk_size=5,
-            t=0,
+            time=0,
         )
 
     # Test chunk_size too large
@@ -480,7 +480,7 @@ def test_flow_field_out_of_memory():
         field.sum_vel_mesh(
             step_size=0.02,
             chunk_size=0,
-            t=0,
+            time=0,
         )
 
     # Clean up
