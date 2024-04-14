@@ -5,6 +5,7 @@ This module is intended to be modifiable by the user to define custom shape func
 """
 import numpy as np
 from typing import Callable, Union
+from modules import utils
 
 HALF_PI = 0.5 * np.pi
 C = 3.6276
@@ -43,6 +44,8 @@ def set_cutoff(value: float):
     value : float
         Cutoff value for the shape function.
     """
+    if not utils.is_positive(value):
+        raise ValueError("Cutoff value must be a positive number.")
     global cutoff
     cutoff = value
 

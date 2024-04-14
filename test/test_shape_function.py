@@ -41,3 +41,6 @@ def test_shape_function_exceptions():
 
     with pytest.raises(ValueError):
         shape_function.set_active(123)
+
+    with pytest.raises(ValueError):
+        shape_function.set_cutoff(-1)
