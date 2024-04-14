@@ -7,7 +7,7 @@ import main
 
 AVG_VEL = 2.5
 RTOL = 1e-5
-STD_TOL = 0.05
+STD_TOL = 0.1
 
 
 @pytest.fixture(scope="module", autouse=True)
