@@ -26,3 +26,23 @@ def random_unit_vectors(n):
     z = np.cos(theta)
 
     return np.stack((x, y, z), axis=-1)
+
+
+def filter_keys(dictionary, keys):
+    """
+    Filter dictionary keys by a list of keys.
+    Mainly used to filter out unwanted keys from a user provided json object.
+
+    Parameters
+    ----------
+    dictionary : dict
+        Dictionary to filter.
+    keys : list
+        List of keys to keep.
+
+    Returns
+    -------
+    dict
+        Filtered dictionary.
+    """
+    return {key: dictionary[key] for key in keys if key in dictionary}

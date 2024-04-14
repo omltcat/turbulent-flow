@@ -4,6 +4,7 @@ from datetime import datetime
 from modules import file_io
 from modules.flow_field import FlowField
 from modules import visualize
+from modules import utils
 
 
 class Query:
@@ -69,12 +70,11 @@ class Query:
             low_bounds = params.get("low_bounds", None)
             high_bounds = params.get("high_bounds", None)
 
-            keys = ["low_bounds", "high_bounds", "step_size", "chunk_size", "t"]
-            args = {key: params[key] for key in keys if key in params}
+            kwargs = utils.filter_keys(params, ["low_bounds", "high_bounds", "step_size", "chunk_size", "t"])
 
             # Calculate velocity in meshgrid
             try:
-                vel = self.field.sum_vel_mesh(**args)
+                vel = self.field.sum_vel_mesh(**kwargs)
             except Exception as e:
                 raise Exception(f"Error calculating velocity in meshgrid: {e}")
 
