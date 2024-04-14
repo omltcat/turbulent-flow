@@ -45,7 +45,7 @@ def set_cutoff(value: float):
         Cutoff value for the shape function.
     """
     if not utils.is_positive(value):
-        raise ValueError("Cutoff value must be a positive number.")
+        raise ValueError("Cutoff value must be a positive.")
     global cutoff
     cutoff = value
 

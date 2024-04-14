@@ -395,7 +395,7 @@ How test will be performed: Automated test script, GitHub Actions.
 
 \begin{enumerate}
 
-  \item{test-field-sum\\}
+  \item{test-field-mean\\}
 
   Control: Automatic
             
@@ -409,10 +409,10 @@ How test will be performed: Automated test script, GitHub Actions.
   Output: Velocity vectors at each point: $\mathbf{u}$\\
   Expected behavior:
   \begin{itemize}
-    \item $|\sum\mathbf{u}-\mathbf{u_{avg}}| < \text{tol}$
+    \item $|\frac{\sum\mathbf{u}-\mathbf{u_{avg}}}{N_{grid~points}}| < \text{tol}$
   \end{itemize}
 
-  Test Case Derivation: The vector sum of all velocity fluctuations caused by the eddies should be zero (below tolerance).
+  Test Case Derivation: The vector mean of all velocity fluctuations caused by the eddies should be zero (below tolerance).
             
   How test will be performed: Automated test script, GitHub Actions.
 

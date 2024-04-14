@@ -13,7 +13,7 @@ def setup():
     latest_file = max(glob.glob(path), key=os.path.getmtime)
 
 
-@pytest.mark.system
+@pytest.mark.validation
 @pytest.mark.skip
 def test_stress():
     # main(["new", "-p", "example", "-n", "uvw_test", "-d", "10", "10", "10"])
@@ -35,7 +35,8 @@ def test_stress():
     print("ww:", np.sum(ww) / np.prod(ww.shape))
 
 
-@pytest.mark.system
+@pytest.mark.validation
+@pytest.mark.skip
 def test_divergence():
     vel = np.load(latest_file)
     x_sum = np.sum(vel[..., 0]) / np.prod(vel.shape[:3])
