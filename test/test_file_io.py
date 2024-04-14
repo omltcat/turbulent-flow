@@ -1,5 +1,6 @@
 import pytest
 import os
+from unittest.mock import patch, mock_open
 import modules.file_io as file_io
 
 
@@ -67,18 +68,27 @@ def test_file_io_read_fail_format():
 @pytest.mark.unit
 def test_file_io_write_fail():
     # Test writing to the file
-    sub_dir = "__:::////__"
-    name = "__test__"
+    sub_dir = "profiles"
+    name = "__test_write_fail__"
     content = {"key": "value", "list": [1, 2, 3]}
-    with pytest.raises(file_io.FailToWrite):
-        file_io.write(sub_dir, name, content, indent=4)
 
+    # Mock the open function to raise an IOError when called
+    with patch('builtins.open', mock_open()) as m:
+        m.side_effect = IOError
+        with pytest.raises(file_io.FailToWrite):
+            file_io.write(sub_dir, name, content, indent=4)
+
+    # Test with invalid format
     with pytest.raises(file_io.FailToWrite):
-        file_io.write('profiles', name, content, format="invalid")
+        file_io.write(sub_dir, name, content, format="invalid")
 
 
 @pytest.mark.unit
 def test_file_io_clear_fail():
-    sub_dir = "__:::////__"
-    with pytest.raises(file_io.FailToWrite):
-        file_io.clear(sub_dir)
+    sub_dir = "profiles"
+
+    # Mock the os.remove function to raise an OSError when called
+    with patch('os.remove') as mock_remove:
+        mock_remove.side_effect = OSError
+        with pytest.raises(file_io.FailToWrite):
+            file_io.clear(sub_dir)

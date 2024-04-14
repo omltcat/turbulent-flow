@@ -1,5 +1,5 @@
+import sys
 import argparse
-from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 from modules.eddy_profile import EddyProfile
 from modules.flow_field import FlowField
@@ -8,12 +8,14 @@ from modules import shape_function
 
 
 def main(args=None):
+    # Parse command line arguments
     parser = argparse.ArgumentParser(
         description="Turbulent Flow Synthetic Eddy Generator"
     )
 
     subparsers = parser.add_subparsers(dest="command")
 
+    # New field subparser
     new_parser = subparsers.add_parser(
         "new", help="Create a new field, show help: 'new -h'."
     )
@@ -42,6 +44,7 @@ def main(args=None):
         help="Average flow velocity in x direction (default: 0.0)",
     )
 
+    # Query field subparser
     query_parser = subparsers.add_parser(
         "query", help="Query velocities on an existing field, show help: 'query -h'."
     )
@@ -68,6 +71,7 @@ def main(args=None):
         help="Cutoff value in shape function, mutiples of length-scale (default: 2.0)",
     )
 
+    # Parse arguments
     args = parser.parse_args(args)
 
     if hasattr(args, 'n'):
@@ -75,6 +79,7 @@ def main(args=None):
     if hasattr(args, 'q'):
         args.q = args.q.replace(".json", "")
 
+    # Create new field
     if args.command == "new":
         try:
             profile = EddyProfile(args.p)
@@ -82,16 +87,19 @@ def main(args=None):
                 profile=profile, name=args.n, dimensions=args.d, avg_vel=args.v
             )
             field.save()
+            print(f"New field '{args.n}' created and saved successfully")
         except Exception as e:
-            print(f"Error creating new field: {e}")
-        print(f"New field '{args.n}' created and saved successfully")
+            print(f"Error creating new field: {e}", file=sys.stderr)
+            return
 
+    # Query exiting field
     if args.command == "query":
         try:
             field = FlowField.load(args.n)
             query = Query(field)
         except Exception as e:
-            print(f"Error loading field '{args.n}': {e}")
+            print(f"Error loading field '{args.n}': {e}", file=sys.stderr)
+            return
 
         try:
             if args.s is not None:
@@ -99,16 +107,17 @@ def main(args=None):
             if args.c is not None:
                 shape_function.set_cutoff(args.c)
         except Exception as e:
-            print(f"Error setting shape function: {e}")
+            print(f"Error setting shape function: {e}", file=sys.stderr)
+            return
 
         try:
-            result = query.handle_request(request=args.q, format="file")
-            if isinstance(result, str):
-                print(result)
-            elif isinstance(result, Figure):
+            response = query.handle_request(request=args.q, format="file")
+            print(response)
+            if "Plot saved" in response and __name__ == "__main__":
                 plt.show()
         except Exception as e:
-            print(f"Error handling query: {e}")
+            print(f"Error handling query: {e}", file=sys.stderr)
+            return
 
 
 if __name__ == "__main__":

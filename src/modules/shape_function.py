@@ -1,11 +1,25 @@
+"""
+Shape function library for eddy calculation
+
+This module is intended to be modifiable by the user to define custom shape functions.
+"""
 import numpy as np
 from typing import Callable, Union
+from modules import utils
 
 HALF_PI = 0.5 * np.pi
 C = 3.6276
 
 
 def set_active(func: Union[Callable, str]):
+    """
+    Set the active shape function to be used in the eddy calculation.
+
+    Parameters
+    ----------
+    func : Union[Callable, str]
+        Shape function to use. Can be a function object or a string name of a function.
+    """
     if isinstance(func, str):
         try:
             func = globals()[func]
@@ -20,6 +34,18 @@ def set_active(func: Union[Callable, str]):
 
 
 def set_cutoff(value: float):
+    """
+    Set the global cutoff value for the shape function.
+    Outside this value, the shape function that uses such global value should return 0.
+    Note: Some shape functions may have inherently defined cutoff values.
+
+    Parameters
+    ----------
+    value : float
+        Cutoff value for the shape function.
+    """
+    if not utils.is_positive(value):
+        raise ValueError("Cutoff value must be a positive.")
     global cutoff
     cutoff = value
 
@@ -29,11 +55,13 @@ def get_cutoff():
 
 
 def quadratic(dk, length_scale):
+    """Quadratic shape function"""
     return np.where(
         dk < 1.0,
         length_scale * (1 - dk) ** 2,
         0
     )
+    # Note that this function uses a custom cutoff value of 1.0 and is not affected by the global cutoff value.
 
 
 def gaussian(dk, length_scale):

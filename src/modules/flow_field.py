@@ -35,7 +35,8 @@ class FlowField:
         """
         Generate a new flow field.
 
-        Note that this object only contains the eddy positions and properties, not a specific meshgrid.
+        Note that this object only contains the eddy positions and properties,
+        not a specific meshgrid.
         That is privided by the when querying with `sum_vel_mesh` method.
 
         Dimensions are in the form of `[x, y, z]`.
@@ -106,8 +107,15 @@ class FlowField:
         self.y = {}
         self.z = {}
         self.set_rand_eddy_yz(0)
-        self.set_rand_eddy_yz(1)
-        self.set_rand_eddy_yz(2)
+
+        # if avg_vel is zero, wrap around in x will be the same method as in y and z (exact coordinates)
+        if self.avg_vel == 0:
+            self.y[1] = self.y[0]
+            self.z[1] = self.z[0]
+        # if avg_vel is not zero, wrap around in x will have random y and z to avoid periodicity
+        else:
+            self.set_rand_eddy_yz(1)
+            self.set_rand_eddy_yz(2)
 
         self.alpha = utils.random_unit_vectors(self.N) * np.repeat(
             self.variant_intensity, self.variant_quantity
@@ -144,7 +152,7 @@ class FlowField:
         high_bounds: np.ndarray | list = None,
         step_size: float = 0.2,
         chunk_size: int = 5,
-        t: float = 0,
+        time: float = 0,
         do_return: bool = True,
         do_cache: bool = False,
     ):
@@ -203,7 +211,7 @@ class FlowField:
                 "Chunk size not be negative. Use zero for no chunking (Potentially SLOW and HIGH memory usage!!!)"
             )
 
-        if not utils.is_not_negative(t):
+        if not utils.is_not_negative(time):
             raise ValueError("Time must be non-negative number, by default 0.0")
 
         # Generate arrays of x, y, and z coordinates
@@ -234,7 +242,7 @@ class FlowField:
         file_io.clear(CACHE_DIR)
 
         # Get all eddies and their wrapped-around copies
-        centers, alpha, sigma = self.get_wrap_arounds(t, high_bounds, low_bounds)
+        centers, alpha, sigma = self.get_wrap_arounds(time, high_bounds, low_bounds)
         self.print("Included eddies: ", centers.shape[0])
         # Save chunk information for future loading
         chunk_info = {
@@ -250,7 +258,7 @@ class FlowField:
 
         file_io.write(CACHE_DIR, "__info__", chunk_info, "json")
 
-        # Calculate the velocity field for each chunk
+        # Calculate the velocity field for each chunk, slicing by x, y, and z
         margins = sigma * CUTOFF
         self.print("Chunks [x, y, z]: ", [len(x_chunks), len(y_chunks), len(z_chunks)])
         if self.verbose:
@@ -265,7 +273,7 @@ class FlowField:
             sigma_i = sigma[mask]
             alpha_i = alpha[mask]
             margins_i = margins[mask]
-            for j, yc in enumerate(y_chunks):
+            for _, yc in enumerate(y_chunks):
                 mask = self.within_margin(
                     centers_i[:, 1], margins_i, y_coords[yc[0]], y_coords[yc[-1]]
                 )
@@ -273,7 +281,7 @@ class FlowField:
                 sigma_j = sigma_i[mask]
                 alpha_j = alpha_i[mask]
                 margins_j = margins_i[mask]
-                for k, zc in enumerate(z_chunks):
+                for _, zc in enumerate(z_chunks):
                     mask = self.within_margin(
                         centers_j[:, 2], margins_j, z_coords[zc[0]], z_coords[zc[-1]]
                     )

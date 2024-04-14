@@ -3,7 +3,6 @@ import os
 import glob
 import json
 # import numpy as np
-from matplotlib.figure import Figure
 from modules import file_io
 from modules.query import Query
 from modules.eddy_profile import EddyProfile
@@ -38,6 +37,8 @@ def setup_module():
     FlowField.verbose = True
     for file in glob.glob(f"src/results/{field_name}_*.npy"):
         os.remove(file)
+    for file in glob.glob(f"src/plots/{field_name}_*.png"):
+        os.remove(file)
 
 
 @pytest.mark.unit
@@ -49,31 +50,26 @@ def test_query_meshgrid():
             "high_bounds": [5, 5, 0],
             "step_size": 0.2,
             "chunk_size": 5,
-            "t": 0,
+            "time": 0,
         },
-        "plot": {"axis": "z", "index": 0, "save": "__test_fig__", "size": [640, 480]},
+        "plot": {"axis": "z", "index": 0, "size": [640, 480]},
     }
     request = "__test_mesh__"
     file_io.write("queries", "__test_mesh__", content, format="json")
     response = query.handle_request(request=request, format="file")
-    assert isinstance(response, Figure), f"{response}"
+    assert "Plot saved to plots" in response, f"{response}"
 
     content["params"]["low_bounds"] = [-1, 2, -1]
     content["params"]["high_bounds"] = [1, 2, 1]
     content["plot"]["axis"] = "y"
     response = query.handle_request(request=json.dumps(content))
-    assert isinstance(response, Figure), f"{response}"
+    assert "Plot saved to plots" in response, f"{response}"
 
     content["params"]["low_bounds"] = [-1, -1, -1]
     content["params"]["high_bounds"] = [1, 1, 1]
     content["plot"]["axis"] = "x"
     response = query.handle_request(request=json.dumps(content))
-    assert isinstance(response, Figure), f"{response}"
-
-    content["params"]["do_return"] = False
-    del content["plot"]
-    response = query.handle_request(request=json.dumps(content))
-    assert "Meshgrid velocity calculation complete" in response, f"{response}"
+    assert "Plot saved to plots" in response, f"{response}"
 
     # Clean up
     os.remove(f"src/queries/{request}.json")
@@ -88,29 +84,29 @@ def test_query_points():
         },
     }
     response = query.handle_request(request=json.dumps(content))
-    assert "Points velocity calculation complete" in response, f"{response}"
+    assert "Velocity calculation complete (mode: points)." in response, f"{response}"
 
     del content["params"]["coords"]
     response = query.handle_request(request=json.dumps(content))
-    assert "Points velocity calculation complete" in response, f"{response}"
+    assert "Velocity calculation complete (mode: points)." in response, f"{response}"
 
 
 @pytest.mark.unit
 def test_query_meshgrid_exceptions():
     # Not json string
     content = "invalid"
-    response = query.handle_request(request=content)
-    assert "Invalid query request string" in response, f"{response}"
+    with pytest.raises(Exception, match=r"^Invalid query request string"):
+        query.handle_request(request=content)
 
     # Params not dict
     content = json.dumps({"mode": "meshgrid", "params": "invalid"})
-    response = query.handle_request(request=content)
-    assert "Invalid request" in response, f"{response}"
+    with pytest.raises(TypeError, match=r"^Invalid request parameters"):
+        query.handle_request(request=content)
 
     # Invalid meshgrid params
     content = json.dumps({"mode": "meshgrid", "params": {"low_bounds": [-100, 0, 0]}})
-    response = query.handle_request(request=content)
-    assert "Error calculating velocity" in response, f"{response}"
+    with pytest.raises(Exception, match=r"^Error calculating velocity in meshgrid"):
+        query.handle_request(request=content)
 
 
 @pytest.mark.unit
@@ -122,21 +118,21 @@ def test_query_points_exceptions():
             "coords": "invalid",
         },
     }
-    response = query.handle_request(request=json.dumps(content))
-    assert "Invalid request parameters" in response, f"{response}"
+    with pytest.raises(Exception, match=r"^Invalid request parameters"):
+        query.handle_request(request=json.dumps(content))
 
     # Invalid bounds
     content["params"]["coords"] = [[-100, 0, 0]]
-    response = query.handle_request(request=json.dumps(content))
-    assert "Error calculating velocity at points" in response, f"{response}"
+    with pytest.raises(Exception, match=r"^Error calculating velocity at points"):
+        query.handle_request(request=json.dumps(content))
 
 
 @pytest.mark.unit
 def test_query_mode_exceptions():
     # Invalid mode
     content = {"mode": "invalid", "params": {}}
-    response = query.handle_request(request=json.dumps(content))
-    assert "Invalid request mode" in response, f"{response}"
+    with pytest.raises(Exception, match=r"^Invalid request mode"):
+        query.handle_request(request=json.dumps(content))
 
 
 @pytest.mark.unit
@@ -154,8 +150,8 @@ def test_query_plot_exceptions():
             "index": 10,
         },
     }
-    response = query.handle_request(request=json.dumps(content))
-    assert "Invalid plot index '10'" in response, f"{response}"
+    with pytest.raises(Exception, match="Invalid plot index"):
+        query.handle_request(request=json.dumps(content))
 
     # Invalid plot params (invalid axis)
     content = {
@@ -169,8 +165,8 @@ def test_query_plot_exceptions():
             "axis": "invalid",
         },
     }
-    response = query.handle_request(request=json.dumps(content))
-    assert "Invalid plot axis" in response, f"{response}"
+    with pytest.raises(Exception, match="Invalid plot axis"):
+        query.handle_request(request=json.dumps(content))
 
 
 @pytest.mark.slow
@@ -203,11 +199,11 @@ def test_query_performance():
             # "low_bounds": [0, -10, -10],
             # "high_bounds": [0, 10, 10],
             "chunk_size": 5,
-            "t": 0,
+            "time": 0,
             "do_return": True,
             # "do_cache": True,
         },
-        "plot": {"axis": "x", "index": 0, "save": "__test_fig__", "size": [1280, 960]},
+        "plot": {"axis": "x", "index": 0, "size": [1280, 960]},
     }
     response = query.handle_request(request=json.dumps(content))
     if isinstance(response, str):

@@ -9,13 +9,33 @@ class InvalidProfile(Exception):
 
 
 class EddyProfile:
+    """
+    Eddy profile class to manage eddy parameters and settings that are independent of a field.
+
+    TODO: Expand this class to provide realistic eddy profiles if the user cannot provide one.
+    """
     def __init__(self, name: str):
+        """
+        Initialize the EddyProfile object.
+
+        Parameters
+        ----------
+        name : str
+            Name of the eddy profile file.
+
+        Raises
+        ------
+        InvalidProfile
+            If the eddy profile file is invalid.
+        """
+        # Read the profile data
         data: dict = file_io.read('profiles', name)
 
         self.name = name
         self.settings: dict = data.get('settings', {})
         self.variants: List[Dict] = data.get('variants', [])
 
+        # Validate the profile
         if not isinstance(self.variants, list):
             raise InvalidProfile('Eddy variants must be a list (array)')
         if len(self.variants) == 0:
