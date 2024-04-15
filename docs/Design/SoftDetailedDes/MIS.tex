@@ -760,11 +760,13 @@ None.
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
-\texttt{read} & \texttt{type} str,\newline\texttt{name} str & Record or Array & FileNotExist \\
-\texttt{write} & \texttt{type} str,\newline\texttt{name} str,\newline\texttt{content} Record or Array & - & FailToWrite \\
+\texttt{read} & \texttt{sub\_dir} str,\newline\texttt{name} str & Record or Array or FlowFieldT & FailToRead \\
+\texttt{write} & \texttt{sub\_dir} str,\newline\texttt{name} str,\newline\texttt{content} Record or Array or FlowFieldT or Figure & - & FailToWrite \\
 \hline
 \end{tabular}
 \end{center}
+
+\noindent This module takes care of file directory (always local to the program), handling specific formats and exceptions, so that other modules can focus on their own tasks.
 
 \subsection{Semantics}
 
@@ -773,27 +775,33 @@ None.
 
 \subsubsection{Environment Variables}
 \begin{itemize}
-  \item Files on disk.
+  \item \texttt{dir}: str, directory of the program
+  \item \texttt{file}: file on disk to be read or written
 \end{itemize}
 
 \subsubsection{Assumptions}
 \begin{itemize}
-  \item The field name or profile name is the same as the filename.
-  \item Saved fields are in \texttt{./fields/} and saved profiles are in \texttt{./profiles/} directories
+  \item Array passed is large (such as calculation result), so it is faster to save it in binary format than serializing it to format like JSON.
 \end{itemize}
 
 
 \subsubsection{Access Routine Semantics}
 
-\noindent \texttt{read(type, name)}:
+\noindent \texttt{read(sub\_dir, name)}:
 \begin{itemize}
-\item output: out := Record or Array, the parsed content of the file.
-\item exception: exc := (file cannot be found at \texttt{./<type>/<name>.json} $\Rightarrow$ FileNotExist)
+\item output: out := Record, Array or FlowFieldT, depending on the type of file read.
+\item exception: exc := (file cannot be found or not the expected data type $\Rightarrow$ FailToRead)
 \end{itemize}
 
-\noindent \texttt{write(type, name, content)}:
+\noindent \texttt{write(sub\_dir, name, content)}:
 \begin{itemize}
-\item transition: write the serialized JSON string to the file on disk.
+\item transition: write the \texttt{content} to the file on disk, depending on data type.
+\begin{itemize}
+  \item Record $\Rightarrow$ JSON
+  \item Array $\Rightarrow$ NumPy binary
+  \item FlowFieldT $\Rightarrow$ pickle binary
+  \item Figure $\Rightarrow$ PNG
+\end{itemize} 
 \item exception: exc := (file cannot be written to disk $\Rightarrow$ FailToWrite)
 \end{itemize}
 
