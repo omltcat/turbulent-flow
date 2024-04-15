@@ -110,6 +110,7 @@ character & char & a single symbol or digit\\
 integer & $\mathbb{Z}$ & a number without a fractional component in (-$\infty$, $\infty$) \\
 natural number & $\mathbb{N}$ & a number without a fractional component in [1, $\infty$) \\
 real & $\mathbb{R}$ & any number in (-$\infty$, $\infty$)\\
+boolean & $\mathbb{B}$ & true or false \\
 \bottomrule
 \end{tabular} 
 \end{center}
@@ -301,8 +302,8 @@ None.
     \item \texttt{mode}: str, query mode, (``meshgrid" or ``points").
     \item \texttt{params}
     \begin{itemize}
-      \item (meshgrid mode) \texttt{low\_bound}: VectorT, lower bound of the meshgrid.
-      \item (meshgrid mode) \texttt{high\_bound}: VectorT, upper bound of the meshgrid.
+      \item (meshgrid mode) \texttt{low\_bounds}: VectorT, lower bound of the meshgrid.
+      \item (meshgrid mode) \texttt{high\_bounds}: VectorT, upper bound of the meshgrid.
       \item (meshgrid mode) \texttt{step\_size}: $\mathbb{R}$, step size of the meshgrid.
       \item (meshgrid mode) \texttt{chunk\_size}: $\mathbb{N}$, grid size in each chunk.
       \item (points mode) \texttt{coords}: \{VectorT\}, array of points to query.
@@ -344,13 +345,13 @@ None.
 \item transition: \texttt{field} := as inputted
 \end{itemize}
 
-\noindent \texttt{handle\_request(request)}:\\
+\noindent \texttt{handle\_request(query\_name)}:\\
 \noindent Currently, points mode is a placeholder. An array of points is handled as many single point meshgrids.
 \begin{itemize}
 \item transition:
   \begin{itemize}
     \item \texttt{request} := \texttt{file\_io.read(query\_name)} parse \texttt{query\_file} into a Record.
-    \item \texttt{velocities} := \texttt{field.sum\_vel\_mesh(request)} get the velocity vectors at the queried meshgrid and time.
+    \item \texttt{velocities} := \texttt{field.sum\_vel\_mesh(request.params)} get the velocity vectors at the queried meshgrid and time.
     \item \texttt{result\_file} := \texttt{file\_io.write(`results', velocities)} save the result.
     \item \texttt{figure} := \texttt{visualize.plot\_mesh(velocities, plot)} render plot if requested.
     \item \texttt{plot\_file} := \texttt{file\_io.write(`plots', figure)} save the plot if requested.
@@ -475,7 +476,6 @@ None.
 \item Eddy Module [MIS\ref{mEddy}]
 \item Vector Module [NumPy]
 \item File I/O Module [MIS\ref{mFile}]
-\item Visualization Module [MIS\ref{mVisual}] (PLACEHOLDER)
 \end{itemize}
 
 \subsection{Syntax}
@@ -486,15 +486,15 @@ None.
 \subsubsection{Exported Access Programs}
 
 \begin{center}
-\begin{tabular}{p{2cm} p{4.5cm} p{3.5cm} p{4cm}}
+\begin{tabular}{p{2.3cm} p{4.3cm} p{3.5cm} p{4cm}}
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
-\texttt{init} & \texttt{profile} EddyProfileT, \newline\texttt{field\_name} str, \newline\texttt{dimensions} VectorT, \newline\texttt{avg\_vel} $\mathbb{R}$, \newline\texttt{eddy\_count} $\mathbb{Z}$ & - & \texttt{InvalidDimensions}\newline\texttt{InvalidAvgVelocity}\newline\texttt{EddyScaleTooLarge}\\
-\texttt{load} & \texttt{field\_name} str & - & -  \\
-\texttt{save} & - & \texttt{field} Record & -  \\
+\texttt{init} & \texttt{profile} EddyProfileT, \newline\texttt{field\_name} str, \newline\texttt{dimensions} VectorT, \newline\texttt{avg\_vel} $\mathbb{R}$ & - & \texttt{InvalidDimensions}\newline\texttt{InvalidAvgVelocity}\newline\texttt{EddyScaleTooLarge}\\
+\texttt{load} & \texttt{field\_name} str & \texttt{field} FlowFieldT & -  \\
+\texttt{save} & - & - & -  \\
 % \texttt{save} & \texttt{profile\_name} str & - & -  \\
-\texttt{sum\_vel}& \texttt{position} VectorT,\newline\texttt{time} $\mathbb{R}$ & \texttt{velocity} VectorT & \texttt{OutOfBoundary}\newline\texttt{NegativeTime} \\
+\texttt{sum\_vel\_mesh}& \texttt{high\_bounds} VectorT,\newline\texttt{low\_bounds} VectorT,\newline\texttt{step\_size} $\mathbb{R+}$,\newline\texttt{chunk\_size} $\mathbb{N}$,\newline\texttt{time} $\mathbb{R}$ & \texttt{velocities}\newline array of VectorT & \texttt{OutOfBoundary}\newline\texttt{InvalidStepSize}\newline\texttt{InvalidChunkSize}\newline\texttt{InvalidTime} \\
 \hline
 \end{tabular}
 \end{center}
@@ -505,13 +505,20 @@ None.
 \begin{itemize}
   \item \texttt{profile}: EddyProfileT, eddy profile to be used to generate the flow field.
   \item \texttt{name}: str, name of the flow field (is also filename).
-  \item \texttt{dimensions}: VectorT of \{$L_x, L_y, L_z$\}, size of the flow field, with x being the axial direction, y vertical and z horizontal.
+  \item \texttt{dimensions}: VectorT, size of the flow field, with $x$ being the axial direction, $y$ horizontal and $z$ vertical.
   \item \texttt{avg\_vel}: $\mathbb{R}$, average flow velocity along x-axis.
-  \item \texttt{eddies}: \{EddyT\}, array of eddies in the flow field.
+  \item \texttt{N}: $\mathbb{N}$, total number of eddies in the field.
+  \item \texttt{init\_x}: array of $\mathbb{R}$, initial $x$-coordinates of all eddies in the field.
+  \item \texttt{y}: set \{array of $\mathbb{R}$\}, $y$-coordinates of all eddies in the field at each flow iteration.
+  \item \texttt{z}: set \{array of $\mathbb{R}$\}, $z$-coordinates of all eddies in the field at each flow iteration.
+  \item \texttt{sigma}: array of $\mathbb{R+}$, length scales ($\sigma$) of all eddies in the field.
+  \item \texttt{alpha}: array of VectorT, intensity vector ($\boldsymbol{\alpha}$) of all eddies in the field.
 \end{itemize}
 
 \subsubsection{Environment Variables}
-None.
+\begin{itemize}
+  \item \texttt{field\_file}: binary file containing the flow field object, named after \texttt{field\_name}.
+\end{itemize}
 
 \subsubsection{Assumptions}
 \begin{itemize}
@@ -525,55 +532,61 @@ Initialize the flow field with given eddy profile. Randomly generate eddies base
 \begin{itemize}
 \item transition: 
   \begin{itemize}
-    \item \texttt{profile, name, length\_x, length\_y, length\_z, avg\_vel} := as inputted
-    \item \texttt{eddies} := \{\texttt{eddy\_count} number of EddyT randomly generated with \texttt{profile}\}
+    \item \texttt{profile, name, dimensions, avg\_vel} := as inputted
+    \item \texttt{N} := $\sum (\texttt{profile.get\_density()} \times \prod \texttt{dimensions})$
+    \item \texttt{init\_x} := [$\texttt{-dimensions(0)/2} \leq \text{random}~\mathbb{R} \leq \texttt{dimensions(0)/2}$] of size \texttt{N}
+    \item \texttt{y} := [$\texttt{-dimensions(1)/2} \leq \text{random}~\mathbb{R} \leq \texttt{dimensions(1)/2}$] of size \texttt{N}, for first 3 flow iterations
+    \item \texttt{z} := [$\texttt{-dimensions(2)/2} \leq \text{random}~\mathbb{R} \leq \texttt{dimensions(2)/2}$] of size \texttt{N}, for first 3 flow iterations
+    \item \texttt{sigma} := array of size \texttt{N}, the sigma (length scale) of each eddy variant is repeated in this array by its density $\times$ field volume.
+    \item \texttt{alpha} := array of size \texttt{N}, the magnitude of alpha (intensity) of each eddy variant is repeated in this array by its density $\times$ field volume. Then this array is multiplied by an array of random unit vector to get the alpha vectors of all eddies.
   \end{itemize}
 \item exception: 
   \begin{itemize}
-    \item exc := (any of d in \texttt{dimensions} $\le$ 0 $\Rightarrow$ \texttt{InvalidDimensions})
+    \item exc := (any $d$ $\in$ \texttt{dimensions} $\le$ 0 $\Rightarrow$ \texttt{InvalidDimensions})
     \item exc := (\texttt{avg\_vel} $<$ 0 $\Rightarrow$ \texttt{InvalidAvgVelocity})
-    \item exc := (any of 2$*$\{length\_scale in \texttt{profile}\} $\ge$ any of d in \texttt{dimensions} $\Rightarrow$ \texttt{EddyScaleTooLarge})
+    \item exc := (any $2 \times \sigma \in \texttt{sigma}$ $\ge$ any $d \in \texttt{dimensions}$ $\Rightarrow$ \texttt{EddyScaleTooLarge})
   \end{itemize}
 \end{itemize}
 
 \noindent \texttt{load(field\_name)}:
 \begin{itemize}
-  \item transition: all state variables reconstructed from \texttt{file\_io.read(`field', field\_name)}.
+  \item output: \texttt{field} := \texttt{file\_io.read(`fields', field\_name)} load the flow field from \texttt{field\_file}.
 \end{itemize}
 
-\noindent \texttt{save(new\_name?)}:
+\noindent \texttt{save()}:
 \begin{itemize}
-  \item transition: \texttt{name} := \texttt{new\_name} if provided, otherwise name remains the same.
-  \item output: out := Record (dict) with all current state variables. Each EddyT in \texttt{eddies} is also converted to a Record. So that \texttt{file\_io.write(`field', Record)} can be called to serialized the current state of the flow field into a JSON string for saving.
+  \item transition: \texttt{field\_file} := \texttt{file\_io.write(`fields', field)} save the field object.
 \end{itemize}
 
-\noindent \texttt{sum\_vel(position, time)}:\\
-Add up the velocity influence from all eddies at a given position and time.
+\noindent \texttt{sum\_vel(low\_bounds, high\_bounds, step\_size, chunk\_size, time)}:\\
+This function calculates the velocity at each position within a queried meshgrid, by summing the influence by all nearby eddies at a given time. Due to practical considerations compared to the theoretical models in SRS, it is very hard to explain this part with only formal notations. I had to use nature language.
 \begin{itemize}
-  \item output: out := $\sum$ \{\texttt{eddy.get\_vel(position - eddy\_pos(eddy, time))} for each \texttt{eddy} in \texttt{eddies}\}, with wrap-around applied for eddies near the boundary.
+  \item First, use the queried \texttt{time} to get its corresponding flow iteration and offset. A flow iteration (\texttt{fi}) is defined as when an entire $x$-length of the field dimension has passed due to the average flow velocity in $x$-direction. The offset is the $x$-difference compared to the start of current iteration.
+  \item Position array of eddy centers := \texttt{get\_eddy\_centers(fi)}. In this function, if the $y$ and $z$ positions of the input flow iteration is saved in state variables \texttt{y} and \texttt{z}, they will be returned, otherwise they will be randomly generated and stored. Then, the offset is applied to the \texttt{init\_x}. Now the center positions of all eddies at the queried time are obtained.
+  \item To satisfy conservation of mass, eddies that are partially outside the field need to be wrapped around to the other side. In the $x$-direction, the previous and next flow iterations are added. In the $y$ and $z$ directions, the current field is copied to outside of each side and diagonally (function \texttt{get\_wrap\_arounds()}). To save computational resources, only the eddies that are within the field or outside but touching the field are kept (function \texttt{within\_margin()}).
+  \item The queried region within the field is bounded by \texttt{low\_bounds} and \texttt{high\_bounds}. Using a resolution of \texttt{step\_size}, this region is turned into a meshgrid. Velocity need to be calculated at each point in this meshgrid.
+  \item To avoid repeatedly calculating influence by eddies that are far away from any given point, the field is divided into chunks of size \texttt{chunk\_size} in each direction. For each chunk, only eddies that are either inside the chunk or outside but touching the chunk are considered (function \texttt{within\_margin()}).
+  \item Call \texttt{eddy.sum\_vel\_chunk()} for each chunk to get the velocity at each point in the chunk. This chunk velocity array is then merged to the entire meshgrid velocity array.
+  \item output: \texttt{velocities} := array of VectorT, the velocity vectors at each point in the meshgrid.
 \end{itemize}
 
 \subsubsection{Local Functions}
 
-
-\noindent \texttt{eddy\_pos(eddy, time)}:
+\noindent \texttt{get\_eddy\_centers(flow\_iteration)}:
 \begin{itemize}
-\item output: out := VectorT: \{\texttt{\\
-  get\_offset(time) + eddy.get\_init\_x(),\\
-  eddy.get\_y(get\_iter(time), dimensions[1]),\\
-  eddy.get\_z(get\_iter(time), dimensions[2])}\\
-\}, the center position of the eddy at a given time (moving due to flow).
+  \item output: \texttt{centers} := array of VectorT, eddy center positions at the queried flow iteration. See description above.
 \end{itemize}
 
-\noindent \texttt{get\_iter(time)}:
+\noindent \texttt{get\_wrap\_arounds()}:
 \begin{itemize}
-\item output: out := \texttt{round($\frac{\texttt{avg\_vel}*\texttt{time}}{\texttt{dimensions[0]}}$)}, the number of iterations of the flow field at a given time (how many x-lengths have passed due to average flow velocity).
+  \item output: \texttt{centers}, \texttt{sigma}, \texttt{alpha} := the center position of each eddy and after wrapping, with its corresponding sigma and alpha. See description above.
 \end{itemize}
 
-\noindent \texttt{get\_offset(time)}:
+\noindent \texttt{within\_margin(value, margin, low\_bound, high\_bound)}:
 \begin{itemize}
-\item output: out := $\texttt{avg\_vel}*\texttt{time} \% \texttt{dimensions[0]}$, the x-offset of the flow field at given time in current iteration.
+\item output: out := $\mathbb{B}$, $(\texttt{value} < \texttt{high\_bound} + \texttt{margin}) \land (\texttt{value} > \texttt{low\_bound} - \texttt{margin})$
 \end{itemize}
+
 
 
 \newpage
