@@ -388,14 +388,15 @@ None.
 \subsubsection{Exported Access Programs}
 
 \begin{center}
-\begin{tabular}{p{2.5cm} p{3.5cm} p{5cm} p{4cm}}
+\begin{tabular}{p{3.2cm} p{3.5cm} p{5cm} p{3cm}}
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
-\texttt{load} & \texttt{profile\_name} str & - & \texttt{InvalidProfile} \\
+\texttt{init} & \texttt{profile\_name} str & - & \texttt{InvalidProfile} \\
 % \texttt{save} & \texttt{profile\_name} str & - & -  \\
-\texttt{get\_params}& - & \texttt{params} \{{\{$\mathbb{R+}$, $\mathbb{R+}$\}}\} & - \\
-\texttt{get\_weights}& - & \texttt{weights} \{$\mathbb{R+}$\} & - \\
+\texttt{get\_density}& - & \texttt{densities} array of $\mathbb{R+}$ & - \\
+\texttt{get\_length\_scale}& - & \texttt{length\_scales} array of $\mathbb{R+}$ & - \\
+\texttt{get\_intensity}& - & \texttt{intensities} array of $\mathbb{R+}$ & - \\
 \hline
 \end{tabular}
 \end{center}
@@ -405,40 +406,55 @@ None.
 \subsubsection{State Variables}
 \begin{itemize}
   \item \texttt{name}: str, name of the eddy profile (is also filename).
-  \item \texttt{params}: \{{\{$\mathbb{R+}$, $\mathbb{R+}$\}}\}, array of \{intensity, length\_scale\} sets for each type of eddy.
-  \item \texttt{weights}: \{$\mathbb{R+}$\}, corresponding array of weights for each type of eddy.
+  \item \texttt{variants}: array of Records, each containing \{\texttt{density}, \texttt{length\_scale}, \texttt{intensity}\}
+  \begin{itemize}
+    \item \texttt{density}: $\mathbb{R+}$, how many eddies in a unit volume.
+    \item \texttt{length\_scale}: $\mathbb{R+}$, the length scale ($\sigma$) of the eddy variant.
+    \item \texttt{intensity}: $\mathbb{R+}$, the intensity magnitude ($|\alpha|$) of the eddy variant.
+  \end{itemize}
+  
 \end{itemize}
 
 \subsubsection{Environment Variables}
-None.
+\begin{itemize}
+  \item \texttt{profile\_file}: the file containing the eddy profile.
+\end{itemize}
 
 \subsubsection{Assumptions}
 None.
 
 \subsubsection{Access Routine Semantics}
 
-\noindent \texttt{load(profile\_name)}:\\
-Load a saved eddy profile from file, which contains the one or more eddy types, their parameters (intensity magnitude and length-scale) and weights (for random generation).
+\noindent \texttt{init(profile\_name)}:
 \begin{itemize}
-\item transition: \texttt{params, weights} := \texttt{file\_io.read(`profile', profile\_name)}
-\item exception: exc := (\texttt{params} is not \{{\{$\mathbb{R+}$, $\mathbb{R+}$\}}\} or \texttt{weights} is not type \{$\mathbb{R+}$\} $\Rightarrow$ \texttt{InvalidProfile})
+\item transition:
+  \begin{itemize}
+    \item \texttt{name} := \texttt{profile\_name}
+    \item \texttt{variants} := \texttt{file\_io.read(`profiles', profile\_name)} load the eddy profile from \texttt{profile\_file}.
+  \end{itemize}
+\item exception: exc := (($\nexists \texttt{density} \vee \nexists \texttt{length\_scale} \vee \nexists \texttt{intensity}) \forall \texttt{variants} \Rightarrow$ \texttt{InvalidProfile})
+\item exception: exc := ($\neg \forall \{\texttt{density}, \texttt{length\_scale}, \texttt{intensity} \in \texttt{variants}\} >0$ $\Rightarrow$ \texttt{InvalidProfile})
 % \item output: out := \texttt{encode(\{VectorT\})}, velocity vectors at all the queried points in one JSON string.
 \end{itemize}
 %   will have one or the other.}
 
-\noindent \texttt{get\_params()}:
+\noindent \texttt{get\_density()}:
 \begin{itemize}
-\item output: out := \texttt{params}
+\item output: \texttt{densities} := $[\texttt{density} \in \texttt{variants}]$
 \end{itemize}
 
-\noindent \texttt{get\_weights()}:
+\noindent \texttt{get\_length\_scale()}:
 \begin{itemize}
-\item output: out := \texttt{weights}
+\item output: \texttt{length\_scales} := $[\texttt{length\_scale} \in \texttt{variants}]$
+\end{itemize}
+
+\noindent \texttt{get\_intensity()}:
+\begin{itemize}
+\item output: \texttt{intensities} := $[\texttt{intensity} \in \texttt{variants}]$
 \end{itemize}
 
 \subsubsection{Local Functions}
-Some functions to compute the eddy profile based on user provided parameters, to be implemented in the future.
-
+None.
 
 
 \newpage
