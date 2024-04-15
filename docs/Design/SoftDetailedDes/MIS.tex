@@ -723,7 +723,7 @@ None.
 \noindent \texttt{active(dk, sigma)}:
 \begin{itemize}
   \item output: \texttt{shape\_val} := $\mathbb{R}$, depending on the currently active function, 
-  \newline calls the active shape function with the inputted parameters to get output value.
+  \newline because the variable \texttt{active} points to a function in this module, calling it will actually call the designated function behind it.
 \end{itemize}
 
 \noindent \texttt{quadratic(dk, sigma)}:
