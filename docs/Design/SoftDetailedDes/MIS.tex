@@ -193,11 +193,12 @@ None.
 \subsubsection{Exported Access Programs}
 
 \begin{center}
-\begin{tabular}{p{2cm} p{5.6cm} p{3cm} p{2cm}}
+\begin{tabular}{p{2cm} p{3.5cm} p{3cm} p{5cm}}
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
-\texttt{main} & \texttt{command\_args} str, & - & - \\
+\texttt{new}  & \texttt{profile\_name} str,\newline\texttt{field\_name} str,\newline\texttt{dimensions} $\mathbb{R}^3$,\newline\texttt{avg\_vel} $\mathbb{R}$ & - & unrecognized arguments,\newline required args not inputted\\
+\texttt{query}  & \texttt{field\_name} str,\newline\texttt{query\_file} str,\newline\texttt{shape\_func} str,\newline\texttt{cutoff} $\mathbb{R}$ & - & unrecognized arguments,\newline required args not inputted\\
 \hline
 \end{tabular}
 \end{center}
@@ -205,11 +206,14 @@ None.
 \subsection{Semantics}
 
 \subsubsection{State Variables}
-None.
+\begin{itemize}
+  \item \texttt{profile}: EddyProfileT, the eddy profile object to be used for generating the flow field.
+  \item \texttt{field}: FlowFieldT, the flow field object to be generated.
+\end{itemize}
 
 \subsubsection{Environment Variables}
 \begin{itemize}
-  \item Command line console.
+  \item \texttt{console} str
 \end{itemize}
 
 \subsubsection{Assumptions}
@@ -217,18 +221,30 @@ None.
 
 \subsubsection{Access Routine Semantics}
 
-\noindent \texttt{main(command\_args)}:
+\noindent \texttt{new(profile\_name, field\_name, dimensions, avg\_vel)}:
 \begin{itemize}
-\item \texttt{--new\_field --name <field\_name> --dim <Lx>,<Ly>,<Lz>, --vel <avg\_vel> --count <eddy\_count> --profile <profile\_name>} 
+  \item transition:
   \begin{itemize}
-    \item call \texttt{eddy\_profile.load(profile\_name)} to read the eddy profile file.
-    \item call \texttt{flow\_field.init(profile, field\_name, dimensions, avg\_vel, eddy\_count)} to create a new flow field.
+    \item \texttt{profile} := \texttt{eddy\_profile.load(profile\_name)} load the eddy profile.
+    \item \texttt{field} := \texttt{flow\_field.init(profile, field\_name, dimensions, avg\_vel)} create a new field.
+    \item Call \texttt{flow\_field.save()} to save itself.
+    \item \texttt{console} := ``Field (\texttt{field\_name}) generated and saved."
   \end{itemize}
-\item \texttt{--field <field\_name> --query <request>}
+  \item exception: exc := (\texttt{profile\_name}, \texttt{field\_name}, \texttt{dimensions} not inputted $\Rightarrow$ ``Required arguments not inputted"). \texttt{avg\_vel} has default value of 0.0 so it can be omitted.
+  \item exception: exc := (Any arguments inputted other than \texttt{profile\_name}, \texttt{field\_name}, \texttt{dimensions}, \texttt{avg\_vel} $\Rightarrow$ ``Unrecognized arguments")
+\end{itemize}
+
+\noindent \texttt{query(field\_name, query\_file, shape\_func, cutoff)}:
+\begin{itemize}
+  \item transition:
   \begin{itemize}
-    \item call \texttt{flow\_field.load(field\_name)} to load the flow field.
-    \item call \texttt{query.handle\_request(request)} to get the velocity vectors at the queried points.
+    \item \texttt{field} := \texttt{flow\_field.load(field\_name)} load a saved field.
+    \item if \texttt{shape\_func} is passed, call \texttt{shape\_function.set\_active(shape\_func)} to set the active shape function.
+    \item if \texttt{cutoff} is passed, call \texttt{shape\_function.set\_cutoff(cutoff)} to set the cutoff value.
+    \item \texttt{console} := \texttt{query.handle\_request(field, query\_file)} to get the velocity vectors at the queried positions and times specified in \texttt{query\_file}, and output an operation summary (where the raw result and plot are saved).
   \end{itemize}
+  \item exception: exc := (\texttt{field\_name}, \texttt{query\_file} not inputted $\Rightarrow$ ``Required arguments not inputted"). 
+  \item exception: exc := (Any arguments inputted other than \texttt{field\_name}, \texttt{query\_file}, \texttt{shape\_func}, \texttt{cutoff} $\Rightarrow$ ``Unrecognized arguments")
 \end{itemize}
 
 \subsubsection{Local Functions}
