@@ -343,7 +343,7 @@ How test will be performed: Automated test script, GitHub Actions.
     \item $|\mathbf{u_1} -\mathbf{u_2}| <\text{tol}|\mathbf{u_1}|$\tab $|\mathbf{u_3}| = |\mathbf{u_4}|=0$
   \end{itemize}
 
-  Test Case Derivation: Points should have equal and opposite velocities inside the eddy, and zero velocity outside. We can also make the script query more points inside the eddy to test if the magnitude follows shape function
+  Test Case Derivation: Points should have equal and opposite velocities inside the eddy, and zero velocity outside. This is a result of the shape function cutting off the influence of each eddy beyond $\sigma$.
             
   How test will be performed: Automated test script, GitHub Actions.
 
@@ -375,7 +375,7 @@ How test will be performed: Automated test script, GitHub Actions.
     \item $\text{std}(\mathbf{u_z}) < \text{tol}$
   \end{itemize}
 
-  Test Case Derivation: Flow of an eddy should be around its orientation axis. Thus, velocity standard deviation along the eddy orientation should be zero (below tolerance).
+  Test Case Derivation: Flow of an eddy should be around its orientation axis. There should not be velocity in the axial direction. Thus, velocity standard deviation along the eddy orientation should be zero (below tolerance).
             
   How test will be performed: Automated test script, GitHub Actions.
 
@@ -412,7 +412,7 @@ How test will be performed: Automated test script, GitHub Actions.
     \item $|\frac{\sum\mathbf{u}-\mathbf{u_{avg}}}{N_{grid~points}}| < \text{tol}$
   \end{itemize}
 
-  Test Case Derivation: The vector mean of all velocity fluctuations caused by the eddies should be zero (below tolerance).
+  Test Case Derivation: The vector mean of all velocity fluctuations caused by the eddies should be zero (below tolerance). For eddies completely within the field, this should be inherently true as velocity moves in circles. For eddies partially outside the field boundary, they should be wrapped around to the opposite side of the field to ensure this property.
             
   How test will be performed: Automated test script, GitHub Actions.
 
@@ -433,7 +433,7 @@ How test will be performed: Automated test script, GitHub Actions.
     \item $\text{std}(\mathbf{u})|_{t_0} - \text{std}(\mathbf{u})|_{t_1} < \text{tol}$
   \end{itemize}
 
-  Test Case Derivation: Velocity standard deviation should stay the same regardless of time.
+  Test Case Derivation: Velocity standard deviation should stay the same regardless of time, as the eddies are only moved to different locations in the field.
 
   How test will be performed: Automated test script, GitHub Actions.
 
@@ -455,7 +455,7 @@ How test will be performed: Automated test script, GitHub Actions.
     \item if $|\mathbf{\alpha}|_1 > |\mathbf{\alpha}|_2$ then $\text{std}(\mathbf{u})_1 > \text{std}(\mathbf{u})_2$
   \end{itemize}
 
-  Test Case Derivation: Velocity standard deviation should increase with eddy intensity $|\mathbf{\alpha}|$.
+  Test Case Derivation: Velocity standard deviation should increase with eddy intensity $|\mathbf{\alpha}|$, as the velocity fluctuations are stronger with higher intensity.
 
   How test will be performed: Automated test script, GitHub Actions.
 
