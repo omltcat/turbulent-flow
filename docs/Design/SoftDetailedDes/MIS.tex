@@ -116,12 +116,12 @@ boolean & $\mathbb{B}$ & true or false \\
 \end{center}
 
 \noindent
-The specification of \progname \ uses some derived data types: sequences (\textbf{array}), records, strings (\textbf{str}), and
-tuples. Sequences are lists filled with elements of the same data type. Strings
-are sequences of characters. Tuples contain a list of values, potentially of
-different types. In addition, \progname \ uses functions, which
-are defined by the data types of their inputs and outputs. Local functions are
-described by giving their type signature followed by their specification.
+The specification of \progname \ also uses some derived data types: 
+\begin{itemize}
+  \item \textbf{Array} (sequence): lists filled with elements of the same data type
+  \item \textbf{Record}: a collection of fields, where each field is a key-value pair
+  \item \textbf{String} (\textbf{str}): a sequence of characters 
+\end{itemize}
 
 \subsection{Variable Name Traceability}
 To help program development and understanding, some notations regarding the eddy profile from the SRS TM and DD are altered in the MIS to better reflect their usage in the code:
@@ -138,6 +138,11 @@ As several modules listed in Section \ref{SecMD} are Abstract Data Types (ADTs),
   \item \textbf{EddyProfileT}: Eddy profile object, stores a Record of different types of eddies with their parameters (intensity, length\_scale), and weights for random generation [MIS\ref{mProf}].
   \item \textbf{FlowFieldT}: Flow field object, stores all EddyT objects in that field, with methods for velocity sum calculation, see Flow Field Module [MIS\ref{mFlow}].
   \item \textbf{QueryT}: Query interface object, handles the request to query a field, see Query Interface Module [MIS\ref{mQuery}].
+\end{itemize}
+
+Additional Abstract Data Types:
+\begin{itemize}
+  \item \textbf{Figure}: matplotlib figure object, for visualization.
 \end{itemize}
 
 \section{Module Decomposition} \label{SecMD}
