@@ -231,8 +231,8 @@ None.
     \item Call \texttt{flow\_field.save()} to save itself.
     \item \texttt{console} := ``Field (\texttt{field\_name}) generated and saved."
   \end{itemize}
-  \item exception: exc := (\texttt{profile\_name}, \texttt{field\_name}, \texttt{dimensions} not inputted $\Rightarrow$ ``Required arguments not inputted"). \texttt{avg\_vel} has default value of 0.0 so it can be omitted.
-  \item exception: exc := (Any arguments inputted other than \texttt{profile\_name}, \texttt{field\_name}, \texttt{dimensions}, \texttt{avg\_vel} $\Rightarrow$ ``Unrecognized arguments")
+  \item exception: exc := ($\nexists$ \texttt{profile\_name} $\vee$ $\nexists$ \texttt{field\_name}$\vee$ $\nexists$ \texttt{dimensions}$\Rightarrow$ ``Required arguments not inputted"). \texttt{avg\_vel} has default value of 0.0 so it can be omitted.
+  \item exception: exc := (input $\notin$ \{\texttt{profile\_name}, \texttt{field\_name}, \texttt{dimensions}, \texttt{avg\_vel}\} $\Rightarrow$ ``Unrecognized arguments")
 \end{itemize}
 
 \noindent \texttt{query(field\_name, query\_file, shape\_func, cutoff)}:
@@ -245,8 +245,8 @@ None.
     \item if \texttt{cutoff} is passed, call \texttt{shape\_function.set\_cutoff(cutoff)} to set the cutoff value.
     \item \texttt{console} := \texttt{query.handle\_request(query\_file)} to get the velocity vectors at the queried positions and times specified in \texttt{query\_file}, and output an operation summary (where the raw result and plot are saved).
   \end{itemize}
-  \item exception: exc := (\texttt{field\_name}, \texttt{query\_file} not inputted $\Rightarrow$ ``Required arguments not inputted"). 
-  \item exception: exc := (Any arguments inputted other than \texttt{field\_name}, \texttt{query\_file}, \texttt{shape\_func}, \texttt{cutoff} $\Rightarrow$ ``Unrecognized arguments")
+  \item exception: exc := ($\nexists$ \texttt{field\_name} $\vee$ $\nexists$ \texttt{query\_file} $\Rightarrow$ ``Required arguments not inputted"). 
+  \item exception: exc := (input $\notin$ \{\texttt{field\_name}, \texttt{query\_file}, \texttt{shape\_func}, \texttt{cutoff}\} $\Rightarrow$ ``Unrecognized arguments")
 \end{itemize}
 
 \subsubsection{Local Functions}
