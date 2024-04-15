@@ -66,7 +66,7 @@
 
 \section{Symbols, Abbreviations, and Acronyms}
 
-Please refer to the Software Requirements Specification (SRS) \citet{SRS} of this project. Section 1 contains Symbols, Abbreviations, and Acronyms. If you are not familiar with fluids and CFD, Section 4.1.1 of the SRS contains a list of Terminology and Definitions.\\
+Please refer to the Software Requirements Specification (\href{https://github.com/omltcat/turbulent-flow/blob/main/docs/SRS/SRS.pdf}{SRS}) of this project. Section 1 contains Symbols, Abbreviations, and Acronyms. If you are not familiar with fluids and CFD, Section 4.1.1 of the SRS contains a list of Terminology and Definitions.\\
 ~\newline
 The following symbols and operators are used in this document:\\
 \renewcommand{\arraystretch}{1.2}
@@ -139,7 +139,7 @@ Furthermore, maintainability, namely the ability for user to easily modify the s
 \subsection{Relevant Documentation}
 
 \begin{itemize}
-  \item Software Requirements Specification (\href{https://github.com/omltcat/turbulent-flow/blob/main/docs/SRS/SRS.pdf}{SRS}) \citet{SRS} is the most important guideline for this VnV plan. It contains the requirements of the software, and the theoretical Modules of the synthetic eddy method. 
+  \item Software Requirements Specification (\href{https://github.com/omltcat/turbulent-flow/blob/main/docs/SRS/SRS.pdf}{SRS}) is the most important guideline for this VnV plan. It contains the requirements of the software, and the theoretical Modules of the synthetic eddy method. 
   \item Design Documents will be used to guide the unit testing and the design verification. This include the Module Guide (\href{https://github.com/omltcat/turbulent-flow/blob/main/docs/Design/SoftArchitecture/MG.pdf}{MG}) and the Module Interface Specification (\href{https://github.com/omltcat/turbulent-flow/blob/main/docs/Design/SoftDetailedDes/MIS.pdf}{MIS}). 
 \end{itemize}
 
@@ -175,7 +175,7 @@ This section lays out how the VnV will be carried out in aspect and by whom. It 
 
 \subsection{SRS Verification Plan}
 
-Most of the Functional Requirements in the SRS \citet{SRS}, namely R1-R4 are derived from the synthetic eddy method by \citet{PolettoEtAl2013}, and can be represented mathematically. Thus, they are covered by automated testing detailed in Section \ref{FuncTest}. R5, the interface with CFD software, need to be verified with manual testing by actually conducting CFD simulations with the generated IC and BC.
+Functional Requirements R1 and R2 in the (\href{https://github.com/omltcat/turbulent-flow/blob/main/docs/SRS/SRS.pdf}{SRS}) are derived from the synthetic eddy method by \citet{PolettoEtAl2013}, and can be represented mathematically. Thus, they are covered by automated testing detailed in Section \ref{FuncTest}. R3, the interface with CFD software, need to be verified with manual testing by actually conducting CFD simulations with the generated IC and BC.
 
 The Nonfunctional Requirements in the SRS, including Accuracy, Usability, Maintainability and Portability, will be verified by manual testing. All of these other than Maintainability involves running the software in conjecture with CFD solvers, and will be performed when the CFD integration is implemented in the future. Maintainability will be verified by persons other than the developer attempting to modify the software, and is detailed in Section \ref{NonfuncTest}.
 
@@ -462,7 +462,7 @@ How test will be performed: Automated test script, GitHub Actions.
 \end{enumerate}
 
 \subsubsection{Divergence Test} \label{DivergenceFree}
-\paragraph{Divergence Free Condition [R4]} 
+\paragraph{Divergence Free Condition [R2]} 
 
 \begin{enumerate}
 
@@ -489,12 +489,8 @@ How test will be performed: Automated test script, GitHub Actions.
 
 \end{enumerate}
 
-\subsubsection{Eddy Profile} \label{EddyProfile}
-\paragraph{Provide Realistic Profile Before Generation [R3]\\}
-Test case for this requirement will be added in the future given more theoretical background.
-
 \subsubsection{CFD Interface} \label{CFDInterface}
-\paragraph{Feed IC and BC to CFD Software [R5]\\}
+\paragraph{Feed IC and BC to CFD Software [R3]\\}
 
 \begin{enumerate}
 
@@ -522,7 +518,7 @@ Test case for this requirement will be added in the future given more theoretica
 
 \newpage
 \subsection{Tests for Nonfunctional Requirements} \label{NonfuncTest}
-NFR1, NFR2 and NFR4 is already covered by functional test of CFD interface (\ref{CFDInterface}). NFR3 (maintainability) will be verified by a separate test detailed below.
+NFR2 and NFR4 is already covered by functional test of CFD interface (\ref{CFDInterface}). NFR3 (maintainability) will be verified by a separate test detailed below.
 % \wss{The nonfunctional requirements for accuracy will likely just reference the
 %   appropriate functional tests from above.  The test cases should mention
 %   reporting the relative error for these tests.  Not all projects will
@@ -533,6 +529,10 @@ NFR1, NFR2 and NFR4 is already covered by functional test of CFD interface (\ref
 
 % \wss{Static tests, review, inspections, and walkthroughs, will not follow the
 % format for the tests given below.}
+
+\subsubsection{Accuracy} \label{EddyProfile}
+\paragraph{Provide Realistic Profile Before Generation \\}
+Test case for this requirement will be added in the future given more theoretical background.
 
 \subsubsection{Maintainability} \label{MaintTest}
 		
@@ -568,9 +568,9 @@ How test will be performed: Performed by volunteers or potential users of the so
   Test \ref{InputTest}      & X  &    &    &      &      &      &      &      \\\hline
   Test \ref{EddyGenTest}    &    & X  &    &      &      &      &      &      \\\hline
   Test \ref{FieldGenTest}   &    & X  &    &      &      &      &      &      \\\hline
-  Test \ref{DivergenceFree} &    &    &    & X    &      &      &      &      \\\hline
-  Test \ref{EddyProfile}    &    &    &    & X    &      &      &      &      \\\hline
+  Test \ref{DivergenceFree} &    & X  &    &      &      &      &      &      \\\hline
   Test \ref{CFDInterface}   &    &    & X  &      & X    &      & X    &      \\\hline
+  Test \ref{EddyProfile}    &    &    &    & X    &      &      &      &      \\\hline
   Test \ref{MaintTest}      &    &    &    &      &      & X    &      &      \\\hline
   \end{tabular}
   \caption{Traceability Between Test Cases and Requirements}
