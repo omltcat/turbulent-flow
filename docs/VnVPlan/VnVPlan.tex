@@ -518,7 +518,7 @@ How test will be performed: Automated test script, GitHub Actions.
 
 \newpage
 \subsection{Tests for Nonfunctional Requirements} \label{NonfuncTest}
-NFR2 and NFR4 is already covered by functional test of CFD interface (\ref{CFDInterface}). NFR3 (maintainability) will be verified by a separate test detailed below.
+NFR2 and NFR4 is already covered by functional test of CFD interface (\ref{CFDInterface}). NFR1 (accuracy), NFR3 (maintainability) and NFR5 (performance) will be verified by tests detailed below.
 % \wss{The nonfunctional requirements for accuracy will likely just reference the
 %   appropriate functional tests from above.  The test cases should mention
 %   reporting the relative error for these tests.  Not all projects will
@@ -557,6 +557,30 @@ How test will be performed: Performed by volunteers or potential users of the so
 
 \end{enumerate}
 
+\subsubsection{Performance} \label{PerfTest}
+\paragraph{Computing Time and Memory Usage\\}
+Test case in this section mimics real-life usage. The test is not meant to execute until finish as it would take too long. Instead, it is used to give a rough estimate of the computing time and memory usage.
+
+\begin{enumerate}
+
+\item{test-performance\\}
+
+Type: Manual
+
+Initial State: \progname{} is installed and ready to run.
+
+Input: 
+\begin{itemize}
+  \item Field: $20\times20\times20$ field with around 10 million eddies
+  \item Query: $1000\times1000\times1000$ meshgrid
+\end{itemize}
+
+Output: Memory usage and estimated computing time
+
+How test will be performed: Developer will run the test on their local machine while monitor task manager and command line output. The program will give an estimate of the computing time as it computes the velocities in the field. The memory usage by the program reported by task manager will be taken when the program is running.
+
+\end{enumerate}
+
 \newpage
 \subsection{Traceability Between Test Cases and Requirements}
 \begin{table}[h!]
@@ -572,6 +596,7 @@ How test will be performed: Performed by volunteers or potential users of the so
   Test \ref{CFDInterface}   &    &    & X  &      & X    &      & X    &      \\\hline
   Test \ref{EddyProfile}    &    &    &    & X    &      &      &      &      \\\hline
   Test \ref{MaintTest}      &    &    &    &      &      & X    &      &      \\\hline
+  Test \ref{PerfTest}       &    &    &    &      &      &      &      & X    \\\hline
   \end{tabular}
   \caption{Traceability Between Test Cases and Requirements}
   \label{Table:A_trace}
