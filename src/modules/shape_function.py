@@ -54,17 +54,17 @@ def get_cutoff():
     return cutoff
 
 
-def quadratic(dk, length_scale):
+def quadratic(dk, sigma):
     """Quadratic shape function"""
     return np.where(
         dk < 1.0,
-        length_scale * (1 - dk) ** 2,
+        sigma * (1 - dk ** 2),
         0
     )
     # Note that this function uses a custom cutoff value of 1.0 and is not affected by the global cutoff value.
 
 
-def gaussian(dk, length_scale):
+def gaussian(dk, sigma):
     """Gaussian shape function"""
     return np.where(
         dk < cutoff,
@@ -82,7 +82,7 @@ def gaussian(dk, length_scale):
     # Use pre-calcuated constants when possible because this function is called many times.
     # It is faster not to recalculate these values every time.
 
-    # Your inputs must include dk and length_scale (sigma), even if some shape functions may not use length_scale.
+    # Your inputs must include dk and sigma (sigma), even if some shape functions may not use sigma.
 
     # You can choose what shape function and cutoff value to use in query arguments.
 

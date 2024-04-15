@@ -194,12 +194,12 @@ None.
 \subsubsection{Exported Access Programs}
 
 \begin{center}
-\begin{tabular}{p{2cm} p{3.5cm} p{3cm} p{5cm}}
+\begin{tabular}{p{2cm} p{4cm} p{2.5cm} p{5cm}}
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
 \texttt{new}  & \texttt{profile\_name} str,\newline\texttt{field\_name} str,\newline\texttt{dimensions} $\mathbb{R}^3$,\newline\texttt{avg\_vel} $\mathbb{R}$ & - & unrecognized arguments,\newline required args not inputted\\
-\texttt{query}  & \texttt{field\_name} str,\newline\texttt{query\_name} str,\newline\texttt{shape\_func} str,\newline\texttt{cutoff} $\mathbb{R}$ & - & unrecognized arguments,\newline required args not inputted\\
+\texttt{query}  & \texttt{field\_name} str,\newline\texttt{query\_name} str,\newline\texttt{shape\_func\_name} str,\newline\texttt{cutoff} $\mathbb{R}$ & - & unrecognized arguments,\newline required args not inputted\\
 \hline
 \end{tabular}
 \end{center}
@@ -236,18 +236,18 @@ None.
   \item exception: exc := (input $\notin$ \{\texttt{profile\_name}, \texttt{field\_name}, \texttt{dimensions}, \texttt{avg\_vel}\} $\Rightarrow$ ``Unrecognized arguments")
 \end{itemize}
 
-\noindent \texttt{query(field\_name, query\_name, shape\_func, cutoff)}:
+\noindent \texttt{query(field\_name, query\_name, shape\_func\_name, cutoff)}:
 \begin{itemize}
   \item transition:
   \begin{itemize}
     \item \texttt{field} := \texttt{flow\_field.load(field\_name)} load a saved field.
     \item \texttt{query} := \texttt{query.init(field)} initialize the query interface with the field.
-    \item if \texttt{shape\_func} is passed, call \texttt{shape\_function.set\_active(shape\_func)} to set the active shape function.
-    \item if \texttt{cutoff} is passed, call \texttt{shape\_function.set\_cutoff(cutoff)} to set the cutoff value.
+    \item if \texttt{shape\_func\_name} is passed, call \texttt{shape\_func\_nametion.set\_active(shape\_func\_name)} to set the active shape function.
+    \item if \texttt{cutoff} is passed, call \texttt{shape\_func\_nametion.set\_cutoff(cutoff)} to set the cutoff value.
     \item \texttt{console} := \texttt{query.handle\_request(query\_name)} to get the velocity vectors at the queried positions and times specified in \texttt{query\_name}, and output an operation summary (where the raw result and plot are saved).
   \end{itemize}
   \item exception: exc := ($\nexists$ \texttt{field\_name} $\vee$ $\nexists$ \texttt{query\_name} $\Rightarrow$ ``Required arguments not inputted"). 
-  \item exception: exc := (input $\notin$ \{\texttt{field\_name}, \texttt{query\_name}, \texttt{shape\_func}, \texttt{cutoff}\} $\Rightarrow$ ``Unrecognized arguments")
+  \item exception: exc := (input $\notin$ \{\texttt{field\_name}, \texttt{query\_name}, \texttt{shape\_func\_name}, \texttt{cutoff}\} $\Rightarrow$ ``Unrecognized arguments")
 \end{itemize}
 
 \subsubsection{Local Functions}
@@ -647,7 +647,7 @@ None.
 \section{MIS of Shape Function Module} \label{mShape}
 
 \subsection{Module}
-\texttt{shape\_function}
+\texttt{shape\_func\_nametion}
 
 \subsection{Uses}
 \begin{itemize}
@@ -661,16 +661,18 @@ None.
 
 \subsubsection{Exported Access Programs}
 \begin{center}
-\begin{tabular}{p{2cm} p{5.6cm} p{3cm} p{2cm}}
+\begin{tabular}{p{3cm} p{4cm} p{3cm} p{3.5cm}}
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
-\texttt{set\_active} & \texttt{active\_func} Function & - & - \\
+\texttt{set\_active} & \texttt{shape\_func\_name} str & - & FunctionNotDefined \\
+\texttt{set\_cutoff} & \texttt{cutoff\_value} $\mathbb{R}$ & - & InvalidCutoff \\
+\texttt{get\_cutoff} & - & \texttt{cutoff\_value} $\mathbb{R}$ & - \\
 % \texttt{save} & \texttt{profile\_name} str & - & -  \\
-\texttt{active}& \texttt{rel\_position} VectorT,\newline\texttt{length\_scale} $\mathbb{R}$ & \texttt{shape\_val} $\mathbb{R}$ & - \\
-\texttt{squared}& \texttt{rel\_position} VectorT,\newline\texttt{length\_scale} $\mathbb{R}$ & \texttt{shape\_val} $\mathbb{R}$ & - \\
-\texttt{gaussian}& \texttt{rel\_position} VectorT,\newline\texttt{length\_scale} $\mathbb{R}$ & \texttt{shape\_val} $\mathbb{R}$ & - \\
-\texttt{...}& \texttt{rel\_position} VectorT,\newline\texttt{length\_scale} $\mathbb{R}$ & \texttt{shape\_val} $\mathbb{R}$ & - \\
+\texttt{active}& \texttt{dk} $\mathbb{R}$,\newline\texttt{sigma} $\mathbb{R}$ & \texttt{shape\_val} $\mathbb{R}$ & - \\
+\texttt{quadratic}& \texttt{dk} $\mathbb{R}$,\newline\texttt{lsigma} $\mathbb{R}$ & \texttt{shape\_val} $\mathbb{R}$ & - \\
+\texttt{gaussian}& \texttt{dk} $\mathbb{R}$,\newline\texttt{lsigma} $\mathbb{R}$ & \texttt{shape\_val} $\mathbb{R}$ & - \\
+\texttt{...}& \texttt{dk} $\mathbb{R}$,\newline\texttt{sigma} $\mathbb{R}$ & \texttt{shape\_val} $\mathbb{R}$ & - \\
 \hline
 \end{tabular}
 \end{center}
@@ -680,40 +682,54 @@ User can modify this module to add more shape functions.
 
 \subsubsection{State Variables}
 \begin{itemize}
-  \item \texttt{active}: The function that is currently designated as the active shape function.
+  \item \texttt{active}: the function that is currently designated as the active shape function.
+  \item \texttt{cutoff}: $\mathbb{R}$, the cutoff value for the shape function. 
 \end{itemize}
 
 \subsubsection{Environment Variables}
 None.
 
 \subsubsection{Assumptions}
-None.
+\begin{itemize}
+  \item \texttt{sigma} is always passed as input. Some shape functions may not use it, but it is always assumed to be passed by the caller so that any shape function can be used interchangeably without needing to modify the caller's module.
+\end{itemize}
 
 \subsubsection{Access Routine Semantics}
 
-\noindent \texttt{set\_active(active\_func)}:
+\noindent \texttt{set\_active(shape\_func\_name)}:
 \begin{itemize}
-\item transition: \texttt{active} := \texttt{active\_func},\newline so that other modules can always call \texttt{shape\_function.active()} to use the designated function. This should be set in \texttt{main} when the program starts.
+\item transition: \texttt{active} := the function in this module with name \texttt{shape\_func\_name},
+\newline so that other modules can always call \texttt{shape\_func\_nametion.active()} to use the designated function.
+\item exception: exc := (\texttt{shape\_func\_name} $\notin$ \{functions in library\} $\Rightarrow$ \texttt{FunctionNotDefined})
 \end{itemize}
 
-\noindent \texttt{active()}:
+\noindent \texttt{set\_cutoff(cutoff\_value)}:
 \begin{itemize}
-  \item output: out := \texttt{init\_x}
+\item transition: \texttt{cutoff} := \texttt{cutoff\_value}
+\item exception: exc := (\texttt{cutoff\_value} $\le$ 0 $\Rightarrow$ \texttt{InvalidCutoff})
 \end{itemize}
 
-\noindent \texttt{active(rel\_position, length\_scale)}:
+\noindent \texttt{get\_cutoff()}:
 \begin{itemize}
-  \item output: out := shape function value, depending on the active shape function.
+\item output: \texttt{cutoff\_value} := \texttt{cutoff}
 \end{itemize}
 
-\noindent \texttt{squared(rel\_position, length\_scale)}:
+\noindent \texttt{active(dk, sigma)}:
 \begin{itemize}
-  \item output: out := shape function value computed by taking the distance from the rel\_position to the center \texttt{mag(rel\_position)}, and \texttt{length\_scale} (or length sclae) of the eddy. See [SRS: TM1].
+  \item output: \texttt{shape\_val} := $\mathbb{R}$, depending on the currently active function, 
+  \newline calls the active shape function with the inputted parameters to get output value.
 \end{itemize}
 
-\noindent \texttt{gaussian(rel\_position, length\_scale)}:
+\noindent \texttt{quadratic(dk, sigma)}:
 \begin{itemize}
-  \item output: out := Use a different (gaussian) equation to get the above value, as may be preferred by some researchers.
+  \item output: \texttt{shape\_val} := $\texttt{sigma}\times(1-\texttt{dk})^2$ if $\texttt{dk} < 1$ otherwise 0. See [SRS: TM1].
+  \newline This function is not affected by change of \texttt{cutoff} value, otherwise the output will be negative when \texttt{dk} is greater than 1.
+\end{itemize}
+
+\noindent \texttt{gaussian(dk, sigma)}:
+\begin{itemize}
+  \item output: \texttt{shape\_val} := $Ce^{0.5\pi\texttt{dk}}$ if $\texttt{dk} < 1$ otherwise 0,
+  \newline where $C = 3.6276$ (provided by Nikita)
 \end{itemize}
 
 \subsubsection{Local Functions}
