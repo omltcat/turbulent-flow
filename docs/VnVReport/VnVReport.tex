@@ -3,6 +3,9 @@
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{hyperref}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{caption}
 \hypersetup{
     colorlinks,
     citecolor=black,
@@ -30,8 +33,7 @@
 \begin{tabularx}{\textwidth}{p{3cm}p{2cm}X}
 \toprule {\bf Date} & {\bf Version} & {\bf Notes}\\
 \midrule
-Date 1 & 1.0 & Notes\\
-Date 2 & 1.1 & Notes\\
+2024-04-15 & 1.0 & Initial Commit\\
 \bottomrule
 \end{tabularx}
 
@@ -87,13 +89,26 @@ the supervisor (when one exists) shaped the final product.  In particular
 the feedback from the Rev 0 demo to the supervisor (or to potential users) 
 should be highlighted.}
 
-\section{Automated Testing}
+\section{Automated Testing} \label{sec:AutomatedTesting}
+\texttt{pytest --cov=src --cov-report html test -m "(unit and not slow) or system"}
 		
 \section{Trace to Requirements}
 		
 \section{Trace to Modules}		
 
 \section{Code Coverage Metrics}
+
+Coverage is tested with pytest-cov, using the command shown in Section \ref{sec:AutomatedTesting} that executes unit and system tests. An overall coverage of 98\% is achieved, with coverage report is shown in Figure \ref{fig:coverage}. 
+
+\begin{figure}[h!]
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{img/coverage.png}
+  \caption{Coverage report}
+  \label{fig:coverage}
+\end{center}
+\end{figure}
+
+The only two modules that are not fully covered are \texttt{main} and \texttt{query}. The not covered lines are either related to exception handling with those exceptions already tested in lower level modules, or impossible to reach in automated testing (e.g. plot pop-up).
 
 \bibliographystyle{plainnat}
 \bibliography{../../refs/References}
