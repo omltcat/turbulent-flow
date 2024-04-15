@@ -149,7 +149,8 @@
 \midrule
 2024-02-01 & 1.0 & Intro, problem, assumptions, goals, I/O and requirements\\
 2024-02-05 & 1.1 & Revisions based on presentation feedback. Finished theoretical models and matrices\\
-2024-03-21 & 1.2 & All issued from feedback addressed.\\
+2024-03-21 & 1.2 & All issued from feedback addressed\\
+2024-04-15 & 1.3 & Update TM, GD and IM equations to more general forms\\
 \bottomrule
 \end{tabularx}
 
@@ -803,9 +804,9 @@ Label &\bf Eddy Shape Function \\
 % Units&$MLt^{-3}T^0$\\
 % \hline
 Equation & $
-q_\sigma(|\mathbf{r}^k|) = 
+q_\sigma(|\mathbf{r}^k(\mathbf{x})|) = 
 \begin{cases} 
-  \sigma^k [1-|\mathbf{r}^k|^2] & \text{if } |\mathbf{r}^k| < 1 \\
+  \sigma^k (1-|\mathbf{r}^k(\mathbf{x})|^2) & \text{if } |\mathbf{r}^k(\mathbf{x})| < 1 \\
   0 & \text{elsewhere}
 \end{cases}
 $ \\
@@ -815,7 +816,7 @@ Shape function describe the distribution of vorticity with respect to distance f
 
 \begin{itemize}
   \item $\sigma^k$ is the length-scale (radius) of the $k$th eddy (\si{\metre}).
-  \item $|\mathbf{r}^k|$ is the normalized distance from a given point to the center of the $k$th eddy, with 0 being the center and 1 being the edge. [\ddref{radial}]
+  \item $d^k$ is the normalized distance from a given point to the center of the $k$th eddy, with 0 being the center and 1 being the edge. [\ddref{radial}]
 \end{itemize}
 \\
 \hline
@@ -840,9 +841,9 @@ Label &\bf Velocity Fluctuation Field \\
 \hline
 % Units&$MLt^{-3}T^0$\\
 % \hline
-Equation & $\mathbf{u}'(\mathbf{x}) = \frac{1}{\sqrt{N}}\sum_{k=1}^{N}\frac{q_\sigma(|\mathbf{r}^k(\mathbf{x})|)}{|\mathbf{r}^k(\mathbf{x})|^3}\mathbf{r}^k(\mathbf{x})\times\boldsymbol{\alpha}^k$ \\
+Equation & $\mathbf{u}'(\mathbf{x}) = \frac{1}{\sqrt{N}}\sum_{k=1}^{N}q_\sigma(|\mathbf{r}^k(\mathbf{x})|)\mathbf{r}^k(\mathbf{x})\times\boldsymbol{\alpha}^k$ \\
 \hline
-Description & The equation gives the fluctuation of velocity (the deviation from the average flow velocity) at point $\mathbf{x}$ in the flow field. It is the normalized sum of the velocity fluctuation by each eddy, with shape function $q_\sigma(|\mathbf{r}^k(\mathbf{x})|)$ [\tref{SF}].
+Description & The equation gives the fluctuation of velocity (the deviation from the average flow velocity) at point $\mathbf{x}$ in the flow field. It is the normalized sum of the velocity fluctuation by each eddy, with shape function $q_\sigma(d^k)$ [\tref{SF}].
 \begin{itemize}
   \item $N$ is the number of eddies.
   \item $\mathbf{r}^k$ is the normalized distance to the center of the $k$th eddy  [\ddref{radial}].
@@ -881,7 +882,7 @@ Label &\bf Velocity fluctuation without normalizing energy \\
 \hline
 % Units&$MLt^{-3}T^0$\\
 % \hline
-Equation & $\mathbf{u}'(\mathbf{x}) = \sum_{k=1}^{N}\frac{q_\sigma(|\mathbf{r}^k(\mathbf{x})|)}{|\mathbf{r}^k(\mathbf{x})|^3}\mathbf{r}^k(\mathbf{x})\times\boldsymbol{\alpha}^k$ \\
+Equation & $\mathbf{u}'(\mathbf{x}) = \sum_{k=1}^{N}q_\sigma(|\mathbf{r}^k(\mathbf{x})|)\mathbf{r}^k(\mathbf{x})\times\boldsymbol{\alpha}^k$ \\
 \hline
 Description & The equation in \tref{VFF} uses $\frac{1}{\sqrt{N}}$ to keep the total turbulent kinetic energy of the field constant when the number of eddies ($N$) changes. Holyev proposes the removal of this term, so that energy is simply the result of $N$ and $\boldsymbol{\alpha}$.
 \\
@@ -1121,7 +1122,7 @@ identified in Sections~\ref{sec_theoretical} and \ref{sec_gendef}.
   \hline
   Equation & $\mathbf{u}(\mathbf{x}, t) = \mathbf{u_\text{avg}} + \mathbf{u'}(\mathbf{x}, t)$\\
   & where \\
-  & $\mathbf{u}'(\mathbf{x},t) = \sum_{k=1}^{N}\frac{q_\sigma(|\mathbf{r}^k(\mathbf{x}, t)|)}{|\mathbf{r}^k(\mathbf{x}, t)|^3}\mathbf{r}^k(\mathbf{x}, t)\times\boldsymbol{\alpha}^k$ [\dref{Holyev}]\\
+  & $\mathbf{u}'(\mathbf{x},t) = \sum_{k=1}^{N}q_\sigma(|\mathbf{r}^k(\mathbf{x}, t)|)\mathbf{r}^k(\mathbf{x}, t)\times\boldsymbol{\alpha}^k$ [\dref{Holyev}]\\
   & $ q_\sigma(|\mathbf{r}^k(\mathbf{x},t)|) = \sigma^k [1-|\mathbf{r}^k(\mathbf{x},t)|^2] \text{ if } |\mathbf{r}^k(\mathbf{x},t)| < 1 \text{ , otherwise } 0 $ [\tref{SF}]\\
   & $\mathbf{r}^k(\mathbf{x},t) = \frac{\mathbf{x}-\mathbf{x}^k(t)}{\sigma^k}$ [\ddref{radial}]\\
   & $\mathbf{x}^k(t) = \mathbf{x}^k_0 + \mathbf{u_\text{avg}}t$ [\ddref{center}]\\
