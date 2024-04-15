@@ -126,8 +126,9 @@ The specification of \progname \ also uses some derived data types:
 \subsection{Variable Name Traceability}
 To help program development and understanding, some notations regarding the eddy profile from the SRS TM and DD are altered in the MIS to better reflect their usage in the code:
 \begin{itemize}
-  \item intensity: magnitude of the eddy intensity vector ($\boldsymbol{\alpha}$) [SRS: DD3].
-  \item orientation: unit vector direction of the eddy intensity vector ($\boldsymbol{\alpha}$) [SRS: DD3].
+  \item \texttt{sigma}: length scale of eddy, \texttt{length\_scale} in eddy profile ($\sigma$) [SRS: TM1].
+  \item \texttt{alpha}: eddy intensity vector ($\boldsymbol{\alpha}$) [SRS: DD3].
+  \item \texttt{intensity}: magnitude of \texttt{alpha} vector, used in eddy profile.
 \end{itemize}
 
 \subsection{Abstract Data Types}
