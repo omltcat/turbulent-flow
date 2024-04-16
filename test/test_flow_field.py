@@ -7,9 +7,7 @@ import pytest
 
 import matplotlib.pyplot as plt
 
-# from itertools import combinations, product
-# import matplotlib.pyplot as plt
-
+# Relative tolerance for floating point comparisons
 RTOL = 1e-5
 
 
@@ -24,6 +22,10 @@ def setup_module():
 @pytest.mark.unit
 @pytest.mark.poc
 def test_eddy_generation():
+    """
+    Test single eddy generation
+    SLOW MESHGRID!! NOT USED BY AUTO TESTS
+    """
     # Test profile
     profile_name = "__test__"
     content = {
@@ -97,11 +99,6 @@ def test_eddy_generation():
     # Calculate number of samples
     num_samples = np.prod(vel_t0.shape[:-1])
 
-    # vel_t0[:, 80, 0] = 10
-
-    # Check zero velocity in z direction
-    # assert np.isclose(np.sum(vel_t0[:, :, 0]), 0, rtol=RTOL)
-
     # Check average velocity fluctation is zero
     avg_fluct = np.sum(vel_t0 - np.array([avg_vel, 0, 0]), axis=(0, 1, 2)) / num_samples
     assert np.linalg.norm(avg_fluct) < RTOL
@@ -124,7 +121,7 @@ def test_eddy_generation():
 
 @pytest.mark.poc
 def test_flow_field_wrap():
-    # Test profile
+    """Test wrap-around with a single eddy"""
     profile_name = "__test__"
     content = {
         "settings": {},
@@ -175,7 +172,7 @@ def test_flow_field_wrap():
 
 @pytest.mark.unit
 def test_flow_field():
-    # Test profile
+    """Test flow field generation and properties"""
     profile_name = "__test__"
     content = {
         "settings": {},
@@ -271,34 +268,6 @@ def test_flow_field():
     diff_sum = np.sum(np.linalg.norm(vel_t0_xneg10 - vel_t10_x10, axis=-1))
     assert diff_sum < RTOL
 
-    # # Test for zero average velocity fluctuation
-    # vel_t20 = field.sum_vel_mesh(
-    #     step_size=0.2,
-    #     chunk_size=5,
-    #     t=20,
-    # )
-    # # Calculate number of samples
-    # num_samples = np.prod(vel_t20.shape[:-1])
-
-    # # Velocity fluctuation
-    # vel_fluct = vel_t20 - np.array([avg_vel, 0, 0])
-
-    # # Check for zero average velocity fluctuation
-    # avg_fluct = np.sum(vel_fluct, axis=(0, 1, 2)) / num_samples
-    # assert np.linalg.norm(avg_fluct) < 0.01
-
-    # # Create a 2D heatmap for at t=0, x=0
-    # magnitude = np.linalg.norm(vel_fluct - np.array([avg_vel, 0, 0]), axis=-1)
-    # im = plt.imshow(
-    #     magnitude[0, :, :],
-    #     cmap="coolwarm",
-    #     interpolation="nearest",
-    #     extent=[-10, 10, -10, 10],
-    #     origin="lower",
-    # )
-    # plt.colorbar(im, label="Velocity magnitude (m/s)")
-    # plt.show()
-
     # Clean up
     os.remove(f"src/profiles/{profile_name}.json")
     os.remove(f"src/fields/{field_name}.pkl")
@@ -306,6 +275,7 @@ def test_flow_field():
 
 @pytest.mark.unit
 def test_flow_field_init_exceptions():
+    """Test exceptions for flow field initialization"""
     profile_name = "__invalid__"
     content = {
         "settings": {},
@@ -346,6 +316,7 @@ def test_flow_field_init_exceptions():
 
 @pytest.mark.unit
 def test_flow_field_mesh_exceptions():
+    """Test exceptions for flow field mesh qeury"""
     profile_name = "__test__"
     content = {
         "settings": {},
@@ -425,6 +396,7 @@ def test_flow_field_mesh_exceptions():
 
 @pytest.mark.unit
 def test_flow_field_set_exceptions():
+    """Test exceptions for flow field setters"""
     profile_name = "__test__"
     content = {
         "settings": {},
@@ -452,6 +424,10 @@ def test_flow_field_set_exceptions():
 @pytest.mark.memory
 @pytest.mark.unit
 def test_flow_field_out_of_memory():
+    """
+    Test flow field generation with out of memory conditions
+    SLOW!! NOT USED BY AUTO TESTS
+    """
     profile_name = "__test__"
     content = {
         "settings": {},
