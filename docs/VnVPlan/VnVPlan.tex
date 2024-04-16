@@ -162,10 +162,12 @@ This section lays out how the VnV will be carried out in aspect and by whom. It 
 
 \begin{itemize}
   \item Phil Du - Developer: Writing test scripts according to VnV and implementing automated tests with continuous integration (CI). Ensuring coding standards are respected with linters.
-  \item Nikita Holyev - Theorist: Reviewing the VnV plan to ensure that the tests are relevant to the theoretical models.
-  \item Cynthia Liu - Domain Expert: Reviewing the VnV plan and design documents to make sure the SRS is met.
-  \item Morteza Mirzaei - Secondary reviewer of the VnV plan.
-  \item Dr. Spencer Smith - Supervisor.
+  \item Nikita Holyev - Theorist: Provide theoretical background support and potential usage cases for the software.
+  \item Dr. Spencer Smith - Supervisor. Reviewing all documents.
+  \item Cynthia Liu - Domain Expert: Reviewing all documents.
+  \item Kim Ying Wong - Secondary reviewer of SRS.
+  \item Morteza Mirzaei - Secondary reviewer of VnV Plan.
+  \item Nada Elmasry - Secondary reviewer of MG and MIS.
   \item Several volunteers as subjects for usability (future) and maintainability testing, see \ref{NonfuncTest} for detailed procedures. They are recruited from class as well as potential users of the software.
 \end{itemize}
 
@@ -175,11 +177,9 @@ This section lays out how the VnV will be carried out in aspect and by whom. It 
 
 \subsection{SRS Verification Plan}
 
-Functional Requirements R1 and R2 in the (\href{https://github.com/omltcat/turbulent-flow/blob/main/docs/SRS/SRS.pdf}{SRS}) are derived from the synthetic eddy method by \citet{PolettoEtAl2013}, and can be represented mathematically. Thus, they are covered by automated testing detailed in Section \ref{FuncTest}. R3, the interface with CFD software, need to be verified with manual testing by actually conducting CFD simulations with the generated IC and BC.
+The (\href{https://github.com/omltcat/turbulent-flow/blob/main/docs/SRS/SRS.pdf}{SRS}) is reviewed by Cynthia Liu, Kim Ying Wong and Dr. Spencer Smith to ensure that the requirements are clear with good traceability, and the models are represented to be easily understandable. The \href{https://github.com/omltcat/turbulent-flow/blob/main/docs/Checklists/SRS-Checklist.pdf}{SRS Checklist} can be used as reference. Feedback will be given as GitHub Issues, and the developer will update the document accordingly.
 
-The Nonfunctional Requirements in the SRS, including Accuracy, Usability, Maintainability and Portability, will be verified by manual testing. All of these other than Maintainability involves running the software in conjecture with CFD solvers, and will be performed when the CFD integration is implemented in the future. Maintainability will be verified by persons other than the developer attempting to modify the software, and is detailed in Section \ref{NonfuncTest}.
-
-The Functional and Nonfunctional Requirements in the SRS serve as a checklist.
+The developer will also go-through the models in the SRS with Nikita Holyev to ensure that they are mathematically correct and reflect the current direction of work in the theoretical side.
 
 % \wss{List any approaches you intend to use for SRS verification.  This may include
 %   ad hoc feedback from reviewers, like your classmates, or you may plan for 
@@ -189,21 +189,21 @@ The Functional and Nonfunctional Requirements in the SRS serve as a checklist.
 
 \subsection{Design Verification Plan}
 
-\textit{Pending design documents.}
+The design documents, including the Module Guide (\href{https://github.com/omltcat/turbulent-flow/blob/main/docs/Design/SoftArchitecture/MG.pdf}{MG}) and the Module Interface Specification (\href{https://github.com/omltcat/turbulent-flow/blob/main/docs/Design/SoftDetailedDes/MIS.pdf}{MIS}), is reviewed by Cynthia Liu, Nada Elmasry and Dr. Spencer Smith to ensure that the design is unambiguous, inline with module design best-practices and consistent with the requirements in the SRS. The \href{https://github.com/omltcat/turbulent-flow/blob/main/docs/Checklists/MG-Checklist.pdf}{MG Checklist} and \href{https://github.com/omltcat/turbulent-flow/blob/main/docs/Checklists/MIS-Checklist.pdf}{MIS Checklist} can be used as references. Feedback will be given as GitHub Issues, and the developer will update the documents accordingly.
 
-\wss{Plans for design verification}
+Discussions will also be held with Nikita Holyev to identify potential usage cases that may require future proofing in the design.
 
-\wss{The review will include reviews by your classmates}
+% \textit{Pending design documents.}
 
-\wss{Create a checklists?}
+% \wss{Plans for design verification}
+
+% \wss{The review will include reviews by your classmates}
+
+% \wss{Create a checklists?}
 
 \subsection{Verification and Validation Plan Verification Plan}
 
-The VnV plan itself is verified by review. The developer and reviewers will ensure that all the requirements in the SRS are covered by the plan. 
-\begin{itemize}
-  \item The developer, domain expert, secondary reviewer and supervisor will use GitHub Issues to discuss and track suggestions made to improve the VnV plan.
-  \item The developer will host one-on-one meetings with the theorist to brief him on the development and testing of the software, to ensure that they are relevant to the theoretical models.
-\end{itemize}
+The VnV plan is reviewed by Cynthia Liu, Morteza Mirzaei and Dr. Spencer Smith to ensure the plan reflects requirements in the SRS with clear and specific test cases. The \href{https://github.com/omltcat/turbulent-flow/blob/main/docs/Checklists/VnV-Checklist.pdf}{VnV Checklist} can be used as reference. Feedback will be given as GitHub Issues, and the developer will update the document accordingly.
  
 
 % \wss{The verification and validation plan is an artifact that should also be
@@ -228,7 +228,7 @@ Successful implementation of the synthetic eddy method can be verified by automa
 
 \begin{itemize}
   \item Continuous Integration (CI): GitHub Actions for automated tests.
-  \item Memory Usage Monitoring: \href{https://docs.pytest.org/}{pytest}.
+  \item System and Unit Tests: \href{https://docs.pytest.org/}{pytest}.
   \item Code Coverage: \href{https://docs.pytest.org/}{pytest}.
   \item Linters: \href{https://marketplace.visualstudio.com/items?itemName=ms-python.flake8}{flake8}: ensure PEP8 coding standards are respected.
 \end{itemize}
