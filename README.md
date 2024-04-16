@@ -85,11 +85,11 @@ The example profile can be found at **src/profiles/example.json**. It contains s
 ### Querying the flow field
 ```bash
 # view help
-python main.py query -h
+python ./src/main.py query -h
 ```
 ```bash
 # query the flow field "test" with the provided "example_meshgrid" query file
-python main.py query -n test -q example_meshgrid
+python ./src/main.py query -n test -q example_meshgrid
 ```
 Since we did not pass shape function (-s) and cutoff (-c), the default values "gaussian" and 2.0 will be used.
 
