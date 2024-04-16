@@ -16,68 +16,130 @@
 
 \maketitle
 
-\plt{Reflection is an important component of getting the full benefits from a
-learning experience.  Besides the intrinsic benefits of reflection, this
-document will be used to help the TAs grade how well your team responded to
-feedback.  In addition, several CEAB (Canadian Engineering Accreditation Board)
-Learning Outcomes (LOs) will be assessed based on your reflections.}
+% \plt{Reflection is an important component of getting the full benefits from a
+% learning experience.  Besides the intrinsic benefits of reflection, this
+% document will be used to help the TAs grade how well your team responded to
+% feedback.  In addition, several CEAB (Canadian Engineering Accreditation Board)
+% Learning Outcomes (LOs) will be assessed based on your reflections.}
 
 \section{Changes in Response to Feedback}
 
-\plt{Summarize the changes made over the course of the project in response to
-feedback from TAs, the instructor, teammates, other teams, the project
-supervisor (if present), and from user testers.}
+Most changes made to the project were in response to feedback from reviewers are to improve clarity or consistency in the documents. For example, \href{https://github.com/omltcat/turbulent-flow/issues/9}{issue \#9}, \href{https://github.com/omltcat/turbulent-flow/issues/13}{issue \#13}, \href{https://github.com/omltcat/turbulent-flow/issues/22}{issue \#22}, and \href{https://github.com/omltcat/turbulent-flow/issues/61}{issue \#61}. This again proves the importance of having another pair of eyes to review the documents, as what may seem clear to the author may not be clear to the reader.
 
-\plt{For those teams with an external supervisor, please highlight how the feedback 
-from the supervisor shaped your project.  In particular, you should highlight the 
-supervisor's response to your Rev 0 demonstration to them.}
+Revisions to the instance model, other than to improve notation and clarity, were generally suggested by Nikita Holyev after discussions, which then resulted in changes to how to program is structured.
 
-\subsection{SRS and Hazard Analysis}
+Changes to requirements were mostly made in response to feedback from Dr. Smith. 
+
+GitHub issues were heavily leveraged to track these changes. Even for changes originated from myself, I often created an issue before start modifying the documentation or code. Besides keeping a record, this was very helpful as a reminder of what still need to be done. 
+
+% \plt{Summarize the changes made over the course of the project in response to
+% feedback from TAs, the instructor, teammates, other teams, the project
+% supervisor (if present), and from user testers.}
+
+% \plt{For those teams with an external supervisor, please highlight how the feedback 
+% from the supervisor shaped your project.  In particular, you should highlight the 
+% supervisor's response to your Rev 0 demonstration to them.}
+
+% \plt{Version control can make the summary relatively easy, if you used issues
+% and meaningful commits.  If you feedback is in an issue, and you responded in
+% the issue tracker, you can point to the issue as part of explaining your
+% changes.  If addressing the issue required changes to code or documentation, you
+% can point to the specific commit that made the changes.}
+
+\subsection{SRS}
+Major changes:
+\begin{itemize}
+    \item Add performance NFR \href{https://github.com/omltcat/turbulent-flow/issues/40}{issue \#40} (which end up being too optimistic, need further changes)
+    \item Move ``realistic turbulent flow" Goal to NFR \href{https://github.com/omltcat/turbulent-flow/issues/42}{issue \#42}
+    \item Remove two requirements (one moved to NFR) \href{https://github.com/omltcat/turbulent-flow/issues/52}{issue \#52}, \href{https://github.com/omltcat/turbulent-flow/issues/53}{issue \#53}
+    \item Update TM, GD and IM to reflect the direction Nikita's research is going \href{https://github.com/omltcat/turbulent-flow/commit/86ae92d744d9f19878fc19d52f57f824410bddc9}{commit 86ae92d}
+\end{itemize}
 
 \subsection{Design and Design Documentation}
-
+Major changes:
+\begin{itemize}
+    \item MIS: Rewrite the ``Uses'' section in each module due to initial misunderstanding \href{https://github.com/omltcat/turbulent-flow/issues/34}{issue \#34}
+    \item MG: Change what classified as a ``Software Decision Module'', due to initial misunderstanding \href{https://github.com/omltcat/turbulent-flow/issues/37}{issue \#37}
+    \item MIS: Improve access routing documentation at multiple places, e.g \href{https://github.com/omltcat/turbulent-flow/issues/35}{issue \#35}, \href{https://github.com/omltcat/turbulent-flow/issues/73}{issue \#73}
+    \item Change what is in a ``eddy profile'' after discussion with Nikita, from quantity based to density based, so that the same eddy profile can be used on different sizes of fields \href{https://github.com/omltcat/turbulent-flow/issues/72}{issue \#72}
+\end{itemize}
 \subsection{VnV Plan and Report}
+Major changes:
+\begin{itemize}
+    \item Expand rational to explain test case to non-expert readers \href{https://github.com/omltcat/turbulent-flow/issues/28}{issue \#28}
+    \item Specifying Expected Knowledge Level \href{https://github.com/omltcat/turbulent-flow/issues/29}{issue \#29}
+    \item Rewrite verification plan sections according to feedback by Dr. Smith \href{https://github.com/omltcat/turbulent-flow/issues/57}{issue \#57}, \href{https://github.com/omltcat/turbulent-flow/issues/58}{issue \#58}
+\end{itemize}
 
 \section{Design Iteration (LO11)}
 
-\plt{Explain how you arrived at your final design and implementation.  How did
-the design evolve from the first version to the final version?} 
+There was a mismatch of expectations initially regarding the scale of the problem. I was not aware of the number of eddies (10 million) and meshgrid point (1 billion) that Nikita was trying to work with. This led to me not giving enough considerations to performance and tried to implement the module ``by the book'', strictly following the modular design and instant model. 
+
+The performance of the initial implementation ended up being unable to realistically handle the real life scale of the problem. This led to a major redesign of the Flow Field and Eddy modules. Some modularity was sacrificed for performance, with more information be consolidated into the Flow Field module for faster vectorized operations. 
+
+The chunk approach was also not part of the original design or theory, but implemented to save memory and reduced unnecessary computation. This was inspired by the chunk design of Minecraft. 
+
+I do wonder how can we better document, or even better, anticipate such implementations. I had a feeling that, due to the scientific computing nature of this project, a lot of the focus was given on turning mathematical models into program. However, the real-world consideration of performance and ``programming tricks'' were not given enough attention.
+
+% \plt{Explain how you arrived at your final design and implementation.  How did
+% the design evolve from the first version to the final version?} 
 
 \section{Design Decisions (LO12)}
 
-\plt{Reflect and justify your design decisions.  How did limitations,
- assumptions, and constraints influence your decisions?}
+Other than the module change and chunk approach discussed above, three other design decisions were made that are not related to performance or mathematical model: the use of JSON file for eddy profiles and queries, inclusion of File I/O Module and Query Interface Module. 
 
-\section{Economic Considerations (LO23)}
+The JSON file was chosen for the expected use case of the program. With large meshgrid, the program will likely be submitted to run on a cluster. The JSON file allows the user to easily pre-define the eddy profiles and queries, instead of needing to input them every time the program is run. These files may also be generated by other programs.
 
-\plt{Is there a market for your product? What would be involved in marketing your 
-product? What is your estimate of the cost to produce a version that you could 
-sell?  What would you charge for your product?  How many units would you have to 
-sell to make money? If your product isn't something that would be sold, like an 
-open source project, how would you go about attracting users?  How many potential 
-users currently exist?}
+The File I/O Module was included to handle the reading and writing of files needed by multiple modules. This module is used to handle various file formats in various subdirectories local to the program directory. Even though for each file format, there is a dedicated way to handle file I/O (JSON decode, NumPy load, etc.), the File I/O Module is used to abstract the file handling process so that the other modules do not need to know how to handle them and work with the file paths.
 
-\section{Reflection on Project Management (LO24)}
+The Query Interface Module seems a bit redundant at this stage, as it merely passes information between the Main Control Module and the Flow Field Module during a query. But this leaves the possibility that, if the program is to be run on a server as a service, the Query Interface Module can be expanded to have different query methods, such as REST API, or even via a GUI.
 
-\plt{This question focuses on processes and tools used for project management.}
+% \plt{Reflect and justify your design decisions.  How did limitations,
+%  assumptions, and constraints influence your decisions?}
 
-\subsection{How Does Your Project Management Compare to Your Development Plan}
+% \section{Economic Considerations (LO23)}
 
-\plt{Did you follow your Development plan, with respect to the team meeting plan, 
-team communication plan, team member roles and workflow plan.  Did you use the 
-technology you planned on using?}
+% \plt{Is there a market for your product? What would be involved in marketing your 
+% product? What is your estimate of the cost to produce a version that you could 
+% sell?  What would you charge for your product?  How many units would you have to 
+% sell to make money? If your product isn't something that would be sold, like an 
+% open source project, how would you go about attracting users?  How many potential 
+% users currently exist?}
 
-\subsection{What Went Well?}
+% \section{Reflection on Project Management (LO24)}
 
-\plt{What went well for your project management in terms of processes and 
-technology?}
+% \plt{This question focuses on processes and tools used for project management.}
 
-\subsection{What Went Wrong?}
+% \subsection{How Does Your Project Management Compare to Your Development Plan}
 
-\plt{What went wrong in terms of processes and technology?}
+% \plt{Did you follow your Development plan, with respect to the team meeting plan, 
+% team communication plan, team member roles and workflow plan.  Did you use the 
+% technology you planned on using?}
 
-\subsection{What Would you Do Differently Next Time?}
+% \subsection{What Went Well?}
 
-\plt{What will you do differently for your next project?}
+% \plt{What went well for your project management in terms of processes and 
+% technology?}
+
+% \subsection{What Went Wrong?}
+
+% \plt{What went wrong in terms of processes and technology?}
+
+% \subsection{What Would you Do Differently Next Time?}
+
+% \plt{What will you do differently for your next project?}
+
+% \section{Reflection on Capstone}
+
+% \plt{This question focuses on what you learned during the course of the capstone project.}
+
+% \subsection{Which Courses Were Relevant}
+
+% \plt{Which of the courses you have taken were relevant for the capstone project?}
+
+% \subsection{Knowledge/Skills Outside of Courses}
+
+% \plt{What skills/knowledge did you need to acquire for your capstone project
+% that was outside of the courses you took?}
 
 \end{document}
