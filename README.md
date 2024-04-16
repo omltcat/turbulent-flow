@@ -28,7 +28,8 @@ The folders and files for this project are as follows:
 │   └── system      # system test cases
 │── requirements.txt    # dependencies
 ├── INSTALL.md
-└── README.md
+├── README.md
+└── Makefile        # Quick start commands
 ```
 
 ## Quick Start
