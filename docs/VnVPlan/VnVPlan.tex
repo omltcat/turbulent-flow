@@ -229,7 +229,7 @@ To ensure the quality of the codebase, the \href{https://github.com/omltcat/turb
 \subsection{Automated Testing and Verification Tools}
 
 \begin{itemize}
-  \item Continuous Integration (CI): GitHub Actions for automated tests.
+  \item Continuous Integration (CI): GitHub Actions to run automated tests upon pull request to main branch.
   \item System and Unit Tests: \href{https://docs.pytest.org/}{pytest}.
   \item Code Coverage: \href{https://docs.pytest.org/}{pytest}.
   \item Linters: \href{https://marketplace.visualstudio.com/items?itemName=ms-python.flake8}{flake8}: ensure PEP8 coding standards are respected.
@@ -280,7 +280,7 @@ The system tests are divided into two main categories: Functional and Nonfunctio
 	
 \subsection{Tests for Functional Requirements} \label{FuncTest}
 
-These tests are traced to R1-R5 (Section 5.1) of the SRS \citet{SRS}. With R5 being the only Function Requirement that needs to be tested manually, the rest will be automated. 
+These tests are traced to R1-R3 (Section 5.1) of the \href{https://github.com/omltcat/turbulent-flow/blob/main/docs/SRS/SRS.pdf}{SRS}. Only test for R3 is manual, as it involves interfacing with CFD software. The rest are automated with pytest and GitHub Actions.
 
 Areas of testing are structured with respect to the list of Function Requirements.
 
@@ -291,7 +291,7 @@ Areas of testing are structured with respect to the list of Function Requirement
 % \wss{Include a blurb here to explain why the subsections below
 %   cover the requirements.  References to the SRS would be good here.}
 
-\subsubsection{Input Test} \label{InputTest}
+\subsubsection{Input Test} \label{ST:Input}
 
 
 % \wss{It would be nice to have a blurb here to explain why the subsections below
@@ -320,7 +320,7 @@ How test will be performed: Automated test script, GitHub Actions.
 \end{enumerate}
 
 \newpage
-\subsubsection{Eddy Generation Test} \label{EddyGenTest}
+\subsubsection{Eddy Generation Test} \label{ST:EddyGen}
 \paragraph{Generation of a Single Eddy [R2]}
 
 \begin{enumerate}
@@ -392,7 +392,7 @@ How test will be performed: Automated test script, GitHub Actions.
 \end{enumerate}
 
 \newpage
-\subsubsection{Field Genration Test} \label{FieldGenTest}
+\subsubsection{Field Genration Test} \label{ST:FieldGen}
 \paragraph{Generation of Flow Field [R2]}
 
 \begin{enumerate}
@@ -463,7 +463,7 @@ How test will be performed: Automated test script, GitHub Actions.
 
 \end{enumerate}
 
-\subsubsection{Divergence Test} \label{DivergenceFree}
+\subsubsection{Divergence Test} \label{ST:DivFree}
 \paragraph{Divergence Free Condition [R2]} 
 
 \begin{enumerate}
@@ -491,7 +491,7 @@ How test will be performed: Automated test script, GitHub Actions.
 
 \end{enumerate}
 
-\subsubsection{CFD Interface} \label{CFDInterface}
+\subsubsection{CFD Interface} \label{ST:CFD}
 \paragraph{Feed IC and BC to CFD Software [R3]\\}
 
 \begin{enumerate}
@@ -520,7 +520,7 @@ How test will be performed: Automated test script, GitHub Actions.
 
 \newpage
 \subsection{Tests for Nonfunctional Requirements} \label{NonfuncTest}
-NFR2 and NFR4 is already covered by functional test of CFD interface (\ref{CFDInterface}). NFR1 (accuracy), NFR3 (maintainability) and NFR5 (performance) will be verified by tests detailed below.
+NFR2 is already covered by functional test of CFD interface (\ref{ST:CFD}). NFR1 (accuracy), NFR3 (maintainability) NFR4(portability) and NFR5 (performance) will be verified by tests detailed below.
 % \wss{The nonfunctional requirements for accuracy will likely just reference the
 %   appropriate functional tests from above.  The test cases should mention
 %   reporting the relative error for these tests.  Not all projects will
@@ -532,11 +532,11 @@ NFR2 and NFR4 is already covered by functional test of CFD interface (\ref{CFDIn
 % \wss{Static tests, review, inspections, and walkthroughs, will not follow the
 % format for the tests given below.}
 
-\subsubsection{Accuracy} \label{EddyProfile}
+\subsubsection{Accuracy} \label{ST:EddyProf}
 \paragraph{Provide Realistic Profile Before Generation \\}
 Test case for this requirement will be added in the future given more theoretical background.
 
-\subsubsection{Maintainability} \label{MaintTest}
+\subsubsection{Maintainability} \label{ST:Maint}
 		
 \paragraph{Modifying Shape Function\\}
 In terms of maintainability, users who looks to modify \progname{} would most likely want to change the shape functions of the eddies to fit their specific needs. If the software is well structured and documented, they should be able to do so with ease, even without systematic programming knowledge.
@@ -559,7 +559,13 @@ How test will be performed: Performed by volunteers or potential users of the so
 
 \end{enumerate}
 
-\subsubsection{Performance} \label{PerfTest}
+\subsubsection{Portability} \label{ST:Port}
+\paragraph{Cross-platform Test\\}
+Since unit tests and system tests executed by GitHub Actions are performed on Ubuntu runners (\href{https://github.com/omltcat/turbulent-flow/blob/main/.github/workflows/run-tests.yaml}{see here}), this already covers installing and running on Linux. 
+
+To test Windows and MacOS, an additional GitHub Action workflow is created to install and run a test of the Main Control Module on Windows and MacOS runners (\href{https://github.com/omltcat/turbulent-flow/blob/main/.github/workflows/cross-platform.yaml}{see here}). The details of this test file can be found in Section \ref{UT:Main}. The only reason for choosing this specific test is that it is fast to perform, as MacOS runners are billed 10 times as expensive as Linux runners.
+
+\subsubsection{Performance} \label{ST:Perf}
 \paragraph{Computing Time and Memory Usage\\}
 Test case in this section mimics real-life usage. The test is not meant to execute until finish as it would take too long. Instead, it is used to give a rough estimate of the computing time and memory usage.
 
@@ -591,14 +597,15 @@ How test will be performed: Developer will run the test on their local machine w
   \hline
                             & R1 & R2 & R3 & NFR1 & NFR2 & NFR3 & NFR4 & NFR5 \\
   \hline
-  Test \ref{InputTest}      & X  &    &    &      &      &      &      &      \\\hline
-  Test \ref{EddyGenTest}    &    & X  &    &      &      &      &      &      \\\hline
-  Test \ref{FieldGenTest}   &    & X  &    &      &      &      &      &      \\\hline
-  Test \ref{DivergenceFree} &    & X  &    &      &      &      &      &      \\\hline
-  Test \ref{CFDInterface}   &    &    & X  &      & X    &      & X    &      \\\hline
-  Test \ref{EddyProfile}    &    &    &    & X    &      &      &      &      \\\hline
-  Test \ref{MaintTest}      &    &    &    &      &      & X    &      &      \\\hline
-  Test \ref{PerfTest}       &    &    &    &      &      &      &      & X    \\\hline
+  Test \ref{ST:Input}     & X  &    &    &      &      &      &      &      \\\hline
+  Test \ref{ST:EddyGen}   &    & X  &    &      &      &      &      &      \\\hline
+  Test \ref{ST:FieldGen}  &    & X  &    &      &      &      &      &      \\\hline
+  Test \ref{ST:DivFree}   & X  &    &    &      &      &      &      &      \\\hline
+  Test \ref{ST:CFD}       &    &    & X  &      & X    &      &      &      \\\hline
+  Test \ref{ST:EddyProf}  &    &    &    & X    &      &      &      &      \\\hline
+  Test \ref{ST:Maint}     &    &    &    &      &      & X    &      &      \\\hline
+  Test \ref{ST:Port}      &    &    &    &      &      &      & X    &      \\\hline
+  Test \ref{ST:Perf}      &    &    &    &      &      &      &      & X    \\\hline
   \end{tabular}
   \caption{Traceability Between Test Cases and Requirements}
   \label{Table:A_trace}
@@ -609,128 +616,216 @@ How test will be performed: Developer will run the test on their local machine w
 
 \section{Unit Test Description}
 
-\wss{This section should not be filled in until after the MIS (detailed design
-  document) has been completed.}
+Unit tests are written for the modules described in the \href{https://github.com/omltcat/turbulent-flow/blob/main/docs/Design/SoftArchitecture/MG.pdf}{MG} and \href{https://github.com/omltcat/turbulent-flow/blob/main/docs/Design/SoftDetailedDes/MIS.pdf}{MIS}. For most modules, a dedicated test file is created, unless that module cannot function independently and can be sufficiently tested when other modules are tested.
 
-\wss{Reference your MIS (detailed design document) and explain your overall
-philosophy for test case selection.}  
+Each module is tested for the expected use cases, edge cases and exceptions. These tests are heavily leveraged during development to ensure that changes in one module do not break the functionality of another.
 
-\wss{To save space and time, it may be an option to provide less detail in this section.  
-For the unit tests you can potentially layout your testing strategy here.  That is, you 
-can explain how tests will be selected for each module.  For instance, your test building 
-approach could be test cases for each access program, including one test for normal behaviour 
-and as many tests as needed for edge cases.  Rather than create the details of the input 
-and output here, you could point to the unit testing code.  For this to work, you code 
-needs to be well-documented, with meaningful names for all of the tests.}
+All unit tests that are not designated as ``slow'' in the test file are run by GitHub Actions upon pull request to the main branch.
+
+% \wss{This section should not be filled in until after the MIS (detailed design
+%   document) has been completed.}
+
+% \wss{Reference your MIS (detailed design document) and explain your overall
+% philosophy for test case selection.}  
+
+% \wss{To save space and time, it may be an option to provide less detail in this section.  
+% For the unit tests you can potentially layout your testing strategy here.  That is, you 
+% can explain how tests will be selected for each module.  For instance, your test building 
+% approach could be test cases for each access program, including one test for normal behaviour 
+% and as many tests as needed for edge cases.  Rather than create the details of the input 
+% and output here, you could point to the unit testing code.  For this to work, you code 
+% needs to be well-documented, with meaningful names for all of the tests.}
 
 \subsection{Unit Testing Scope}
 
-\wss{What modules are outside of the scope.  If there are modules that are
-  developed by someone else, then you would say here if you aren't planning on
-  verifying them.  There may also be modules that are part of your software, but
-  have a lower priority for verification than others.  If this is the case,
-  explain your rationale for the ranking of module importance.}
+Unit tests are performed on all modules developed for \progname{}, except:
+\begin{itemize}
+  \item Eddy Module [MG: M6]: The inputs to this module need to be generated by the Flow Field Module. Thus, the Eddy Module will be tested when the Flow Field Module is tested.
+  \item Visualization Module [MG: M10]: This module is only a placeholder at current stage. However, it is still covered by the test cases in the Query Interface Module.
+  \item Utils: Not actually a module in the design, but several helper functions to reduce code repetition. These functions are tested when the modules that use them are tested.
+\end{itemize} 
 
-\subsection{Tests for Functional Requirements}
+% \wss{What modules are outside of the scope.  If there are modules that are
+%   developed by someone else, then you would say here if you aren't planning on
+%   verifying them.  There may also be modules that are part of your software, but
+%   have a lower priority for verification than others.  If this is the case,
+%   explain your rationale for the ranking of module importance.}
 
-\wss{Most of the verification will be through automated unit testing.  If
-  appropriate specific modules can be verified by a non-testing based
-  technique.  That can also be documented in this section.}
+% \subsection{Tests for Functional Requirements}
 
-\subsubsection{Module 1}
+% \wss{Most of the verification will be through automated unit testing.  If
+%   appropriate specific modules can be verified by a non-testing based
+%   technique.  That can also be documented in this section.}
 
-\wss{Include a blurb here to explain why the subsections below cover the module.
-  References to the MIS would be good.  You will want tests from a black box
-  perspective and from a white box perspective.  Explain to the reader how the
-  tests were selected.}
+\subsubsection{Main Control Module [MG: M2]} \label{UT:Main}
+
+Test for creating a new field and query an existing field, setting active shape functions and cutoff, as well as handling exceptions raised by lower-level modules. See \href{https://github.com/omltcat/turbulent-flow/blob/main/test/test_main.py}{test\_main.py}
+
+
+% \wss{Include a blurb here to explain why the subsections below cover the module.
+%   References to the MIS would be good.  You will want tests from a black box
+%   perspective and from a white box perspective.  Explain to the reader how the
+%   tests were selected.}
 
 \begin{enumerate}
+  \item test-main-new
+  \item test-main-query
+  \item test-main-new-exception
+  \item test-main-query-field-not-exist
+  \item test-main-query-shape-function-exceptions
+  \item test-main-query-cutoff
+  \item test-main-query-exception
 
-\item{test-id1\\}
+% \item{test-id1\\}
 
-Type: \wss{Functional, Dynamic, Manual, Automatic, Static etc. Most will
-  be automatic}
+% Type: \wss{Functional, Dynamic, Manual, Automatic, Static etc. Most will
+%   be automatic}
 					
-Initial State: 
+% Initial State: 
 					
-Input: 
+% Input: 
 					
-Output: \wss{The expected result for the given inputs}
+% Output: \wss{The expected result for the given inputs}
 
-Test Case Derivation: \wss{Justify the expected value given in the Output field}
+% Test Case Derivation: \wss{Justify the expected value given in the Output field}
 
-How test will be performed: 
+% How test will be performed: 
 					
-\item{test-id2\\}
+% \item{test-id2\\}
 
-Type: \wss{Functional, Dynamic, Manual, Automatic, Static etc. Most will
-  be automatic}
+% Type: \wss{Functional, Dynamic, Manual, Automatic, Static etc. Most will
+%   be automatic}
 					
-Initial State: 
+% Initial State: 
 					
-Input: 
+% Input: 
 					
-Output: \wss{The expected result for the given inputs}
+% Output: \wss{The expected result for the given inputs}
 
-Test Case Derivation: \wss{Justify the expected value given in the Output field}
+% Test Case Derivation: \wss{Justify the expected value given in the Output field}
 
-How test will be performed: 
+% How test will be performed: 
 
-\item{...\\}
+% \item{...\\}
     
 \end{enumerate}
 
-\subsubsection{Module 2}
+\subsubsection{Query Interface Module [MG: M3]} \label{UT:Query}
+Test for query in meshgrid and points modes, as well as handling exceptions when the query is invalid. See \href{https://github.com/omltcat/turbulent-flow/blob/main/test/test_query.py}{test\_query.py}
 
-...
-
-\subsection{Tests for Nonfunctional Requirements}
-
-\wss{If there is a module that needs to be independently assessed for
-  performance, those test cases can go here.  In some projects, planning for
-  nonfunctional tests of units will not be that relevant.}
-
-\wss{These tests may involve collecting performance data from previously
-  mentioned functional tests.}
-
-\subsubsection{Module ?}
-		
 \begin{enumerate}
-
-\item{test-id1\\}
-
-Type: \wss{Functional, Dynamic, Manual, Automatic, Static etc. Most will
-  be automatic}
-					
-Initial State: 
-					
-Input/Condition: 
-					
-Output/Result: 
-					
-How test will be performed: 
-					
-\item{test-id2\\}
-
-Type: Functional, Dynamic, Manual, Static etc.
-					
-Initial State: 
-					
-Input: 
-					
-Output: 
-					
-How test will be performed: 
-
+  \item test-query-meshgrid
+  \item test-query-points
+  \item test-query-meshgrid-exceptions
+  \item test-query-points-exceptions
+  \item test-query-mode-exceptions
+  \item test-query-plot-exceptions
 \end{enumerate}
 
-\subsubsection{Module ?}
+\subsubsection{Eddy Profile Module [MG: M4]} \label{UT:Prof}
+Test for loading valid and invalid eddy profiles (exceptions). See \href{https://github.com/omltcat/turbulent-flow/blob/main/test/test_eddy_profile.py}{test\_eddy\_profile.py}
 
-...
+\begin{enumerate}
+  \item test-eddy-profile
+  \item test-eddy-profile-invalid
+\end{enumerate}
+
+\subsubsection{Flow Field Module [MG: M5]} \label{UT:Field}
+Test initializing field and calculating velocities with meshgrid. Eddy generation is also tested here. Exceptions during initialization and calculation are also tested. See \href{https://github.com/omltcat/turbulent-flow/blob/main/test/test_flow_field.py}{test\_flow\_field.py}
+
+\begin{enumerate}
+  \item test-eddy-generation
+  \item test-flow-field
+  \item test-flow-field-wrap
+  \item test-flow-field-init-exceptions
+  \item test-flow-field-mesh-exceptions
+  \item test-flow-field-set-exceptions
+  \item test-flow-field-out-of-memory
+\end{enumerate}
+
+\subsubsection{Shape Function Module [MG: M7]} \label{UT:Shape}
+Test for calculating shape function values with different active shape functions and cutoffs, as well as exceptions when setting active shape function or cutoff. See \href{https://github.com/omltcat/turbulent-flow/blob/main/test/test_shape_function.py}{test\_shape\_function.py}
+
+\begin{enumerate}
+  \item test-shape-function
+  \item test-shape-function-exceptions
+\end{enumerate}
+
+\subsubsection{File IO Module [MG: M8]} \label{UT:FileIO}
+Test for reading, writing and deleting files within the program directory, as well as handling exceptions when the file is not found, unable to read/write or the expected format is not matched. See \href{https://github.com/omltcat/turbulent-flow/blob/main/test/test_file_io.py}{test\_file\_io.py}
+
+\begin{enumerate}
+  \item test-file-io
+  \item test-file-io-read-fail
+  \item test-file-io-read-fail-format
+  \item test-file-io-write-fail
+  \item test-file-io-clear-fail
+\end{enumerate}
+
+
+% \subsection{Tests for Nonfunctional Requirements}
+
+% \wss{If there is a module that needs to be independently assessed for
+%   performance, those test cases can go here.  In some projects, planning for
+%   nonfunctional tests of units will not be that relevant.}
+
+% \wss{These tests may involve collecting performance data from previously
+%   mentioned functional tests.}
+
+% \subsubsection{Module ?}
+		
+% \begin{enumerate}
+
+% \item{test-id1\\}
+
+% Type: \wss{Functional, Dynamic, Manual, Automatic, Static etc. Most will
+%   be automatic}
+					
+% Initial State: 
+					
+% Input/Condition: 
+					
+% Output/Result: 
+					
+% How test will be performed: 
+					
+% \item{test-id2\\}
+
+% Type: Functional, Dynamic, Manual, Static etc.
+					
+% Initial State: 
+					
+% Input: 
+					
+% Output: 
+					
+% How test will be performed: 
+
+% \end{enumerate}
+
+% \subsubsection{Module ?}
+
 
 \subsection{Traceability Between Test Cases and Modules}
 
-\wss{Provide evidence that all of the modules have been considered.}
+% \wss{Provide evidence that all of the modules have been considered.}
+
+\begin{table}[h!]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+  \hline
+                            & M2 & M3 & M4 & M5 & M6 & M7 & M8 & M10 \\
+  \hline
+  Test \ref{UT:Main}        & X  &    &    &    &    &    &    &     \\\hline
+  Test \ref{UT:Query}       &    & X  &    &    &    &    &    & X   \\\hline
+  Test \ref{UT:Prof}        &    &    & X  &    &    &    &    &     \\\hline
+  Test \ref{UT:Field}       &    &    &    & X  & X  &    &    &     \\\hline
+  Test \ref{UT:Shape}       &    &    &    &    &    & X  &    &     \\\hline
+  Test \ref{UT:FileIO}      &    &    &    &    &    &    & X  &     \\\hline
+  \end{tabular}
+  \caption{Traceability Between Unit Test Cases and Modules}
+  \label{Table:A_trace}
+\end{table}
 				
 \bibliographystyle{plainnat}
 
