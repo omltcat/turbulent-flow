@@ -7,6 +7,7 @@ import main
 
 @pytest.fixture(scope="module", autouse=True)
 def setup_module():
+    """Setup and teardown for the module tests"""
     # Create a profile file
     profile_content = {
         "settings": {},
@@ -43,6 +44,7 @@ def setup_module():
 
 @pytest.mark.unit
 def test_main_new():
+    """Test creating a new field with main module"""
     args = [
         "new",
         "-p",
@@ -62,6 +64,7 @@ def test_main_new():
 
 @pytest.mark.unit
 def test_main_query():
+    """Test querying a field with main module"""
     args = [
         "query",
         "-n",
@@ -79,6 +82,8 @@ def test_main_query():
 
 @pytest.mark.unit
 def test_main_new_exceptions(capsys):
+    """Test exceptions in creating a new field with main module as reported by lower level modules"""
+    # Use a non-existent profile
     args = [
         "new",
         "-p",
@@ -97,6 +102,8 @@ def test_main_new_exceptions(capsys):
 
 @pytest.mark.unit
 def test_main_query_field_not_exist(capsys):
+    """Test querying a non-existent field with main module"""
+    # Use a non-existent field
     args = [
         "query",
         "-n",
@@ -115,6 +122,8 @@ def test_main_query_field_not_exist(capsys):
 
 @pytest.mark.unit
 def test_main_query_shape_function_exception(capsys):
+    """Test exceptions in setting shape function with main module as reported by lower level modules"""
+    # Use a non-existent shape function
     args = [
         "query",
         "-n",
@@ -131,6 +140,8 @@ def test_main_query_shape_function_exception(capsys):
 
 @pytest.mark.unit
 def test_main_query_exception(capsys):
+    """Test exceptions in querying a field with main module as reported by lower level modules"""
+    # Use a non-existent query file
     args = [
         "query",
         "-n",

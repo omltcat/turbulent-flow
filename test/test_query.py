@@ -11,6 +11,7 @@ from modules.flow_field import FlowField
 
 @pytest.fixture(scope="module", autouse=True)
 def setup_module():
+    """Setup and teardown for the module tests"""
     global query
     # Eddy profile
     profile_name = "__test__"
@@ -23,6 +24,8 @@ def setup_module():
             {"density": 0.005, "intensity": 1.2, "length_scale": 1.5},
         ],
     }
+
+    # Create a field
     field_name = "test_field"
     file_io.write("profiles", profile_name, content)
     profile = EddyProfile(profile_name)
@@ -34,6 +37,7 @@ def setup_module():
 
     yield
 
+    # Clean up
     FlowField.verbose = True
     for file in glob.glob(f"src/results/{field_name}_*.npy"):
         os.remove(file)
@@ -43,6 +47,8 @@ def setup_module():
 
 @pytest.mark.unit
 def test_query_meshgrid():
+    """Test querying the field with meshgrid mode"""
+    # Query file content
     content = {
         "mode": "meshgrid",
         "params": {
@@ -57,18 +63,23 @@ def test_query_meshgrid():
     request = "__test_mesh__"
     file_io.write("queries", "__test_mesh__", content, format="json")
     response = query.handle_request(request=request, format="file")
+    # Check the response showing the plot is saved
     assert "Plot saved to plots" in response, f"{response}"
 
+    # Change the plot axis to y
     content["params"]["low_bounds"] = [-1, 2, -1]
     content["params"]["high_bounds"] = [1, 2, 1]
     content["plot"]["axis"] = "y"
     response = query.handle_request(request=json.dumps(content))
+    # Check the response showing the plot is saved
     assert "Plot saved to plots" in response, f"{response}"
 
+    # Change the plot axis to x
     content["params"]["low_bounds"] = [-1, -1, -1]
     content["params"]["high_bounds"] = [1, 1, 1]
     content["plot"]["axis"] = "x"
     response = query.handle_request(request=json.dumps(content))
+    # Check the response showing the plot is saved
     assert "Plot saved to plots" in response, f"{response}"
 
     # Clean up
@@ -77,6 +88,8 @@ def test_query_meshgrid():
 
 @pytest.mark.unit
 def test_query_points():
+    """Test querying the field with points mode"""
+    # Query file content
     content = {
         "mode": "points",
         "params": {
@@ -84,15 +97,19 @@ def test_query_points():
         },
     }
     response = query.handle_request(request=json.dumps(content))
+    # Check the response showing the velocity calculation is complete
     assert "Velocity calculation complete (mode: points)." in response, f"{response}"
 
+    # Remove the coordinates, shoud now use default value (0, 0, 0)
     del content["params"]["coords"]
     response = query.handle_request(request=json.dumps(content))
+    # Check the response showing the velocity calculation is complete
     assert "Velocity calculation complete (mode: points)." in response, f"{response}"
 
 
 @pytest.mark.unit
 def test_query_meshgrid_exceptions():
+    """Test query exceptions in meshgrid mode"""
     # Not json string
     content = "invalid"
     with pytest.raises(Exception, match=r"^Invalid query request string"):
@@ -111,6 +128,7 @@ def test_query_meshgrid_exceptions():
 
 @pytest.mark.unit
 def test_query_points_exceptions():
+    """Test query exceptions in points mode"""
     # Invalid points params
     content = {
         "mode": "points",
@@ -129,6 +147,7 @@ def test_query_points_exceptions():
 
 @pytest.mark.unit
 def test_query_mode_exceptions():
+    """Test query exceptions with invalid mode"""
     # Invalid mode
     content = {"mode": "invalid", "params": {}}
     with pytest.raises(Exception, match=r"^Invalid request mode"):
@@ -137,6 +156,7 @@ def test_query_mode_exceptions():
 
 @pytest.mark.unit
 def test_query_plot_exceptions():
+    """Test query exceptions with invalid plot params"""
     # Invalid plot params (index out of bounds)
     content = {
         "mode": "meshgrid",
