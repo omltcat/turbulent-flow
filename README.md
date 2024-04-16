@@ -21,7 +21,7 @@ The folders and files for this project are as follows:
 │   ├── main.py     # main file to run the software          
 |   ├── modules     # modules of the software
 │   ├── profiles    # put eddy profiles here, contains examples
-│   ├── qeuries     # put query files here, contains examples
+│   ├── queries     # put query files here, contains examples
 │   ├── results     # raw results will be saved here
 │   └── plots       # plots will be saved here
 ├── test    # test cases
@@ -57,17 +57,14 @@ pip install -r requirements.txt
 
 
 ## Usage
-First, enter the source code directory:
-```bash
-cd src
-```
 ### Creating a new flow field
 ```bash
 # view help
-python main.py new -h
-
+python ./src/main.py new -h
+```
+```bash
 # create a new 20x20x20 field named "test", using the provided "example" eddy profile
-python main.py new -p example -n test -d 20 20 20
+python ./src/main.py new -p example -n test -d 20 20 20
 ```
 Since we did not pass average velocity (-v) the default value 0.0 will be used.
 
@@ -89,7 +86,8 @@ The example profile can be found at **src/profiles/example.json**. It contains s
 ```bash
 # view help
 python main.py query -h
-
+```
+```bash
 # query the flow field "test" with the provided "example_meshgrid" query file
 python main.py query -n test -q example_meshgrid
 ```
@@ -115,3 +113,13 @@ The example query file can be found at **src/queries/example_meshgrid.json**. It
 ```
 
 After the run, you should see a plot pop-up. The raw result and the plot will be saved in **src/results** and **src/plots** respectively.
+
+### Running the test cases
+```bash
+# System and unit test cases, same ones in GitHub Actions
+pytest --cov=src --cov-fail-under=95 -m "(unit or system) and not slow"
+```
+```bash
+# Performance benchmark with 1000^3 meshgrid and 10 million eddies
+pytest -s -m "performance"
+```
