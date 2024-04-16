@@ -31,10 +31,29 @@ The folders and files for this project are as follows:
 └── README.md
 ```
 
-## Installation
-Please refer to the [INSTALL.md](INSTALL.md) for detailed installation instructions.
+## Quick Start
+If you have **Make** and **Conda** installed, and just want to quickly see this program in action, you can run the following commands.  
+Otherwise, see [Installation](#installation) and [Usage](#usage).
+```bash
+make install # create a new conda environment named "eddy" and install dependencies
 
-Makefile WIP for people with make and conda installed:
+make run # create a new flow field with example profile, query it and see a plot
+
+make test # run the unit and system test cases
+
+make clean # remove the conda environment
+```
+
+
+## Installation
+This program requires Python 3.11 or later. The use of a virtual environment manager (such as Conda) is highly recommended. 
+
+If such concepts are new to you, please refer to the [INSTALL.md](INSTALL.md) for detailed installation instructions.
+
+If you are familiar with Python, you can install the dependencies of this program with:
+```bash
+pip install -r requirements.txt
+```
 
 
 ## Usage
