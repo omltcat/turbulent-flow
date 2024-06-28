@@ -38,10 +38,10 @@ def main(args=None):
     )
     new_parser.add_argument(
         "-v",
-        default=0.0,
+        default=0,
         metavar="Vx",
         type=float,
-        help="Average flow velocity in x direction (default: 0.0)",
+        help="Average flow velocity in x direction (default: 0)",
     )
 
     # Query field subparser

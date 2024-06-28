@@ -30,7 +30,7 @@ class FlowField:
         profile: EddyProfile,
         name: str,
         dimensions: np.ndarray | list,
-        avg_vel: float = 0.0,
+        avg_vel: float | int = 0,
     ):
         """
         Generate a new flow field.
@@ -112,6 +112,8 @@ class FlowField:
         if self.avg_vel == 0:
             self.y[1] = self.y[0]
             self.z[1] = self.z[0]
+            self.y[2] = self.y[0]
+            self.z[2] = self.z[0]
         # if avg_vel is not zero, wrap around in x will have random y and z to avoid periodicity
         else:
             self.set_rand_eddy_yz(1)
