@@ -17,6 +17,10 @@ def setup_module():
     yield
     FlowField.verbose = True
 
+    # Clean up
+    os.remove("src/profiles/__test__.json")
+    os.remove("src/fields/test_field.pkl")
+
 
 @pytest.mark.slow
 @pytest.mark.unit
@@ -261,16 +265,11 @@ def test_flow_field():
         low_bounds=[10, -10, -10],
         high_bounds=[10, 10, 10],
         time=10,
-        do_cache=True,
     )
 
     # Due to average flow velocity, these two should be the same
     diff_sum = np.sum(np.linalg.norm(vel_t0_xneg10 - vel_t10_x10, axis=-1))
     assert diff_sum < RTOL
-
-    # Clean up
-    os.remove(f"src/profiles/{profile_name}.json")
-    os.remove(f"src/fields/{field_name}.pkl")
 
 
 @pytest.mark.unit
@@ -390,9 +389,6 @@ def test_flow_field_mesh_exceptions():
             time=-1,
         )
 
-    # Clean up
-    os.remove(f"src/profiles/{profile_name}.json")
-
 
 @pytest.mark.unit
 def test_flow_field_set_exceptions():
@@ -415,9 +411,6 @@ def test_flow_field_set_exceptions():
     # Test for invalid average velocity
     with pytest.raises(ValueError):
         field.set_avg_vel(-2)
-
-    # Clean up
-    os.remove(f"src/profiles/{profile_name}.json")
 
 
 @pytest.mark.slow
