@@ -53,3 +53,6 @@ def test_query_coordinate(capsys):
     main.main(["query", "-n", "test_system_input_field", "-q", "test_system_input_query"])
     captured = capsys.readouterr()
     assert "Bounds must be within the flow field" in captured.err
+
+    # Clean up
+    os.remove("src/queries/test_system_input_query.json")
