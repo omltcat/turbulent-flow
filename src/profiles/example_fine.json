@@ -1,0 +1,55 @@
+{
+    "settings": {},
+    "variants": [
+        {
+            "density": 618.1,
+            "intensity": 0.3977,
+            "length_scale": 0.04000
+        },
+        {
+            "density": 348.2,
+            "intensity": 0.5137,
+            "length_scale": 0.06108
+        },
+        {
+            "density": 99.96,
+            "intensity": 0.6328,
+            "length_scale": 0.09325
+        },
+        {
+            "density": 26.14,
+            "intensity": 0.7521,
+            "length_scale": 0.1424
+        },
+        {
+            "density": 7.157,
+            "intensity": 0.8681,
+            "length_scale": 0.2174
+        },
+        {
+            "density": 2.035,
+            "intensity": 0.9737,
+            "length_scale": 0.3320
+        },
+        {
+            "density": 0.5662,
+            "intensity": 1.059,
+            "length_scale": 0.5069
+        },
+        {
+            "density": 0.1481,
+            "intensity": 1.117,
+            "length_scale": 0.7739
+        },
+        {
+            "density": 0.02769,
+            "intensity": 1.145,
+            "length_scale": 1.182
+        },
+        {
+            "density": 0.002625,
+            "intensity": 1.153,
+            "length_scale": 1.804
+        }
+    ]
+}

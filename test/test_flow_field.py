@@ -273,6 +273,23 @@ def test_flow_field():
 
 
 @pytest.mark.unit
+def test_flow_field_parallel():
+    field: FlowField = FlowField.load("test_field")
+    field.sum_vel_mesh(
+        step_size=0.2,
+        chunk_size=5,
+        low_bounds=[-10, -10, -10],
+        high_bounds=[10, 10, 10],
+        time=0,
+        threads=4,
+    )
+
+    # Check for number of chunk cache files created
+    expected_files = 20 / 0.2 // 5
+    assert len([f for f in os.listdir("src/.cache") if "x_" in f]) == expected_files
+
+
+@pytest.mark.unit
 def test_flow_field_init_exceptions():
     """Test exceptions for flow field initialization"""
     profile_name = "__invalid__"

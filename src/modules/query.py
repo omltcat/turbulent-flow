@@ -70,7 +70,14 @@ class Query:
             low_bounds = params.get("low_bounds", None)
             high_bounds = params.get("high_bounds", None)
 
-            kwargs = utils.filter_keys(params, ["low_bounds", "high_bounds", "step_size", "chunk_size", "time"])
+            kwargs = utils.filter_keys(params, [
+                "low_bounds",
+                "high_bounds",
+                "step_size",
+                "chunk_size",
+                "time",
+                "threads"
+            ])
 
             # Calculate velocity in meshgrid
             try:
@@ -88,7 +95,7 @@ class Query:
 
             # Plot meshgrid if requested
             plot: dict = request.get("plot", None)
-            if plot is not None:
+            if plot is not None and isinstance(vel, np.ndarray):
                 try:
                     fig = visualize.plot_mesh(
                         vel,
