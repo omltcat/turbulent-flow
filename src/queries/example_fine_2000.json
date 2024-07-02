@@ -1,0 +1,10 @@
+{
+    "mode": "meshgrid",
+    "params": {
+        "low_bounds": [-10, -10, -10],
+        "high_bounds": [10, 10, 10],
+        "step_size": 0.01,
+        "chunk_size": 5,
+        "time": 0
+    }
+}
