@@ -43,6 +43,12 @@ def main(args=None):
         type=float,
         help="Average flow velocity in x direction (default: 0)",
     )
+    new_parser.add_argument(
+        "-x",
+        default="",
+        metavar="X_FUNC",
+        help="X velocity profile function to be used (default: none)"
+    )
 
     # Query field subparser
     query_parser = subparsers.add_parser(
@@ -84,7 +90,7 @@ def main(args=None):
         try:
             profile = EddyProfile(args.p)
             field = FlowField(
-                profile=profile, name=args.n, dimensions=args.d, avg_vel=args.v
+                profile=profile, name=args.n, dimensions=args.d, avg_vel=args.v, x_vel_prof=args.x
             )
             field.save()
             print(f"New field '{args.n}' created and saved successfully")
