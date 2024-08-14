@@ -40,4 +40,4 @@ def linear_2d(ny, nz):
     """
     Linear velocity profile in y, with no variation in z direction.
     """
-    return ny + 1
+    return (ny + 1) / 2
