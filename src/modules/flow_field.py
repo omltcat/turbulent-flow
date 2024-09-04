@@ -388,6 +388,7 @@ class FlowField:
         for i in WRAP_ITER:
             if hasattr(self, "x_vel"):
                 centers = self.get_eddy_center_x_vel(t)
+                centers[:, 0] += i * self.dimensions[0]
             else:
                 centers = self.get_eddy_centers(flow_iter + i)
                 centers[:, 0] += offset - i * self.dimensions[0]
