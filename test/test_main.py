@@ -81,6 +81,46 @@ def test_main_query():
 
 
 @pytest.mark.unit
+def test_main_new_x_profile():
+    """Test creating a new field with a custom x-velocity profile"""
+    args = [
+        "new",
+        "-p",
+        "main_test_profile",
+        "-n",
+        "main_test_field_x_profile",
+        "-d",
+        "10",
+        "10",
+        "10",
+        "-v",
+        "5",
+        "-x",
+        "parabola_2d",
+    ]
+    main.main(args)
+    assert os.path.exists("src/fields/main_test_field_x_profile.pkl")
+
+
+@pytest.mark.unit
+def test_main_query_x_profile():
+    """Test querying a field with a custom x-velocity profile"""
+    args = [
+        "query",
+        "-n",
+        "main_test_field_x_profile",
+        "-q",
+        "main_test_query",
+        "-s",
+        "gaussian",
+        "-c",
+        "1.0",
+    ]
+    main.main(args)
+    assert glob.glob("src/results/main_test_*.npy")
+
+
+@pytest.mark.unit
 def test_main_new_exceptions(capsys):
     """Test exceptions in creating a new field with main module as reported by lower level modules"""
     # Use a non-existent profile

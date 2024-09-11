@@ -290,6 +290,110 @@ def test_flow_field_parallel():
 
 
 @pytest.mark.unit
+def test_non_uniform_x_vel():
+    """Test using a linear velocity profile from 0 to 8 m/s from y=-10 to y=10 (like a slip boundary)"""
+    profile_name = "__test__"
+    content = {
+        "settings": {},
+        "variants": [
+            {"density": 0.005, "intensity": 1.2, "length_scale": 2.0},
+        ],
+    }
+
+    file_io.write("profiles", profile_name, content)
+    profile = EddyProfile(profile_name)
+
+    # Field creation
+    field_name = "two_eddies"
+    dimensions = np.array([20, 20, 20])
+    field = FlowField(profile, field_name, dimensions, avg_vel=8, x_vel_prof="linear_2d")
+
+    # Keep only two eddies, so we can track their movements without interference
+    field.N = 2
+    field.sigma = field.sigma[:2]
+    field.alpha = field.alpha[:2]
+
+    # Move one eddy to 0,-5,0 and the other to 0,5,0
+    field.init_x = np.array([0, 0])
+    field.y[0] = np.array([-5, 5])
+    field.z[0] = np.array([0, 0])
+
+    # Recalculate x_vel at these new positions
+    ny: np.ndarray = field.y[0] / field.high_bounds[1]
+    nz: np.ndarray = field.z[0] / field.high_bounds[2]
+    field.x_vel = field.x_vel_func(ny, nz) * field.avg_vel
+
+    field.save()
+
+    # Avg velocity for eddy A is 2 m/s, for eddy B is 6 m/s
+
+    # Get velocities at t=0, around 0,-5,0 and 0,5,0
+    vel_t0_a = field.sum_vel_mesh(
+        step_size=0.2,
+        chunk_size=5,
+        low_bounds=[-2, -7, -2],
+        high_bounds=[2, -3, 2],
+        time=0,
+    )
+    vel_t0_b = field.sum_vel_mesh(
+        step_size=0.2,
+        chunk_size=5,
+        low_bounds=[-2, 3, -2],
+        high_bounds=[2, 7, 2],
+        time=0,
+    )
+
+    # Get velocities at t=1, around 2,-5,0 and 6,5,0
+    vel_t1_a = field.sum_vel_mesh(
+        step_size=0.2,
+        chunk_size=5,
+        low_bounds=[0, -7, -2],
+        high_bounds=[4, -3, 2],
+        time=1,
+    )
+    vel_t1_b = field.sum_vel_mesh(
+        step_size=0.2,
+        chunk_size=5,
+        low_bounds=[4, 3, -2],
+        high_bounds=[8.0001, 7, 2],
+        time=1,
+    )
+    # Check if the velocity box at t=0 and t=1 is the same
+    diff_sum = np.sum(np.linalg.norm(vel_t0_a - vel_t1_a, axis=-1))
+    assert diff_sum < RTOL
+
+    diff_sum = np.sum(np.linalg.norm(vel_t0_b - vel_t1_b, axis=-1))
+    assert diff_sum < RTOL
+
+    # Get velocities at t=2, around 4,-5,0 and -8,5,0 (wrapping around)
+    vel_t2_a = field.sum_vel_mesh(
+        step_size=0.2,
+        chunk_size=5,
+        low_bounds=[2, -7, -2],
+        high_bounds=[6.0001, -3, 2],
+        time=2,
+    )
+    vel_t2_b = field.sum_vel_mesh(
+        step_size=0.2,
+        chunk_size=5,
+        low_bounds=[-10, 3, -2],
+        high_bounds=[-6, 7, 2],
+        time=2,
+    )
+
+    # Check if the velocity box at t=0 and t=2 is the same
+    diff_sum = np.sum(np.linalg.norm(vel_t0_a - vel_t2_a, axis=-1))
+    assert diff_sum < RTOL
+
+    diff_sum = np.sum(np.linalg.norm(vel_t0_b - vel_t2_b, axis=-1))
+    assert diff_sum < RTOL
+
+    # Clean up
+    os.remove(f"src/profiles/{profile_name}.json")
+    os.remove(f"src/fields/{field_name}.pkl")
+
+
+@pytest.mark.unit
 def test_flow_field_init_exceptions():
     """Test exceptions for flow field initialization"""
     profile_name = "__invalid__"
