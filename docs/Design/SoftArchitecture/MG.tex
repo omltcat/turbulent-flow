@@ -240,6 +240,30 @@ The design of the system is intended to satisfy the requirements developed in
 the SRS. In this stage, the system is decomposed into modules. The connection
 between requirements and modules is listed in Table~\ref{TblRT}.
 
+To facilitate the transformation from mathematical models to a usable software, some design decisions are made, which are not part of the models and not explicitly mentioned in the SRS. These are documented as follows:
+
+\subsection{Field Wrap-around}
+Eddies that are touching the boundary of the field would have some flow out-of and into the field. To maintain conservation of mass mandated in the SRS, these flows need to be accounted for and compensated. A common practice is to move the part of an eddy that is outside the field to the opposite side of the field (wrap-around). However, if there is field is flowing with a uniform average velocity, this will introduce a situation where the field is repeating itself with predictable periodicity. This would not be a realistic representation of a turbulent flow field. To address this, the following designs are used, depending on the flow velocity and pattern:
+
+\subsubsection{Stationary Field: Classic Wrap-around}
+If the user inputs a zero average $x$-velocity, the classic wrap-around as described above is used. For example, if an eddy is protruding out from the positive $x$-boundary, the part that is outside should be moved to protrude in at the negative $x$-boundary, with the same $y$ and $z$ coordinates. This does mean that the field repeats itself in any direction. This decision was made after discussion with the domain expert as zero average velocity is more of a research scenario, in which this simple wrap-around is more desirable for related research computations.
+
+To achieve this wrap around effect, the entire field is copied and shifted in the opposite direction. i.e. to wrap around the positive $x$-boundary, the entire field is copied and placed outside the negative $x$-boundary of the original field, so that the negative $x$-boundary of the original field is mated with the positive $x$-boundary of the copied field. This is done for all boundaries, and also diagonally and at the corners, so that any protruding eddies are wrapped around to the opposite side. This results in a field that is 27 times the original field size, with the original field at the center. To avoid wasting memory, all the eddies in the copied field that are not touching the original field boundary are discarded.
+
+\subsubsection{Non-stationary Field: Random Wrap-around in flow direction}
+If the user inputs a non-zero average $x$-velocity that is uniform across the entire field, the classic wrap-around would result in a periodic flow field. To avoid this, instead of the classic wrap-around in $x$-direction, a "flow iteration" mechanism is introduced. When the field is generated, two more fields (iterations) outside the positive and negative $x$-boundaries are also generated. These additional fields have eddies with same strength and directions, at same $x$ coordinates as those in the original field, but different and random $y$ and $z$ coordinates. As the flow moves forward, additional fields are randomly generated and attached to the end, like frames on a film reel. This ensures that when viewing at any section on this "reel" with the same $x$ width as the original field, the amount of eddies is always the same, and any eddies protruding out the $x$-boundaries are accounted for by eddies in the next/previous iteration, but at different $y$ and $z$ coordinates to avoid periodicity. Wrap-around at the $y$ and $z$ boundaries are still done as in the classic wrap-around.
+
+\subsubsection{Non-stationary Field with Non-uniform Average Velocity}
+If the user inputs a non-zero average $x$-velocity that is not uniform across the entire field, but rather as a function of $y$ and $z$, each velocity that each eddy center moves would be different depending on its $y$ and $z$ coordinates. The flow iteration mechanism cannot be applied here as it relies on everything moving at the same pace. Instead, the classic wrap-around is again used.
+
+This design decision is made because, although for each individual eddy, its reappearance at the same location is predictable, when looking at the entire field with many eddies moving at different $x$-velocities, the field as a whole would not repeat itself like with uniform average velocity.
+
+\subsection{Chunking}
+
+While the instance model (IM1 from SRS) requires that to calculate velocity at any location, the influence of all eddies need to be considered. However, most shape functions (such as TM1) sets a cutoff distance. This means that the influence of most eddies are in fact zero. To avoid unnecessary computation of the distance and influence of each eddies against each mesh grid point in the field, the field is divided into chunks of cubic shape. Only eddies that are either within or outside but touching a chunk are considered for calculations against locations inside that chunk. This filtering requires only simple checks of $x$, $y$, and $z$ coordinates of the eddy center against the chunk boundaries, which is much faster than calculating the distance between the eddy center and each mesh grid point.
+
+While one eddy can influence multiple mesh grid points, each point is independent of each other. This means the chunks can potentially be processed in parallel to speed up the computation.
+
 % \wss{The intention of this section is to document decisions that are made
 %   ``between'' the requirements and the design.  To satisfy some requirements,
 %   design decisions need to be made.  Rather than make these decisions implicit,
