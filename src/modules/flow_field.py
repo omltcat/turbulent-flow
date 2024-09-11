@@ -2,6 +2,7 @@
 Turbulent Flow Field Module
 """
 
+from concurrent.futures import ThreadPoolExecutor
 # import time
 from tqdm import tqdm
 import numpy as np
@@ -174,8 +175,7 @@ class FlowField:
         step_size: float = 0.2,
         chunk_size: int = 5,
         time: float = 0,
-        do_return: bool = True,
-        do_cache: bool = False,
+        threads: int = 1,
     ):
         """
         Calculate the velocity field for a meshgrid.
@@ -192,15 +192,13 @@ class FlowField:
             Size of chunks to split the meshgrid into, by default 5
         `t` : float, optional
             Time passed, by default 0
-        `do_return` : bool, optional
-            Return the velocity field, by default True
-        `do_cache` : bool, optional
-            Save chunks cache, by default False
+        `threads` : int, optional
+            Number of threads to use, by default 1
 
         Returns
         -------
         `vel`: np.ndarray
-            Velocity field for the meshgrid
+            Velocity field for the meshgrid. This will only return if `threads` is 1.
         """
         if low_bounds is None:
             low_bounds = self.low_bounds
@@ -239,6 +237,14 @@ class FlowField:
         x_coords = self.step_coords(low_bounds[0], high_bounds[0], step_size)
         y_coords = self.step_coords(low_bounds[1], high_bounds[1], step_size)
         z_coords = self.step_coords(low_bounds[2], high_bounds[2], step_size)
+
+        # Check the handling of multiple threads
+        if threads == 1:
+            do_return = True
+            do_cache = False
+        else:
+            do_return = False
+            do_cache = True
 
         # Initialize the velocity field if a return is needed
         if do_return:
@@ -297,12 +303,8 @@ class FlowField:
 
         file_io.write(CACHE_DIR, "__info__", chunk_info, "json")
 
-        # Calculate the velocity field for each chunk, slicing by x, y, and z
-        margins = sigma * CUTOFF
-        self.print("Chunks [x, y, z]: ", [len(x_chunks), len(y_chunks), len(z_chunks)])
-        if self.verbose:
-            pbar = tqdm(total=len(x_chunks) * len(y_chunks) * len(z_chunks))
-        for i, xc in enumerate(x_chunks):
+        # Function to compute chunks looping through Y and Z for parallel processing of X
+        def calc_x_chunks(i, xc):
             vel_i = np.zeros((len(xc), len(y_coords), len(z_coords), 3))
             if x_vel_plane is None:
                 vel_i[..., 0] = self.avg_vel
@@ -349,6 +351,26 @@ class FlowField:
                 vel[xc[0] : xc[-1] + 1, :, :, :] = vel_i
             if do_cache:
                 file_io.write(CACHE_DIR, f"x_{i}", vel_i, CACHE_FORMAT)
+
+        # Calculate the velocity field for each chunk, slicing by x, y, and z
+        margins = sigma * CUTOFF
+        self.print("Chunks [x, y, z]: ", [len(x_chunks), len(y_chunks), len(z_chunks)])
+        self.print("Threads: ", threads)
+        if self.verbose:
+            pbar = tqdm(total=len(x_coords) * len(y_coords) * len(z_coords), desc="Grid points")
+            plock = pbar.get_lock()
+
+        if threads == 1:
+            for i, xc in enumerate(x_chunks):
+                calc_x_chunks(i, xc)
+        else:
+            with ThreadPoolExecutor(max_workers=threads) as executor:
+                futures = [
+                    executor.submit(calc_x_chunks, i, xc)
+                    for i, xc in enumerate(x_chunks)
+                ]
+                for future in futures:
+                    future.result()
 
         if self.verbose:
             pbar.close()
