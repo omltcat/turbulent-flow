@@ -151,6 +151,7 @@
 2024-02-05 & 1.1 & Revisions based on presentation feedback. Finished theoretical models and matrices\\
 2024-03-21 & 1.2 & All issued from feedback addressed\\
 2024-04-15 & 1.3 & Update TM, GD and IM equations to more general forms\\
+2024-08-16 & 1.4 & Revised according to Summer 2024 meeting feedbacks\\
 \bottomrule
 \end{tabularx}
 
@@ -225,9 +226,11 @@ $t$ & \si{\second} & time since the start of the simulation
 \\
 $\mathbf{u}$ & \si[per-mode=symbol] {\metre\per\second} & 3D vector of flow velocity at given point and time
 \\
-$\mathbf{u_{\text{avg}}}$ & \si[per-mode=symbol] {\metre\per\second} & 3D vector of average flow velocity
+$\mathbf{\overline{u}}$ & \si[per-mode=symbol] {\metre\per\second} & 3D vector of mean flow velocity
 \\
-$\mathbf{u'}$ & \si[per-mode=symbol] {\metre\per\second} & 3D vector of flow velocity fluctuation (on top of average velocity)
+$\mathbf{u'}$ & \si[per-mode=symbol] {\metre\per\second} & 3D vector of flow velocity fluctuation (on top of mean velocity)
+\\
+$u'$, $v'$, $w'$ & \si[per-mode=symbol] {\metre\per\second} & velocity fluctuation components in $x$, $y$, $z$ directions
 \\
 $\boldsymbol{\alpha}$ & \si[per-mode=symbol] {\metre\per\second} & 3D vector of eddy intensity
 \\
@@ -239,7 +242,7 @@ $k$ &  & index of each eddy, used as a superscript
 \\
 $q_\sigma$ &  & shape function
 \\
-$L_x$, $L_y$, $L_z$ & \si{\metre} & x, y, z dimensions of the flow field
+$L_x$, $L_y$, $L_z$ & \si{\metre} & $x$, $y$, $z$ dimensions of the flow field
 \\
 \bottomrule
 \end{longtable*}
@@ -278,7 +281,7 @@ In this document, the following notation is used:
 \begin{itemize}
   \item Bold font denotes vectors, such as $\mathbf{x}$.
   \item Superscript $k$ indicates index of eddies, such as $\mathbf{x}^k$ (position of $k$th eddy).
-  \item $|~|$ denotes the modulus (magnitude) of a vector, such as $|\mathbf{r^k}|$.
+  \item $|~|$ denotes the modulus (magnitude) of a vector, such as $|\mathbf{r}^k|$.
 \end{itemize}
 
 % \plt{This section is optional, but should be included for projects that make use
@@ -362,11 +365,11 @@ In this document, the following notation is used:
 %   independently verify/derive every statement made.}
 
 \section{Introduction}
-When using CFD (Computational Fluid Dynamics) to simulate turbulent flow, it is typical to start with a laminar flow up stream and let it develop into a turbulent flow downstream. However, this is computationally expensive as it requires simulations over a larger region and longer time, before the flow can develop into the desired state. 
+When using CFD (Computational Fluid Dynamics) to simulate turbulent flow, it is typical to start with a laminar flow upstream and let it develop into a turbulent flow downstream. For example, in a gas turbine simulation, it may be necessary to start with a clean laminar flow at the first turbine stage even if the interest is on a later stage that receives turbulent flow. This is computationally expensive as it requires simulations over a larger region and longer time, before the flow can develop into the desired state. 
 
-A potential approach to save computational time is to start with a artificially generated turbulent flow as initial and boundary conditions (IC and BC) for further CFD simulations. \citet{PolettoEtAl2013} proposed a method to generate a velocity field of such flow with synthetic eddies, which this software aims to implement.
+A potential approach to save computational time is to start with an artificially generated turbulent flow as Initial and Boundary Conditions (IC and BC) for further CFD simulations. \citet{PolettoEtAl2013} proposed a method to generate a velocity field of such flow with synthetic eddies, which this software, named \progname{}, aims to implement.
 
-This project is in collaboration Nikita Holyev, the domain expert in fluid theories. Nikita is a PhD student in Mechanical Engineering at McMaster University, supervised by Dr. Marilyn Lightstone and Dr. Stephen Tullis. He is currently working on the theoretical side of synthetic eddy methods.
+This project is in collaboration Nikita Holyev, the domain expert in fluid theories. Nikita is a PhD student in Mechanical Engineering at McMaster University. He is currently working on the theoretical side of synthetic eddy methods, supervised by Dr.~Marilyn Lightstone and Dr.~Stephen Tullis.
 
 If you find yourself with unfamiliar with the these fluid dynamics terminology, please refer to Section~\ref{sec_termDef} for a brief overview of some background knowledge.
 % \plt{The introduction section is written to introduce the problem.  It starts
@@ -376,9 +379,9 @@ If you find yourself with unfamiliar with the these fluid dynamics terminology, 
 % expect in the Introduction section.}
 
 \subsection{Purpose of Document}
-Since the theory behind this software is in a highly specialized field of study, this document helps the software development team to better understand the problem and any related requirements. It also facilitates communication between the software development team and the domain experts to ensure the correctness of implantation.
+Since the theory behind this software is in a highly specialized field of study, this document helps the software development team to better understand the problem and any related requirements. It also facilitates communication between the software development team and the domain experts to ensure the correctness of implementation.
 
-User of this software can also refer to this document to understand the its capabilities, assumptions and limitations. It also serves as a reference for future maintenance and verification of the software.
+Users of this software can also refer to this document to understand its capabilities, assumptions and limitations. This document also serves as a reference for future maintenance and verification of the software.
 
 % \plt{This section summarizes the purpose of the SRS document.  It does not focus
 %   on the problem itself.  The problem is described in the ``Problem
@@ -392,9 +395,9 @@ User of this software can also refer to this document to understand the its capa
 
 \subsection{Scope of Requirements} 
 
-The scope of this software is limited to consider 3D space external flow scenarios only (for now, feasibility of internal flow such as within a pipe will be looked into with the domain expert.). It is also limited 1D flow direction with one inlet and one outlet.
+The scope of this software is limited to considering 3D space external flow scenarios only, although it is capable of modeling non-uniform mean flow velocity profile that can mimic some aspect of internal flow. It is also limited to one inlet and one outlet.
 
-As the first step of this project, the software will generate any velocity field based on user provided eddy profiles, regardless of whether they will lead to a realistic turbulent flow. This may change later as theoretical work progresses which allows the software to ensure realistic eddy profiles.
+As the first step of this project, the software will generate any velocity field based on user provided eddy profiles, regardless of whether they will lead to a realistic turbulent flow. This may change later, as theoretical work progresses allowing the software to provide realistic eddy profiles.
 
 % \plt{Modelling the real world requires simplification.  The full complexity of
 %   the actual physics, chemistry, biology is too much for existing models, and
@@ -415,7 +418,7 @@ As the first step of this project, the software will generate any velocity field
 
 \subsection{Characteristics of Intended Reader} \label{sec_IntendedReader}
 
-The intended readers of this document are expected to have an undergraduate level understanding of fluid theories (from course such as Junior level Fluid Dynamics or equivalent) and aware of the general workflow when conducting CFD simulation. If not, a brief overview of relevant information needed to understand this document is provided in ~\ref{sec_termDef}.
+The intended readers of this document are expected to have an undergraduate level understanding of fluid dynamics (from course such as Junior level Fluid Dynamics or equivalent) and aware of the general workflow when conducting CFD simulation. If not, a brief overview of relevant information needed to understand this document is provided in Section~\ref{sec_termDef}.
 
 % \plt{This section summarizes the skills and knowledge of the readers of the
 %   SRS.  It does NOT have the same purpose as the ``User Characteristics''
@@ -433,7 +436,7 @@ The intended readers of this document are expected to have an undergraduate leve
 %   graduate course on advanced quantum mechanics?}
 
 \subsection{Organization of Document}
-The introduction section includes reader characteristics and necessary brief background knowledge needed to understand the scope of this project. The General System Description section (\ref{Sec_GSD}) provides a high-level view of what the user need to know to utilize this software. Detailed problem description and the theoretical behind the software are presented in Specific System Description (\ref{Sec_SSD}), followed by Requirements of the software (\ref{Sec_req}). Not all the requirements will be satisfied in the first version of the software. The development will gradually implement features as detailed in Development Plan (\ref{Sec_plan}).
+The introduction section includes reader characteristics and necessary brief background knowledge needed to understand the scope of this project. The General System Description section (Section~\ref{Sec_GSD}) provides a high-level view of what the user need to know to utilize this software. Detailed problem description and the theoretical behind the software are presented in Specific System Description (Section~\ref{Sec_SSD}), followed by Requirements of the software (Section~\ref{Sec_req}). Not all the requirements will be satisfied in the first version of the software. The development will gradually implement features as detailed in Development Plan (Section~\ref{Sec_plan}).
 
 % \plt{This section provides a roadmap of the SRS document.  It will help the
 %   reader orient themselves.  It will provide direction that will help them
@@ -446,7 +449,7 @@ This section provides general information about the system.  It identifies the
 interfaces between the system and its environment, describes the user
 characteristics and lists the system constraints.  
 
-SynthEddy is a software that generates a velocity field for turbulent flow simulations. It can be used standalone or as a external tool for CFD software.
+\progname{} generates a velocity field for turbulent flow simulations. It can be used standalone or as an external tool for CFD software.
 % \plt{This text can likely be
 %   borrowed verbatim.}
 
@@ -460,9 +463,9 @@ SynthEddy is a software that generates a velocity field for turbulent flow simul
 
 \subsection{System Context}
 
-The software takes in user provided flow field dimensions, average velocity and eddy profiles and generates a velocity field. The user can then query the software to get the velocity vector at any point of interest in space and time. This query can also be done by CFD software to use the generated velocity field as IC and BC.
+As illustrated by Figure~\ref{Fig_SystemContext}, the software takes in user provided flow field dimensions, mean velocity and eddy profiles and generates a velocity field. The user can then query the software to get the velocity vector at any point of interest in space and time. This query can also be done by CFD software to use the generated velocity field as IC and BC.
 
-Eddy profile include the intensity and length-scale of each eddy, this will be detailed in \ref{sec_theoretical} and \ref{sec_datadef}.
+The eddy profile include the intensity and length-scale of each eddy. This will be detailed in Section~\ref{sec_theoretical} and \ref{sec_datadef}.
 
 % \plt{Your system context will include a figure that shows the abstract view of
 %   the software.  Often in a scientific context, the program can be viewed
@@ -501,8 +504,8 @@ Eddy profile include the intensity and length-scale of each eddy, this will be d
 \begin{itemize}
 \item User Responsibilities:
 \begin{itemize}
-\item Provide flow field dimensions and average velocity.
-\item Provide eddy profiles. For now, the software will not check if the profiles will lead to a realistic turbulent flow, or suggest any profiles.
+\item Provide flow field dimensions and mean velocity.
+\item Provide eddy profiles that include density (number of eddies per unit volume), intensity and length-scale of each type of eddy in the field.
 \end{itemize}
 \item \progname{} Responsibilities:
 \begin{itemize}
@@ -528,7 +531,7 @@ Eddy profile include the intensity and length-scale of each eddy, this will be d
 
 The expected end users of \progname{} are turbulent flow researchers and engineers looking to leverage \progname{} in their CFD simulations. They should have a (at least) undergraduate Junior level understanding of Fluid Dynamics and can perform CFD without \progname{}.
 
-To provide suitable eddy profiles for \progname{}, the user need to be aware of the synthetic eddy theories. This is detailed later in this document, with more information available in \citet{PolettoEtAl2013}.
+To provide suitable eddy profiles for \progname{}, the user needs to be aware of the synthetic eddy theories. This is detailed later in this document, with more information available in \citet{PolettoEtAl2013}.
 
 % \plt{This section summarizes the knowledge/skills expected of the user.
 %   Measuring usability, which is often a required non-function requirement,
@@ -539,11 +542,11 @@ To provide suitable eddy profiles for \progname{}, the user need to be aware of 
 %   end user of \progname{} should have an understanding of undergraduate Level 1
 %   Calculus and Physics.''}
 
-\subsection{System Constraints}
+\subsection{System Constraints} \label{sec_sysConstraints}
 
-\progname{} should run on the same hardware and operating system that is capable of running the CFD software, which typically is a x86-64 based computer running Windows or Linux. It should have a relatively small CPU and memory footprint, as the CFD software would be computationally expensive and should have priority in system resources.
+According to the typical use case provided by the domain expert ($1000^3$ mesh grid points or more), memory usage is a concern. Current generation desktop platforms, such as Intel 14th generation CPUs support up to 192 GB of RAM (\citeyear{Intel2023}), with usual desktops computers having 16 to 64 GB. Research computing clusters, such as those provided by Compute Canada, typically allows hundreds of GB to a few TB of RAM per node (\citeyear{ComputeCanada2024}). 
 
-Certain CFD software may require the use of specific programming languages for any addons/extensions/libraries, but this does not mean the main process of \progname{} is limited to those languages, as an interface in said language can be created to allow the two to communicate.
+Memory saving considerations should be taken, so that small scale test runs can be performed on a typical desktop computer by a developer or researcher, while full scale ``typical use case'' runs are possible on a computing cluster.
 
 % \plt{System constraints differ from other type of requirements because they
 %   limit the developers' options in the system design and they identify how the
@@ -575,21 +578,21 @@ the instance models of the synthetic eddy methods used in \progname{}.
 % mathematical model  The terminology provides a real world connection to give the
 % mathematical model meaning.}
 
-This subsection provides a list of terms that are used in the this document and their meaning, with the purpose of reducing ambiguity and making it easier to correctly understand the requirements and the theories behind the software:
+This subsection provides a list of terms that are used in this document and their meaning, with the purpose of reducing ambiguity and making it easier to correctly understand the requirements and the theories behind the software.
 
 \begin{itemize}
-  \item \textbf{Fluid Dynamics:} The study of matters that can ``flow", including gases (like air) and liquids (like water), and how they interact with other objects (such as an aircraft).
+  \item \textbf{Fluid Dynamics:} The study of matters that can ``flow'', including gases (like air) and liquids (like water), and how they interact with other objects (such as an aircraft).
   \item \textbf{CFD:} Computational Fluid Dynamics. The use of computers to simulate the flow of fluids and their interaction with other objects. Commonly used in the both research and design of vehicles, fluid pipelines, etc.
-  \item \textbf{Laminar Flow:} Calmly moving flow with no turbulence.
+  \item \textbf{Laminar Flow:} Calmly moving flow with no turbulence. The fluid acts as layers that slide over one another.
   \item \textbf{Turbulent Flow:} Chaotic flow with many random fluctuations within.
   \item \textbf{Eddy:} A swirling, circular movement of a fluid. A turbulent flow can be seen as consisting of many eddies.
-  \item \textbf{Inlet}: Where the fluid enters the simulated flow region.
-  \item \textbf{Outlet}: Where the fluid leaves the simulated flow region.
-  \item \textbf{IC}: Initial Condition. The state of the entire flow region at the beginning of the simulation.
+  \item \textbf{Inlet}: Where the fluid enters the simulated flow field.
+  \item \textbf{Outlet}: Where the fluid leaves the simulated flow field.
+  \item \textbf{IC}: Initial Condition. The state of the entire flow field at the beginning of the simulation.
   \item \textbf{BC}: Boundary Condition. The state of the flow at the boundaries of the simulation region. In CFD, we need to specify the inlet BC. 
   \item \textbf{External Flow}: Flow that is not confined by any solid physical boundaries. Think of the flow around an aircraft in open air.
   \item \textbf{Internal Flow}: Flow that is confined by solid physical boundaries. Think of the flow inside a pipe.
-  \item \textbf{1D Flow}: Flow that is only in one general direction, which enters the flow region from one end (inlet) and leaves from the other (outlet).
+  \item \textbf{1D Flow}: Flow that is only in one general direction, which enters the flow field from one end (inlet) and leaves from the other (outlet).
   \end{itemize}
 
 \subsubsection{Physical System Description} \label{sec_phySystDescrip}
@@ -615,7 +618,7 @@ includes the following elements:
 \item[PS1:] 3D Flow Field
 \item[PS2:] Inlet
 \item[PS3:] Outlet
-\item[PS4:] Average Flow Velocity
+\item[PS4:] Mean Flow Velocity
 \item[PS5:] Individual Eddies
 
 \end{itemize}
@@ -652,11 +655,11 @@ includes the following elements:
 %   amount of technical language.  They should be understandable by non-domain
 %   experts.}
 
-\noindent Given the flow field dimensions, average velocity and eddie profile(s), the goal statements are:
+\noindent Given the flow field dimensions, mean velocity and eddy profile(s), the goal statements are:
 
 \begin{itemize}
 
-\item[GS\refstepcounter{goalnum}\thegoalnum \label{G_anyFlowField}:] Generate a velocity field that mimics a turbulent flow.
+\item[GS\refstepcounter{goalnum}\thegoalnum \label{G_anyFlowField}:] Generate a velocity field over time that mimics a turbulent flow.
 % \item[GS\refstepcounter{goalnum}\thegoalnum \label{G_realFlowField}:] (Stretch) Generate realistic turbulent flow velocity field.
 % \item[GS\refstepcounter{goalnum}\thegoalnum \label{G_interfaceCFD}:] (Stretch) Allow common CFD software to obtain IC and BC through this program.
 
@@ -711,12 +714,12 @@ includes the following elements:
 %   ``uses'' above.  The figure adds ``Likely Changes,'' which are able to
 %   reference (use) Assumptions.}
 
-\begin{figure}[H]
-  \begin{center}
-    \includegraphics[scale=0.9]{RelationsBetweenTM_GD_IM_DD_A.pdf}
-    \caption{The relationships between the subsections of \ref{sec_solSpec}. General Definitions not used.}
-  \end{center}
-\end{figure}
+% \begin{figure}[H]
+%   \begin{center}
+%     \includegraphics[scale=0.9]{RelationsBetweenTM_GD_IM_DD_A.pdf}
+%     \caption{The relationships between the subsections of \ref{sec_solSpec}. General Definitions not used.}
+%   \end{center}
+% \end{figure}
 
 The instance models that govern \progname{} are presented in
 Subsection~\ref{sec_instance}.  The information to understand the meaning of the
@@ -734,9 +737,13 @@ models can be verified.
 
 \subsubsection{Scope Decisions}
 \begin{itemize}
-  \item 3D flow region.
-  \item (Possible removal) External flow only.
-  \item (Currently) No consideration of whether the user provided eddy profiles will lead to a realistic turbulent flow.
+  \item 3D rectangular box flow field.
+  \item One inlet and one outlet.
+  \item No wall boundaries.
+  \item User provides eddy profiles. No consideration of whether such profiles will lead to realistic turbulent flow of the entire field.
+  \item Spherical eddies.
+  \item Homogeneous turbulence (same eddy profile throughout the field).
+  \item Isotropic turbulence (eddies have no directional preference).
 \end{itemize}
 
 % \plt{This section is optional.}
@@ -763,10 +770,10 @@ change [LC], in which the respective assumption is used.
 
 \begin{itemize}
 
-\item[A\refstepcounter{assumpnum}\theassumpnum \label{A_3D}:] The generated flow field is for CFD simulation in 3D space. [\ddref{center}]
-\item[A\refstepcounter{assumpnum}\theassumpnum \label{A_1D}:] 1D flow with constant average velocity, from one inlet to one outlet. [\ddref{center}]
-\item[A\refstepcounter{assumpnum}\theassumpnum \label{A_eddy}:] (Currently) User can provide appropriate eddy profiles. [\tref{SF}, \tref{VFF}]
-\item[A\refstepcounter{assumpnum}\theassumpnum \label{A_ext}:] (Possible removal) The simulation is for external flow. [\tref{SF}]
+\item[A\refstepcounter{assumpnum}\theassumpnum \label{A_eddy}:] User can provide appropriate eddy profiles.
+\item[A\refstepcounter{assumpnum}\theassumpnum \label{A_xVel}:] At any location in the field, mean velocity is along the $x$-axis, from inlet to outlet (or zero). No mean velocity in $y$ or $z$ directions.
+\item[A\refstepcounter{assumpnum}\theassumpnum \label{A_center}:] Eddy centers always move with such prescribed mean velocity. [\ddref{center}]
+\item[A\refstepcounter{assumpnum}\theassumpnum \label{A_noInteract}:] Eddies do not interact with each other.
   % \plt{Short description of each assumption.  Each assumption
   %   should have a meaningful label.  Use cross-references to identify the
   %   appropriate traceability to TM, GD, DD etc., using commands like dref, ddref
@@ -804,32 +811,48 @@ Label &\bf Eddy Shape Function \\
 % Units&$MLt^{-3}T^0$\\
 % \hline
 Equation & $
-q_\sigma(|\mathbf{r}^k(\mathbf{x})|) = 
+q_\sigma(d^k(\mathbf{x})) = 
 \begin{cases} 
-  \sigma^k (1-|\mathbf{r}^k(\mathbf{x})|^2) & \text{if } |\mathbf{r}^k(\mathbf{x})| < 1 \\
+  \sigma^k (1-|\mathbf{r}^k(\mathbf{x})|^2) & \text{if } d^k < 1 \\
+  0 & \text{elsewhere}
+\end{cases}
+$
+\newline
+\newline
+\newline
+$
+q_\sigma(d^k(\mathbf{x})) = 
+\begin{cases} 
+  3.6276e^{-\frac{\pi}{2}(d^k)^2} & \text{if } d^k < 2 \\
   0 & \text{elsewhere}
 \end{cases}
 $ \\
 \hline
 Description &
-Shape function describe the distribution of vorticity with respect to distance from the center of an eddy. For distance outside the length-scale of said eddy, a zero vorticity is prescribed.
+Shape function ($q_\sigma$) describe the distribution of vorticity (strength of circular flow at that location) with respect to distance from the center of an eddy. These functions include a cut-off distance expressed in terms of multiples of length-scale (1 and 2 above). For locations outside such distance, the function value is set to 0, meaning the eddy has negligible influence to that location.
 
 \begin{itemize}
-  \item $\sigma^k$ is the length-scale (radius) of the $k$th eddy (\si{\metre}).
-  \item $d^k$ is the normalized distance from a given point to the center of the $k$th eddy, with 0 being the center and 1 being the edge. [\ddref{radial}]
+  \item $\sigma^k$ is the length-scale (similar to radius) of the $k$th eddy (\si{\metre}).
+  \item $\mathbf{r}^k$ is the normalized vector from a given point ($\mathbf{x}$) to the center of the $k$th eddy. [\ddref{radial}]
+  \item $d^k$ is the normalized distance from a given point ($\mathbf{x}$) to the center of the $k$th eddy, with 0 being the center and 1 being at $\sigma^k$. [\ddref{radial}]
 \end{itemize}
 \\
 \hline
-Notes & This is only one of many possible shape functions that can be used. But they should all be in the form with respect to a normalized distance. 
+Notes & This are only two examples (quadratic and Gaussian) of many possible shape functions that can be used. But they should all be in the form with respect to a normalized distance. 
 \\
 \hline
-  Source & \citet{PolettoEtAl2013}, \ddref{radial}\\
+  Source & 1st equation: \citet{PolettoEtAl2013}, 2nd equation: Nikita Holyev\\
   \hline
-  Ref.\ By & \tref{VFF}, \iref{velocitySum}\\
+  Uses & \ddref{radial}, \ddref{distance}\\
+  \hline
+  Ref.\ By & \tref{VFF}, \dref{Holyev}, \iref{velocitySum}\\
   \hline
 \end{tabular}
 \end{minipage}\\
 \noindent
+
+~\newline
+
 \begin{minipage}{\textwidth}
 \renewcommand*{\arraystretch}{1.5}
 \begin{tabular}{| p{\colAwidth} | p{\colBwidth}|}
@@ -841,9 +864,9 @@ Label &\bf Velocity Fluctuation Field \\
 \hline
 % Units&$MLt^{-3}T^0$\\
 % \hline
-Equation & $\mathbf{u}'(\mathbf{x}) = \frac{1}{\sqrt{N}}\sum_{k=1}^{N}q_\sigma(|\mathbf{r}^k(\mathbf{x})|)\mathbf{r}^k(\mathbf{x})\times\boldsymbol{\alpha}^k$ \\
+Equation & $\mathbf{u}'(\mathbf{x}) = \frac{1}{\sqrt{N}}\sum_{k=1}^{N}q_\sigma(d^k(\mathbf{x}))\mathbf{r}^k(\mathbf{x})\times\boldsymbol{\alpha}^k$ \\
 \hline
-Description & The equation gives the fluctuation of velocity (the deviation from the average flow velocity) at point $\mathbf{x}$ in the flow field. It is the normalized sum of the velocity fluctuation by each eddy, with shape function $q_\sigma(d^k)$ [\tref{SF}].
+Description & The equation gives the fluctuation of velocity (the deviation from the mean flow velocity) at point $\mathbf{x}$ in the flow field. It is the normalized sum of the velocity fluctuation by each eddy, with shape function $q_\sigma$ [\tref{SF}].
 \begin{itemize}
   \item $N$ is the number of eddies.
   \item $\mathbf{r}^k$ is the normalized distance to the center of the $k$th eddy  [\ddref{radial}].
@@ -854,7 +877,9 @@ Description & The equation gives the fluctuation of velocity (the deviation from
 Notes & According to \tref{SF}, at any single position, the fluctuation from most eddies will likely be 0, due to outside the boundaries of most eddies in the field.
 \\
 \hline
-  Source & \citet{PolettoEtAl2013}, \tref{SF}, \ddref{radial}, \ddref{intensity}\\
+  Source & \citet{PolettoEtAl2013}\\
+  \hline
+  Uses & \tref{SF}, \ddref{radial}, \ddref{intensity}\\
   \hline
   Ref.\ By & \dref{Holyev} \\
   \hline
@@ -862,6 +887,7 @@ Notes & According to \tref{SF}, at any single position, the fluctuation from mos
 \end{minipage}\\
 
 ~\newline
+\newpage
 
 
 \subsubsection{General Definitions}\label{sec_gendef}
@@ -882,17 +908,24 @@ Label &\bf Velocity fluctuation without normalizing energy \\
 \hline
 % Units&$MLt^{-3}T^0$\\
 % \hline
-Equation & $\mathbf{u}'(\mathbf{x}) = \sum_{k=1}^{N}q_\sigma(|\mathbf{r}^k(\mathbf{x})|)\mathbf{r}^k(\mathbf{x})\times\boldsymbol{\alpha}^k$ \\
+Equation & $\mathbf{u}'(\mathbf{x}) = \sum_{k=1}^{N}q_\sigma(d^k(\mathbf{x}))\mathbf{r}^k(\mathbf{x})\times\boldsymbol{\alpha}^k$ \\
 \hline
 Description & The equation in \tref{VFF} uses $\frac{1}{\sqrt{N}}$ to keep the total turbulent kinetic energy of the field constant when the number of eddies ($N$) changes. Holyev proposes the removal of this term, so that energy is simply the result of $N$ and $\boldsymbol{\alpha}$.
+\begin{itemize}
+  \item $N$ is the number of eddies.
+  \item $\mathbf{r}^k$ is the normalized distance to the center of the $k$th eddy  [\ddref{radial}].
+  \item $\boldsymbol{\alpha}^k$ is the intensity vector of the $k$th eddy (\si[per-mode=symbol]{\metre\per\second}) [\ddref{intensity}].
+\end{itemize}
 \\
 \hline
 Notes & In \cite{PolettoEtAl2013}, more eddies means each eddy is weaker. Holyev removes such relation to find the optimal combination to fit a realistic turbulent flow, which \progname{} will incorporate in the future.
 \\
 \hline
-  Source & \tref{VFF}, \citet{PolettoEtAl2013}, Nikita Holyev\\
+  Source &  Nikita Holyev\\
   \hline
-  Ref.\ By & \iref{velocitySum} \\
+  Uses &  \tref{SF}, \tref{VFF}, \ddref{radial}, \ddref{intensity}\\
+  \hline
+  Ref.\ By & \ddref{uvw}, \iref{velocitySum} \\
   \hline
 \end{tabular}
 \end{minipage}\\
@@ -963,9 +996,46 @@ The positional vector relative to the center of the eddy, normalized by the leng
 \end{itemize}
 \\
 \hline
-  Source & \citet{PolettoEtAl2013}, \ddref{center}\\
+  Source & \citet{PolettoEtAl2013}\\
   \hline
-  Ref.\ By & \tref{SF}, \tref{VFF}, \iref{velocitySum} \\
+  Uses & \ddref{center}\\
+  \hline
+  Ref.\ By & \tref{SF}, \tref{VFF}, \dref{Holyev}, \ddref{distance}, \iref{velocitySum} \\
+  \hline
+\end{tabular}
+\end{minipage}\\
+
+~\newline
+
+\noindent
+\begin{minipage}{\textwidth}
+\renewcommand*{\arraystretch}{1.5}
+\begin{tabular}{| p{\colAwidth} | p{\colBwidth}|}
+\hline
+\rowcolor[gray]{0.9}
+Number& DD\refstepcounter{datadefnum}\thedatadefnum \label{distance}\\
+\hline
+Label &\bf Normalized distance relative to an eddy center\\
+\hline
+Symbol &$d^k$\\
+\hline
+SI Units& none\\
+\hline
+Equation& $d^k(\mathbf{x}) = |\textbf{r}^k(\mathbf{x})|$ \\
+\hline
+Description &
+The positional vector relative to the center of the eddy, normalized by the length-scale ($\sigma^k$) of that eddy.
+\begin{itemize}
+  \item $\textbf{x}$ is the given position (\si{\metre}).
+  \item $\textbf{r}^k$ is the normalized radial vector relative to the center of $k$th eddy [\ddref{radial}].
+\end{itemize}
+\\
+\hline
+  Source & \citet{PolettoEtAl2013}\\
+  \hline
+  Uses & \ddref{radial}\\
+  \hline
+  Ref.\ By & \tref{SF}, \iref{velocitySum}\\
   \hline
 \end{tabular}
 \end{minipage}\\
@@ -986,19 +1056,19 @@ Symbol &$\textbf{x}^k$\\
 \hline
 SI Units & \si{\metre}\\
 \hline
-Equation&$\textbf{x}^k(t) = \textbf{x}^k_0 + \mathbf{u_\text{avg}}t$\\
+Equation&$\textbf{x}^k(t) = \textbf{x}^k_0 + \mathbf{\overline{u}}t$\\
 \hline
 Description & 
-As the flow field has a constant average velocity $\mathbf{u_\text{avg}}$, the center position  of the $k$th eddy will move with the average velocity over time $t$.
+As the flow field has a constant mean velocity $\mathbf{\overline{u}}$, the center position  of the $k$th eddy will move with the mean velocity over time $t$.
 \begin{itemize}
   \item $\textbf{x}^k(t)$ is the center position of the $k$th eddy at time $t$ (\si{\metre}).
   \item $\textbf{x}^k_0$ is the initial center position of the $k$th eddy (\si{\metre}).
-  \item $\mathbf{u_\text{avg}}$ is the average flow velocity, with zero $y$ and $z$ components (\si[per-mode=symbol]{\metre\per\second}).
+  \item $\mathbf{\overline{u}}$ is the mean flow velocity, with zero $y$ and $z$ components (\si[per-mode=symbol]{\metre\per\second}).
   \item $t$ is time since start (\si{\second}).
 \end{itemize}
 \\
 \hline
-Sources& \aref{A_3D}, \aref{A_1D}\\
+Uses& \aref{A_xVel}\\
 \hline
 Ref.\ By & \ddref{radial}, \iref{velocitySum} \\
 \hline
@@ -1024,12 +1094,41 @@ SI Units & \si[per-mode=symbol]{\metre\per\second}\\
 Equation& none\\
 \hline
 Description & 
-A 3D vector that describes both the direction and intensity magnitude of the $k$th eddy. Fluid flows around such a vector with right hand rule.
+A 3D vector that describes both the direction and intensity magnitude of the $k$th eddy. Fluid flows around this vector such that when looking against the vector (vector pointing at viewer), the flow is clockwise. The greater the vector magnitude, the stronger the flow.
 \\
 \hline
 Sources& \citet{PolettoEtAl2013}\\
 \hline
-Ref.\ By & \tref{VFF}, \iref{velocitySum}\\
+Ref.\ By & \tref{VFF}, \dref{Holyev}, \iref{velocitySum}\\
+\hline
+\end{tabular}
+\end{minipage}\\
+
+~\newline
+
+\noindent
+\begin{minipage}{\textwidth}
+\renewcommand*{\arraystretch}{1.5}
+\begin{tabular}{| p{\colAwidth} | p{\colBwidth}|}
+\hline
+\rowcolor[gray]{0.9}
+Number& DD\refstepcounter{datadefnum}\thedatadefnum \label{uvw}\\
+\hline
+Label& \bf Velocity fluctuation components\\
+\hline
+Symbol &$u'$, $v'$, $w'$\\
+\hline
+SI Units & \si[per-mode=symbol]{\metre\per\second}\\
+\hline
+Equation& $u' = \mathbf{u'}_x$, $v' = \mathbf{u'}_y$, $w' = \mathbf{u'}_z$\\
+\hline
+Description & 
+The $x$, $y$ and $z$ components of the velocity fluctuation vector $\mathbf{u'}$ [\dref{Holyev}]. These are not used during the field calculation, but derived from the end result $\mathbf{u}$ for validation purposes [\iref{velocitySum}].
+\\
+\hline
+Uses& \dref{Holyev}, \iref{velocitySum}\\
+\hline
+Ref. By & Section \ref{sec_CorrectSolution} \\
 \hline
 \end{tabular}
 \end{minipage}\\
@@ -1108,7 +1207,7 @@ identified in Sections~\ref{sec_theoretical} and \ref{sec_gendef}.
   Label& \bf Velocity at any position and time in the flow field\\
   \hline
   Input
-  & $\mathbf{u_{\text{avg}}}$: Average flow velocity (\si[per-mode=symbol]{\metre\per\second})\\
+  & $\mathbf{\overline{u}}$: Mean flow velocity, with zero $y$ and $z$ components (\si[per-mode=symbol]{\metre\per\second})\\
   & $N$: Number of eddies\\
   & $\mathbf{x}^k_0$: Initial center position of each eddy (\si{\metre})\\
   & $\sigma^k$: Length-scale of each eddy (\si{\metre})\\
@@ -1118,23 +1217,24 @@ identified in Sections~\ref{sec_theoretical} and \ref{sec_gendef}.
   \\
   \hline
   Output
-  & $\mathbf{u}$\\ 
+  & $\mathbf{u}$, the velocity at any position and time\\ 
   \hline
-  Equation & $\mathbf{u}(\mathbf{x}, t) = \mathbf{u_\text{avg}} + \mathbf{u'}(\mathbf{x}, t)$\\
+  Equation & $\mathbf{u}(\mathbf{x}, t) = \mathbf{\overline{u}} + \mathbf{u'}(\mathbf{x}, t)$\\
   & where \\
-  & $\mathbf{u}'(\mathbf{x},t) = \sum_{k=1}^{N}q_\sigma(|\mathbf{r}^k(\mathbf{x}, t)|)\mathbf{r}^k(\mathbf{x}, t)\times\boldsymbol{\alpha}^k$ [\dref{Holyev}]\\
-  & $ q_\sigma(|\mathbf{r}^k(\mathbf{x},t)|) = \sigma^k [1-|\mathbf{r}^k(\mathbf{x},t)|^2] \text{ if } |\mathbf{r}^k(\mathbf{x},t)| < 1 \text{ , otherwise } 0 $ [\tref{SF}]\\
-  & $\mathbf{r}^k(\mathbf{x},t) = \frac{\mathbf{x}-\mathbf{x}^k(t)}{\sigma^k}$ [\ddref{radial}]\\
-  & $\mathbf{x}^k(t) = \mathbf{x}^k_0 + \mathbf{u_\text{avg}}t$ [\ddref{center}]\\
+  & $\mathbf{u}'(\mathbf{x},t) = \sum_{k=1}^{N}q_\sigma(d^k(\mathbf{x}, t))\mathbf{r}^k(\mathbf{x}, t)\times\boldsymbol{\alpha}^k$ from [\dref{Holyev}]\\
+  & $ q_\sigma$ is any satisfying shape function as per [\tref{SF}]\\
+  & $\mathbf{r}^k(\mathbf{x},t) = \frac{\mathbf{x}-\mathbf{x}^k(t)}{\sigma^k}$ from [\ddref{radial}]\\
+  & $d^k(\mathbf{x},t) = |\mathbf{r}^k(\mathbf{x},t)|$ from [\ddref{distance}]\\
+  & $\mathbf{x}^k(t) = \mathbf{x}^k_0 + \mathbf{\overline{u}}t$ from [\ddref{center}]\\
   \hline
   Description
-  & The above model gives the velocity vector at any position within the flow field at any given time, by combining the influence from each eddy at such time as they move down the flow field with average velocity.\\
+  & The above model gives the velocity vector at any position within the flow field at any given time, by combining the influence from each eddy at such time as they move down the flow field with mean velocity.\\
   & Such influence is calculated by the relative position of that point to the center of each eddy, according to its length-scale, intensity and shape function.
   \\
   \hline
-  Sources& \dref{Holyev}, \tref{SF}, \ddref{radial}, \ddref{center}, \ddref{intensity}\\
+  Uses& \dref{Holyev}, \tref{SF}, \ddref{radial}, \ddref{distance}, \ddref{center}, \ddref{intensity}\\
   \hline
-  Ref.\ By & None\\
+  Ref.\ By & \ddref{uvw}\\
   \hline
 \end{tabular}
 \end{minipage}\\
@@ -1174,7 +1274,7 @@ uncertainty quantification exercise.
   \midrule 
     $\sigma$ & $\sigma > 0$ & - & 0.01 \si[per-mode=symbol] {\metre} & 0\%
   \\
-    $\textbf{x}$ & $\textbf{x} \in region(L_x,L_y,L_z)$ & - & 1 \si[per-mode=symbol] {\metre} & 0\%
+    $\textbf{x}$ & $\textbf{x} \in field(L_x,L_y,L_z)$ & - & 1 \si[per-mode=symbol] {\metre} & 0\%
   \\
     $t$ & $t \geq 0$ & - & 5 \si[per-mode=symbol] {\second} & 0\%
   \\
@@ -1184,7 +1284,7 @@ uncertainty quantification exercise.
 
 \noindent 
 % \begin{description}
-% \item[(*)] Technically, we can allow queried $\textbf{x}$ to be outside the flow field and return a velocity of 0 or $\mathbf{u_\text{avg}}$, along with a warning.
+% \item[(*)] Technically, we can allow queried $\textbf{x}$ to be outside the flow field and return a velocity of 0 or $\mathbf{\overline{u}}$, along with a warning.
 % Changed to throw exception in MIS
 % \plt{you might need to add some notes or clarifications}
 % \end{description}
@@ -1204,7 +1304,7 @@ uncertainty quantification exercise.
 \subsubsection{Properties of a Correct Solution} \label{sec_CorrectSolution}
 
 \noindent
-A correct solution must be a divergence-free velocity field, obeying conservation of mass.
+A correct solution must be a divergence-free velocity field, obeying conservation of mass. Products of velocity fluctuations components $u'$, $v'$ and $w'$ (derived from output $\textbf{u}$), when averaged across the entire field, should satisfy the current assumption of homogeneous isotropic turbulence.
 % \plt{fill in the details}.  \plt{These
 %   properties are in addition to the stated requirements.  There is no need to
 %   repeat the requirements here.  These additional properties may not exist for
@@ -1220,6 +1320,10 @@ A correct solution must be a divergence-free velocity field, obeying conservatio
   \textbf{Var} & \textbf{Physical Constraints} \\
   \midrule 
   $\textbf{u}$ & $\text{div}(\mathbf{u}|_\text{field}) = 0$
+  \\
+  $u'$, $v'$, $w'$ & $\overline{u'u'} = \overline{v'v'} = \overline{w'w'}$
+  \\
+  $u'$, $v'$, $w'$ & $\overline{u'v'} = \overline{v'w'} = \overline{w'u'} = 0$
   \\
   \bottomrule
 \end{longtable*}
@@ -1242,7 +1346,7 @@ A correct solution must be a divergence-free velocity field, obeying conservatio
 
 \noindent \begin{itemize}
 
-\item[R\refstepcounter{reqnum}\thereqnum \label{R_inputs}:] Must verify that the queried point is within the flow region [Table \ref{TblInputVar}].
+\item[R\refstepcounter{reqnum}\thereqnum \label{R_inputs}:] Must verify that the queried point is within the flow field [Table \ref{TblInputVar}].
 % \plt{Requirements
 %     for the inputs that are supplied by the user.  This information has to be
 %     explicit.}
@@ -1251,11 +1355,10 @@ A correct solution must be a divergence-free velocity field, obeying conservatio
 %     always required, but often echoing the inputs as part of the output is a
 %     good idea.}
 
-\item[R\refstepcounter{reqnum}\thereqnum \label{R_anyEddy}:] Can generate a velocity field given any valid eddy profiles input (length-scale and intensity of each eddy) (\iref{velocitySum}).
+\item[R\refstepcounter{reqnum}\thereqnum \label{R_anyEddy}:] Can generate a velocity field given any valid eddy profiles input, which include density (number of eddies per unit volume), intensity magnitude and length-scale of each type of eddy in the field (\iref{velocitySum}).
 % \item[R\refstepcounter{reqnum}\thereqnum \label{R_realEddy}:] (Future) Capable of providing a realistic eddy profile before generation.
 % \plt{Calculation related requirements.}
 
-\item[R\refstepcounter{reqnum}\thereqnum \label{R_CFD}:] (Future) Allow CFD software to interface with this software to obtain IC and BC.
   % \plt{Verification related requirements.}
 
 % \item[R\refstepcounter{reqnum}\thereqnum \label{R_Output}:] \plt{Output related
@@ -1288,7 +1391,7 @@ A correct solution must be a divergence-free velocity field, obeying conservatio
 \noindent \begin{itemize}
 
 \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Accuracy}:]
-  \textbf{Accuracy} (Future) The accuracy of the computed solutions, namely the how realistically the flow field mimics a turbulent flow, should meet the level needed for being used as IC and BC in CFD simulation. Specifically, \progname{} should be suggest realistic eddy profiles if the user cannot provide one. A benchmark for verifying the accuracy should be developed. 
+  \textbf{Accuracy} The accuracy of the computed solutions, namely the how realistically the flow field mimics a turbulent flow, should meet the level needed for being used as IC and BC in CFD simulation. Given the current assumptions, the result should exhibit characteristics of homogeneous isotropic turbulence (below certain threshold), as detailed in Section \ref{sec_CorrectSolution}.
   % \plt{Characterize the accuracy by giving the context/use for
   %   the software.  Maybe something like, ``The accuracy of the computed
   %   solutions should meet the level needed for $<$engineering or scientific
@@ -1296,7 +1399,7 @@ A correct solution must be a divergence-free velocity field, obeying conservatio
   %   described following the procedure given in Section~X of the Verification and
   %   Validation Plan.''  A link to the VnV plan would be a nice extra.}
 
-\item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Usability}:] \textbf{Usability} The input and output of the software should be easily understandable by those familiar with CFD. Later, it should provide easy setup for integration with CFD software.
+\item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Usability}:] \textbf{Usability} The input and output of the software should be in terms understandable by those familiar with CFD. Later, it should provide easy setup for integration with CFD software.
   % \plt{Characterize the usability by giving the context/use for the software.
   %   You should likely reference the user characteristics section.  The level of
   %   usability achieved by the software shall be described following the
@@ -1323,7 +1426,7 @@ A correct solution must be a divergence-free velocity field, obeying conservatio
 %   understandability and reusability.
 
 \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Performance}:]
-  \textbf{Performance} \progname{} should require minimal computing an memory resources compared to typical CFD software to avoid impacting CFD simulation performance.
+  \textbf{Performance} \progname{} should require less memory for typical use cases, as detailed in Section \ref{sec_sysConstraints} System Constraints.
 
 \end{itemize}
 
@@ -1339,8 +1442,8 @@ A correct solution must be a divergence-free velocity field, obeying conservatio
 
 \noindent \begin{itemize}
 
-\item[LC\refstepcounter{lcnum}\thelcnum\label{LC_realEddy}:] When theoretical work by Nikita Holyev progress, the software update to incorporate the new method to obtain realistic eddy profiles before generating velocity field (\aref{A_eddy}).
-\item[LC\refstepcounter{lcnum}\thelcnum\label{LC_internal}:] Possibility to use this software for internal flow will be looked into. This can be valuable as most turbulent flow scenarios are internal (e.g. within a pipe) (\aref{A_ext}).
+\item[LC\refstepcounter{lcnum}\thelcnum\label{LC_realEddy}:] When theoretical work by Nikita Holyev progress, the software update to incorporate the new method to obtain realistic eddy profiles before generating velocity field (\aref{A_eddy}). The will allow user to input only a few parameters related to the energy spectrum of the flow, instead of details of each eddy type.
+\item[LC\refstepcounter{lcnum}\thelcnum\label{LC_interface}:] Additional interfaces can be developed to facilitate communication between any CFD software and \progname, for obtaining IC and BC automatically.
 % \plt{Give
 %     the likely changes, with a reference to the related assumption (aref), as appropriate.}
 
@@ -1379,39 +1482,21 @@ the assumptions.
 % \plt{The traceability matrix is challenging to maintain manually.  Please do
 %   your best.  In the future tools (like Drasil) will make this much easier.}
 
-\afterpage{
-% \begin{landscape}
-\begin{table}[h!]
-\centering
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-	& \aref{A_3D}& \aref{A_1D}& \aref{A_eddy}& \aref{A_ext} \\
-\hline
-\tref{SF}           & & &X&X \\ \hline
-\tref{VFF}          & & &X&  \\ \hline
-\ddref{radial}      & & & &  \\ \hline
-\ddref{center}      &X&X& &  \\ \hline
-\iref{velocitySum}  & & & &  \\ \hline
-\end{tabular}
-\caption{Traceability Matrix Showing the Connections Between Assumptions and Other Items}
-\label{Table:A_trace}
-\end{table}
-% \end{landscape}
-}
-
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
 \hline        
-	& \tref{SF}& \tref{VFF}& \dref{Holyev} & \ddref{radial}& \ddref{center}& \ddref{intensity} & \iref{velocitySum} \\
+	& \tref{SF}& \tref{VFF}& \dref{Holyev} & \ddref{radial}& \ddref{distance} & \ddref{center}& \ddref{intensity} & \ddref{uvw} & \iref{velocitySum} \\
 \hline
-\tref{SF}           & & & &X& & & \\ \hline
-\tref{VFF}          &X& & &X& &X& \\ \hline
-\dref{Holyev}       & &X& & & & & \\ \hline
-\ddref{radial}      & & & & &X& & \\ \hline
-\ddref{center}      & & & & & & & \\ \hline
-\ddref{intensity}   & & & & & & & \\ \hline
-\iref{velocitySum}  &X& &X&X&X&X& \\ \hline
+\tref{SF}           & & & &X&X& & & & \\ \hline
+\tref{VFF}          &X& & &X& & &X& & \\ \hline
+\dref{Holyev}       &X&X& &X& & &X& & \\ \hline
+\ddref{radial}      & & & & & &X& & & \\ \hline
+\ddref{distance}    & & & &X& & & & & \\ \hline
+\ddref{center}      & & & & & & & & & \\ \hline
+\ddref{intensity}   & & & & & & & & & \\ \hline
+\ddref{uvw}         & & &X& & & & & &X\\ \hline
+\iref{velocitySum}  &X& &X&X&X&X&X& & \\ \hline
 \end{tabular}
 \caption{Traceability Matrix Showing the Connections Between Items of Different Sections}
 \label{Table:trace}
@@ -1421,12 +1506,11 @@ the assumptions.
 \centering
 \begin{tabular}{|c|c|c|c|c|c|c|c|}
 \hline
-	& \iref{velocitySum}& \rref{R_inputs}& \rref{R_anyEddy}& \rref{R_CFD} \\
+	& \iref{velocitySum}& \rref{R_inputs}& \rref{R_anyEddy} \\
 \hline
-\iref{velocitySum}  & & & & \\ \hline
-\rref{R_inputs}     & & & & \\ \hline
-\rref{R_anyEddy}    &X& & & \\ \hline
-\rref{R_CFD}        & & & & \\ \hline
+\iref{velocitySum}  & & & \\ \hline
+\rref{R_inputs}     & & & \\ \hline
+\rref{R_anyEddy}    &X& & \\ \hline
 \end{tabular}
 \caption{Traceability Matrix Showing the Connections Between Requirements and Instance Models}
 \label{Table:R_trace}
