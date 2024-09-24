@@ -2,6 +2,7 @@
 Turbulent Flow Field Module
 """
 
+from concurrent.futures import ThreadPoolExecutor
 # import time
 from tqdm import tqdm
 import numpy as np
@@ -10,6 +11,7 @@ from modules import file_io
 from modules import shape_function
 from modules import eddy
 from modules.eddy_profile import EddyProfile
+from modules import x_velocity
 
 WRAP_ITER = [-1, 0, 1]  # Iterations to wrap around the flow field, do not change
 CUTOFF = 1.2 * shape_function.get_cutoff()  # has to be greater than 1
@@ -31,6 +33,7 @@ class FlowField:
         name: str,
         dimensions: np.ndarray | list,
         avg_vel: float | int = 0,
+        x_vel_prof: str = "",
     ):
         """
         Generate a new flow field.
@@ -58,6 +61,8 @@ class FlowField:
             Dimensions of the the form of `[x, y, z]`
         `avg_vel` : float, optional (default: `0.0`)
             Average flow velocity to move the eddies
+        `x_vel_prof` : str, optional (default: `""`)
+            Name of the x-velocity profile to use, must already be defined in the `x_velocity.py`
         """
         if isinstance(dimensions, list):
             dimensions = np.array(dimensions)
@@ -114,7 +119,17 @@ class FlowField:
             self.z[1] = self.z[0]
             self.y[2] = self.y[0]
             self.z[2] = self.z[0]
-        # if avg_vel is not zero, wrap around in x will have random y and z to avoid periodicity
+        # if avg_vel is not zero and velocity profile defined, use calculate individual x-velocity for each eddy
+        elif x_vel_prof != "":
+            self.x_vel_func = x_velocity.get_func(x_vel_prof)
+            print("Using x-velocity profile: ", x_vel_prof)
+            ny: np.ndarray = self.y[0] / self.high_bounds[1]
+            nz: np.ndarray = self.z[0] / self.high_bounds[2]
+            self.x_vel: np.ndarray = self.x_vel_func(ny, nz) * self.avg_vel
+            print("Max eddy center x-velocity: ", np.max(self.x_vel))
+            print("Min eddy center x-velocity: ", np.min(self.x_vel))
+        # if avg_vel is not zero and not velocity profile defined (constant avg_vel across entire field),
+        # wrap around in x will have random y and z to avoid periodicity
         else:
             self.set_rand_eddy_yz(1)
             self.set_rand_eddy_yz(2)
@@ -132,6 +147,11 @@ class FlowField:
         if fi not in self.y:
             self.set_rand_eddy_yz(fi)
         return np.stack((self.init_x, self.y[fi], self.z[fi]), axis=-1)
+
+    def get_eddy_center_x_vel(self, t):
+        """Get the x, y, and z coordinates of the eddies when x_vel of each eddy is defined."""
+        x = ((self.init_x + self.x_vel * t - self.low_bounds[0]) % self.dimensions[0]) + self.low_bounds[0]
+        return np.stack((x, self.y[0], self.z[0]), axis=-1)
 
     def set_rand_eddy_yz(self, fi: int):
         """Set random y and z coordinates for eddies in a new flow iteration."""
@@ -155,8 +175,7 @@ class FlowField:
         step_size: float = 0.2,
         chunk_size: int = 5,
         time: float = 0,
-        do_return: bool = True,
-        do_cache: bool = False,
+        threads: int = 1,
     ):
         """
         Calculate the velocity field for a meshgrid.
@@ -173,15 +192,13 @@ class FlowField:
             Size of chunks to split the meshgrid into, by default 5
         `t` : float, optional
             Time passed, by default 0
-        `do_return` : bool, optional
-            Return the velocity field, by default True
-        `do_cache` : bool, optional
-            Save chunks cache, by default False
+        `threads` : int, optional
+            Number of threads to use, by default 1
 
         Returns
         -------
         `vel`: np.ndarray
-            Velocity field for the meshgrid
+            Velocity field for the meshgrid. This will only return if `threads` is 1.
         """
         if low_bounds is None:
             low_bounds = self.low_bounds
@@ -221,6 +238,14 @@ class FlowField:
         y_coords = self.step_coords(low_bounds[1], high_bounds[1], step_size)
         z_coords = self.step_coords(low_bounds[2], high_bounds[2], step_size)
 
+        # Check the handling of multiple threads
+        if threads == 1:
+            do_return = True
+            do_cache = False
+        else:
+            do_return = False
+            do_cache = True
+
         # Initialize the velocity field if a return is needed
         if do_return:
             try:
@@ -230,7 +255,25 @@ class FlowField:
                     f"{e}\nNot enough memory to allocate velocity field. "
                     "Consider using a larger step size or focus on a smaller region."
                 ) from e
-            vel[..., 0] = self.avg_vel
+            if not hasattr(self, "x_vel_func"):
+                vel[..., 0] = self.avg_vel
+
+        # Initialize the x-velocity profile cross-section if needed
+        if hasattr(self, "x_vel_func"):
+            # Generate a plane of y and z coordinates
+            ny_coords = y_coords / self.high_bounds[1]
+            nz_coords = z_coords / self.high_bounds[2]
+            nynz = np.stack(
+                np.meshgrid(ny_coords, nz_coords, indexing="ij"), axis=-1
+            )[np.newaxis, ...]
+            ny = nynz[..., 0]
+            nz = nynz[..., 1]
+            # Calculate the x-velocity profile for each point on the plane
+            x_vel_plane = self.x_vel_func(ny, nz) * self.avg_vel
+            print("Max mean x-velocity: ", np.max(x_vel_plane))
+            print("Min mean x-velocity: ", np.min(x_vel_plane))
+        else:
+            x_vel_plane = None
 
         # Divide the coordinates into chunks
         if chunk_size == 0:     # pragma: no cover
@@ -260,14 +303,11 @@ class FlowField:
 
         file_io.write(CACHE_DIR, "__info__", chunk_info, "json")
 
-        # Calculate the velocity field for each chunk, slicing by x, y, and z
-        margins = sigma * CUTOFF
-        self.print("Chunks [x, y, z]: ", [len(x_chunks), len(y_chunks), len(z_chunks)])
-        if self.verbose:
-            pbar = tqdm(total=len(x_chunks) * len(y_chunks) * len(z_chunks))
-        for i, xc in enumerate(x_chunks):
+        # Function to compute chunks looping through Y and Z for parallel processing of X
+        def calc_x_chunks(i, xc):
             vel_i = np.zeros((len(xc), len(y_coords), len(z_coords), 3))
-            vel_i[..., 0] = self.avg_vel
+            if x_vel_plane is None:
+                vel_i[..., 0] = self.avg_vel
             mask = self.within_margin(
                 centers[:, 0], margins, x_coords[xc[0]], x_coords[xc[-1]]
             )
@@ -305,10 +345,32 @@ class FlowField:
                     )
                     if self.verbose:
                         pbar.update(1)
+            if x_vel_plane is not None:
+                vel_i[..., 0] += x_vel_plane
             if do_return:
                 vel[xc[0] : xc[-1] + 1, :, :, :] = vel_i
             if do_cache:
                 file_io.write(CACHE_DIR, f"x_{i}", vel_i, CACHE_FORMAT)
+
+        # Calculate the velocity field for each chunk, slicing by x, y, and z
+        margins = sigma * CUTOFF
+        self.print("Chunks [x, y, z]: ", [len(x_chunks), len(y_chunks), len(z_chunks)])
+        self.print("Threads: ", threads)
+        if self.verbose:
+            pbar = tqdm(total=len(x_coords) * len(y_coords) * len(z_coords), desc="Grid points")
+            plock = pbar.get_lock()
+
+        if threads == 1:
+            for i, xc in enumerate(x_chunks):
+                calc_x_chunks(i, xc)
+        else:
+            with ThreadPoolExecutor(max_workers=threads) as executor:
+                futures = [
+                    executor.submit(calc_x_chunks, i, xc)
+                    for i, xc in enumerate(x_chunks)
+                ]
+                for future in futures:
+                    future.result()
 
         if self.verbose:
             pbar.close()
@@ -346,8 +408,12 @@ class FlowField:
         # Wrap around for the x coordinates
         margin = self.sigma * CUTOFF
         for i in WRAP_ITER:
-            centers = self.get_eddy_centers(flow_iter + i)
-            centers[:, 0] += offset - i * self.dimensions[0]
+            if hasattr(self, "x_vel"):
+                centers = self.get_eddy_center_x_vel(t)
+                centers[:, 0] += i * self.dimensions[0]
+            else:
+                centers = self.get_eddy_centers(flow_iter + i)
+                centers[:, 0] += offset - i * self.dimensions[0]
             # Wrap around for the y and z coordinates
             for j in WRAP_ITER:
                 for k in WRAP_ITER:
