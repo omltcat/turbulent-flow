@@ -115,6 +115,15 @@ The example query file can be found at **src/queries/example_meshgrid.json**. It
 
 After the run, you should see a plot pop-up. The raw result and the plot will be saved in **src/results** and **src/plots** respectively.
 
+### Result file
+The result is saved as a NumPy array (`.npy` file), which you can load and manipulate with your own program.
+
+The shape of the array is `(Nx, Ny, Nz, 3)` where `N` is the number of grid points in each direction, and the last dimension represents $x$, $y$, and $z$ components of the velocity vector.
+
+Please note that for a fine meshgrid, the file size can be large, and you may have a hard time transferring it to another machine. In such case, be prepared to consume the result in the same machine where it was generated.
+
+For testing purposes, use a coarse meshgrid.
+
 ### Running the test cases
 ```bash
 # System and unit test cases, same ones in GitHub Actions
