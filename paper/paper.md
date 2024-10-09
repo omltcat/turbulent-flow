@@ -16,6 +16,10 @@ authors:
     affiliation: 1
   - name: Dr. Spencer Smith
     affiliation: 1
+  - name: Dr. Marilyn Lightstone
+    affiliation: 1
+  - name: Dr. Stephen Tullis
+    affiliation: 1
 affiliations:
  - name: McMaster University, Canada
    index: 1
@@ -33,9 +37,9 @@ bibliography: paper.bib
 
 Turbulent flow is a type of fluid motion characterized by chaotic fluctuations in velocity and pressure.
 Today, most turbulent flow simulations with Computational Fluid Dynamics (CFD) are based on simplified models such as Reynolds-averaged Navier-Stokes (RANS) equations.
-While other approaches can reveal more details in the flow, such as Large Eddy Simulation (LES) and Direct Numerical Simulation (DNS), they are often deemed too computationally expensive and see limited use in practice.
-`SynthEddy` is a Python program that aims to alleviate part of this issue by generating initial conditions (IC) and boundary conditions (BC) for LES using Synthetic Eddy Method.
-This has the potential to reduce the required simulation scale both in time and space, making LES more accessible to a wider audience.
+While other approaches can reveal more details in the flow, such as Large Eddy Simulation (LES) and Direct Numerical Simulation (DNS), they are often deemed too computationally expensive and thus see limited use in practice.
+`SynthEddy` is a Python program that aims to alleviate part of this issue by generating Initial Conditions (IC) and Boundary Conditions (BC) for LES using the Synthetic Eddy Method.
+`SynthEddy` has the potential to reduce the required simulation scale both in time and space, making LES more accessible to a wider audience.
 
 
 # Statement of need
@@ -46,14 +50,14 @@ However, the adoption of LES has been largely limited by its computational cost,
 Not only the model itself is more computationally expensive, but there exists a compounding issue with the initiation of the simulation.
 
 Unlike RANS that can be described by a few parameters, to utilize LES in any practical manner, there must already exist a realistic enough turbulent flow field running in the simulation.
-To reach such a state, either prior simulations are needed (more expensive) or a suitable inlet condition must be synthesized.
+To reach such a state, either prior simulations with longer time and larger field for the turbulent flow to develop are needed (more expensive), or a suitable inlet condition must be synthesized.
 @Poletto:2013 proposed one such method by generation synthetic eddies (many small circular flows) to mimic a turbulent flow.
 Compared to previous proposals, such as random fluctuations, this method is divergence free and closer to the actual turbulent flow.
 
-`SynthEddy` is an implementation of this method in Python, combined with recent work by Nikita Holyev in this topic. 
-It models turbulent flow fields consists of synthetic eddies of various sizes and intensities, flowing from inlet to outlet with a uniform or non-uniform mean velocity.
+`SynthEddy` is an implementation of this method in Python, combined with recent work by Nikita Holyev in this topic. [@Holyev:2024]
+It models turbulent flow fields consisting of synthetic eddies of various sizes and intensities, flowing from inlet to outlet with a uniform or non-uniform mean velocity.
 This physical system is shown in \autoref{fig:PS}.
-User can generate turbulent flow and query velocity field to be used in both turbulent research and as IC/BC for CFD simulations.
+The user can generate turbulent flow and query the velocity field to be used in both turbulent research and as IC/BC for CFD simulations.
 
 ![Physical system\label{fig:PS}](PS.png)
 
@@ -68,7 +72,9 @@ User can generate turbulent flow and query velocity field to be used in both tur
     - Any subsection of the field.
     - At any point in time after generation.
 
-The generated field is fully wrapped around on all boundaries, ensuring conservation of mass and momentum. How wrapped around is handled in different flow scenarios is detailed in the [Module Guide (MG)](https://github.com/omltcat/turbulent-flow/blob/main/docs/Design/SoftArchitecture/MG.pdf).
+A quick start guide is provided in the [README.md](https://github.com/omltcat/turbulent-flow?tab=readme-ov-file#quick-start) of the repository.
+
+The generated field is fully wrapped around on all boundaries, ensuring conservation of mass and momentum. How wrapped around is handled in different flow scenarios is detailed in the [Module Guide (MG)](https://github.com/omltcat/turbulent-flow/blob/main/docs/Design/SoftArchitecture/MG.pdf) (see Field Wrap-around section).
 
 The query result is saved as a NumPy array (`.npy` file) representing velocity vectors in a 3D meshgrid, with a shape of `(Nx, Ny, Nz, 3)` where `N` is the number of grid points in each direction, and the last dimension represents $x$, $y$, and $z$ components of the velocity vector.
 
@@ -78,22 +84,29 @@ A velocity magnitude cross-section plot example from a $1000^3$ meshgrid is show
 
 ## Customization
 `SynthEddy` allows user to easily program certain aspects of the generated field to better suit their specific needs. This includes:
-- Non-uniform mean velocity profile.  
+- Non-uniform mean velocity distribution.  
   Instead of inputting a constant mean velocity across the field, user can provide a function to obtain mean $x$-velocity ($\overline{\mathbf{u}}$) based on $y$- and $z$-coordinates. This is useful in situations like channel flow or boundary layer.
 - Eddy shape function.
   A function that describes the velocity distribution of individual eddies.
+
+  Detailed explanation on editing these functions can be found in the [README.md](https://github.com/omltcat/turbulent-flow/blob/main/README.md#customization).
 
 ## Typical use case
 - Whole field (IC and research)  
   To jump start a CFD simulation, the user can generate a field and query the whole size of the field at $t=0$ to be used as initial condition. This use case can also be used in turbulent research, such as turbulent energy spectrum analysis. Depending on the size of the field and query meshgrid resolution, this can take significant time and memory.
 - Salami slicing (BC)  
-  In a continuously running CFD simulation, the user can query a keep querying a thin subsection of the field with advancing time, and feed the results as inlet boundary conditions to the simulation. Since the region is much smaller than the whole field, this can be done significantly faster.  
+  In a continuously running CFD simulation, the user can keep querying a thin subsection of the field with advancing time, and feed the results as inlet boundary conditions to the simulation. Since the region is much smaller than the whole field, this can be done significantly faster.  
   `SynthEddy` allows querying any subsection of the same field at any time, and ensures continuity between different queried space and time. See [Information preserving](#information-preserving) for more details.
 
-## Performance benchmark
+## Performance and benchmark
+To improve performance on large meshgrid, the grid is divided into chunks for efficient batch processing. This is detailed in the [Module Guide (MG)](https://github.com/omltcat/turbulent-flow/blob/main/docs/Design/SoftArchitecture/MG.pdf) (see Chunking section).
+
+
 A benchmark test is included in the repository (see [README.md](https://github.com/omltcat/turbulent-flow/blob/main/README.md#running-the-test-cases)) for users to get a performance estimate on their machine with a typical whole field query use case. The benchmark has a $1000^3$ meshgrid (acceptable for today's publication) and around 10 million eddies. On an Intel i9-13900K CPU, the run time is approximately 1 hour.
 
 # Design and development
+To ensure `SynthEddy` can adapt to different use cases and be easily maintainable and customizable, the program is designed with the following principles:
+
 ## Information preserving
 A key design philosophy of `SynthEddy` is to preserve as much information as possible in the generated field, hence the separate query process.
 
