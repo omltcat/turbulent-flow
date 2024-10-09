@@ -14,17 +14,17 @@ authors:
     affiliation: 1
   - name: Nikita Holyev
     affiliation: 1
-  - name: Dr. Spencer Smith
+  - name: Spencer Smith
     affiliation: 1
-  - name: Dr. Marilyn Lightstone
+  - name: Marilyn Lightstone
     affiliation: 1
-  - name: Dr. Stephen Tullis
+  - name: Stephen Tullis
     affiliation: 1
 affiliations:
  - name: McMaster University, Canada
    index: 1
    ror: 02fa3aq29
-date: 13 August 2017
+date: 09 October 2024
 bibliography: paper.bib
 
 # Optional fields if submitting to a AAS journal too, see this blog post:
