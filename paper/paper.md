@@ -2,7 +2,7 @@
 title: 'SynthEddy: A Python program for generating synthetic turbulent flow fields'
 tags:
   - Python
-  - fuild dynamics
+  - fluid dynamics
   - turbulent flow
   - computational fluid dynamics
   - large eddy simulation
@@ -36,7 +36,7 @@ bibliography: paper.bib
 # Summary
 
 Turbulent flow is a type of fluid motion characterized by chaotic fluctuations in velocity and pressure.
-Today, most turbulent flow simulations with Computational Fluid Dynamics (CFD) are based on simplified models such as Reynolds-averaged Navier-Stokes (RANS) equations.
+Today, most turbulent flow simulations with Computational Fluid Dynamics (CFD) are based on simplified models such as Reynolds-Averaged Navier-Stokes (RANS) equations.
 While other approaches can reveal more details in the flow, such as Large Eddy Simulation (LES) and Direct Numerical Simulation (DNS), they are often deemed too computationally expensive and thus see limited use in practice.
 `SynthEddy` is a Python program that aims to alleviate part of this issue by generating Initial Conditions (IC) and Boundary Conditions (BC) for LES using the Synthetic Eddy Method.
 `SynthEddy` has the potential to reduce the required simulation scale both in time and space, making LES more accessible to a wider audience.
@@ -51,7 +51,7 @@ Not only the model itself is more computationally expensive, but there exists a 
 
 Unlike RANS that can be described by a few parameters, to utilize LES in any practical manner, there must already exist a realistic enough turbulent flow field running in the simulation.
 To reach such a state, either prior simulations with longer time and larger field for the turbulent flow to develop are needed (more expensive), or a suitable inlet condition must be synthesized.
-@Poletto:2013 proposed one such method by generation synthetic eddies (many small circular flows) to mimic a turbulent flow.
+@Poletto:2013 proposed one such method by generating synthetic eddies to mimic a turbulent flow.
 Compared to previous proposals, such as random fluctuations, this method is divergence free and closer to the actual turbulent flow.
 
 `SynthEddy` is an implementation of this method in Python, combined with recent work by Nikita Holyev in this topic. [@Holyev:2024]
@@ -63,18 +63,18 @@ The user can generate turbulent flow and query the velocity field to be used in 
 
 # Features and usage
 - Generate synthetic turbulent flow field consisting of eddies.  
-  User need to provide an eddy profile with the following parameters of each type of eddy to be included in the field:
+  Users need to provide an eddy profile with the following parameters of each type of eddy to be included in the field:
     - Size (length-scale)
     - Density (number of eddies per unit volume)
     - Intensity magnitude  
-- Query velocity vectors in the generated field as a meshgrid, which can be...
+- Query velocity vectors in the generated field as a meshgrid, which can be:
     - The whole field.
     - Any subsection of the field.
     - At any point in time after generation.
 
 A quick start guide is provided in the [README.md](https://github.com/omltcat/turbulent-flow?tab=readme-ov-file#quick-start) of the repository.
 
-The generated field is fully wrapped around on all boundaries, ensuring conservation of mass and momentum. How wrapped around is handled in different flow scenarios is detailed in the [Module Guide (MG)](https://github.com/omltcat/turbulent-flow/blob/main/docs/Design/SoftArchitecture/MG.pdf) (see Field Wrap-around section).
+The generated field is fully wrapped around on all boundaries, ensuring conservation of mass. How wrapped around is handled in different flow scenarios is detailed in the [Module Guide (MG)](https://github.com/omltcat/turbulent-flow/blob/main/docs/Design/SoftArchitecture/MG.pdf) (see Field Wrap-around section).
 
 The query result is saved as a NumPy array (`.npy` file) representing velocity vectors in a 3D meshgrid, with a shape of `(Nx, Ny, Nz, 3)` where `N` is the number of grid points in each direction, and the last dimension represents $x$, $y$, and $z$ components of the velocity vector.
 
@@ -83,9 +83,9 @@ A velocity magnitude cross-section plot example from a $1000^3$ meshgrid is show
 ![Result cross-section example\label{fig:result}](result.png)
 
 ## Customization
-`SynthEddy` allows user to easily program certain aspects of the generated field to better suit their specific needs. This includes:
+`SynthEddy` allows the user to easily program certain aspects of the generated field to better suit their specific needs. This includes:
 - Non-uniform mean velocity distribution.  
-  Instead of inputting a constant mean velocity across the field, user can provide a function to obtain mean $x$-velocity ($\overline{\mathbf{u}}$) based on $y$- and $z$-coordinates. This is useful in situations like channel flow or boundary layer.
+  Instead of inputting a constant mean velocity across the field, the user can provide a function to obtain mean $x$-velocity ($\overline{\mathbf{u}}$) based on $y$- and $z$-coordinates. This is useful for simulation of channel flows and boundary layers.
 - Eddy shape function.
   A function that describes the velocity distribution of individual eddies.
 
@@ -93,7 +93,7 @@ A velocity magnitude cross-section plot example from a $1000^3$ meshgrid is show
 
 ## Typical use case
 - Whole field (IC and research)  
-  To jump start a CFD simulation, the user can generate a field and query the whole size of the field at $t=0$ to be used as initial condition. This use case can also be used in turbulent research, such as turbulent energy spectrum analysis. Depending on the size of the field and query meshgrid resolution, this can take significant time and memory.
+  To initiate a CFD simulation, the user can generate a field and query its entirety at $t=0$ to obtain the initial condition. This use case can also be used in turbulent research, such as turbulent energy spectrum analysis. Depending on the size of the field and query meshgrid resolution, this can take significant time and memory.
 - Salami slicing (BC)  
   In a continuously running CFD simulation, the user can keep querying a thin subsection of the field with advancing time, and feed the results as inlet boundary conditions to the simulation. Since the region is much smaller than the whole field, this can be done significantly faster.  
   `SynthEddy` allows querying any subsection of the same field at any time, and ensures continuity between different queried space and time. See [Information preserving](#information-preserving) for more details.
@@ -110,7 +110,7 @@ To ensure `SynthEddy` can adapt to different use cases and be easily maintainabl
 ## Information preserving
 A key design philosophy of `SynthEddy` is to preserve as much information as possible in the generated field, hence the separate query process.
 
-Unlike an actual CFD simulation, `SynthEddy` does not use numerical method to solve the field. Thus, there is no need to discretize the field at the beginning, which can lead to loss of information. Instead, the eddies are treated as movable individual entities in a continuous space and time. The field (or queried region) is only discretized into a meshgrid when queried.
+Unlike an actual CFD simulation, `SynthEddy` does not use numerical methods to solve the field. Thus, there is no need to discretize the field at the beginning, which can lead to loss of information. Instead, the eddies are treated as movable individual entities in a continuous space and time. The field (or queried region) is only discretized into a meshgrid when queried.
 
 This allows the user to query the same field multiple times with different parameters, such as having an overall coarse grid and a fine grid for a specific region of interest, or when performing grid sensitivity analysis.
 
@@ -139,6 +139,6 @@ These tests can also be run locally with instructions in the [README.md](https:/
 
 # Acknowledgements
 
-We acknowledge insights and suggestions from Dr. Marilyn Lightstone and Dr. Stephen Tullis during the development of this program.
+We acknowledge the insights and suggestions from Dr. Marilyn Lightstone and Dr. Stephen Tullis during the development of this program and the preparation of this paper.
 
 # References
