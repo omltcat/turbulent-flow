@@ -3,7 +3,7 @@ on:
   push:
     paths:
       - paper/**
-      - .github/workflows/draft-pdf.yaml
+      - .github/workflows/joss-draft-pdf.yaml
 
 jobs:
   paper:
