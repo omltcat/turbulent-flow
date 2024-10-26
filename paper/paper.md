@@ -8,7 +8,7 @@ tags:
   - large eddy simulation
   - direct numerical simulation
 authors:
-  - name: Phil Du
+  - name: Ange (Phil) Du
     orcid: 0009-0009-1049-268X
     # equal-contrib: true
     affiliation: 1
