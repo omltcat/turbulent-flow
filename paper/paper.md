@@ -51,7 +51,7 @@ To reach such a state, either prior simulations with longer time and larger fiel
 @Poletto:2013 proposed one such method by generating synthetic eddies to mimic a turbulent flow.
 Compared to previous proposals, such as random fluctuations, this method is divergence free and closer to the actual turbulent flow.
 
-`SynthEddy` is an implementation of this method in Python, combined with recent work by Holyev in this topic. [@Holyev:2024]
+`SynthEddy` is an implementation of this method in Python, combined with recent work by Holyev in this topic (paper pending).
 It models turbulent flow fields consisting of synthetic eddies of various sizes, orientations and intensities, flowing from inlet to outlet with a uniform or non-uniform mean velocity.
 This physical system is shown in \autoref{fig:PS}.
 The user can generate turbulent flow and query the velocity field to be used in both turbulent research and as IC/BC for CFD simulations.
