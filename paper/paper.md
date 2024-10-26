@@ -9,22 +9,19 @@ tags:
   - direct numerical simulation
 authors:
   - name: Phil Du
-    # orcid: 0000-0000-0000-0000
+    orcid: 0009-0009-1049-268X
     # equal-contrib: true
     affiliation: 1
   - name: Nikita Holyev
     affiliation: 1
   - name: Spencer Smith
-    affiliation: 1
-  - name: Marilyn Lightstone
-    affiliation: 1
-  - name: Stephen Tullis
+    orcid: 0000-0002-0760-0987
     affiliation: 1
 affiliations:
  - name: McMaster University, Canada
    index: 1
    ror: 02fa3aq29
-date: 09 October 2024
+date: 25 October 2024
 bibliography: paper.bib
 
 # Optional fields if submitting to a AAS journal too, see this blog post:
@@ -74,7 +71,7 @@ The user can generate turbulent flow and query the velocity field to be used in 
 
 A quick start guide is provided in the [README.md](https://github.com/omltcat/turbulent-flow?tab=readme-ov-file#quick-start) of the repository.
 
-The generated field is fully wrapped around on all boundaries, ensuring conservation of mass. How wrapped around is handled in different flow scenarios is detailed in the [Module Guide (MG)](https://github.com/omltcat/turbulent-flow/blob/main/docs/Design/SoftArchitecture/MG.pdf) (see Field Wrap-around section).
+The generated field is fully wrapped around on all boundaries, ensuring conservation of mass. Details on how wrapped around is handled in different flow scenarios can be found in the [Module Guide (MG)](https://github.com/omltcat/turbulent-flow/blob/main/docs/Design/SoftArchitecture/MG.pdf) (see Field Wrap-around section).
 
 The query result is saved as a NumPy array (`.npy` file) representing velocity vectors in a 3D meshgrid, with a shape of `(Nx, Ny, Nz, 3)` where `N` is the number of grid points in each direction, and the last dimension represents $x$, $y$, and $z$ components of the velocity vector.
 
