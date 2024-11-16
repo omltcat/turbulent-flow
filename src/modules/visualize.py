@@ -68,7 +68,7 @@ def plot_mesh(
     ax: Axes = fig.add_subplot(111)
     im = ax.imshow(
         magnitude.T,
-        cmap="coolwarm",
+        cmap="jet",
         interpolation="nearest",
         extent=extent,
         origin="lower",
