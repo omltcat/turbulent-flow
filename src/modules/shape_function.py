@@ -71,6 +71,7 @@ def gaussian(dk, sigma):
         C * np.exp(-HALF_PI * dk**2),
         0
     )
+    # The function is structured in this way so that it can be broadcasted by NumPy over many eddies efficiently.
     # Mathematically, this function is equivalent to:
 
     #         ┌ C * e^(-π/2 * dk^2), if dk < cutoff

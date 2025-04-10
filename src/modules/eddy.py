@@ -18,6 +18,9 @@ def sum_vel_chunk(
     """
     Calculate the velocity field due to each eddy within a chunk.
 
+    Uses the intance model (IM1) in SRS as the core of the calculation.
+    Choice of shape function is set in the shape_function module.
+
     Parameters
     ----------
     centers : np.ndarray
