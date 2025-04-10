@@ -52,7 +52,7 @@ To reach such a state, either prior simulations with longer time and larger fiel
 Compared to previous proposals, such as random fluctuations, this method is divergence free and closer to the actual turbulent flow.
 
 `SynthEddy` is an implementation of this method in Python, combined with recent work by Holyev in this topic (paper pending).
-It models turbulent flow fields consisting of synthetic eddies of various sizes, orientations and intensities, flowing from inlet to outlet with a uniform or non-uniform mean velocity.
+It models turbulent flow fields consisting of synthetic eddies of various sizes, orientations and intensities.
 This physical system is shown in \autoref{fig:PS}.
 The user can generate turbulent flow and query the velocity field to be used in both turbulent research and as IC/BC for CFD simulations.
 
@@ -97,9 +97,8 @@ A velocity magnitude cross-section plot example from a $1000^3$ meshgrid is show
 
 ## Performance and benchmark
 To improve performance on large meshgrid, the grid is divided into chunks for efficient batch processing. This is detailed in the [Module Guide (MG)](https://github.com/omltcat/turbulent-flow/blob/main/docs/Design/SoftArchitecture/MG.pdf) (see Chunking section).
-
-
-A benchmark test is included in the repository (see [README.md](https://github.com/omltcat/turbulent-flow/blob/main/README.md#running-the-test-cases)) for users to get a performance estimate on their machine with a typical whole field query use case. The benchmark has a $1000^3$ meshgrid (acceptable for today's publication) and around 10 million eddies. On an Intel i9-13900K CPU, the run time is approximately 1 hour.
+A benchmark test is included in the repository (see [README.md](https://github.com/omltcat/turbulent-flow/blob/main/README.md#running-the-test-cases)).
+On an Intel i9-13900K CPU, with a $1000^3$ meshgrid and around 10 million eddies, the run time is approximately 1 hour.
 
 # Design and development
 To ensure `SynthEddy` can adapt to different use cases and be easily maintainable and customizable, the program is designed with the following principles:
@@ -109,7 +108,7 @@ A key design philosophy of `SynthEddy` is to preserve as much information as pos
 
 Unlike an actual CFD simulation, `SynthEddy` does not use numerical methods to solve the field. Thus, there is no need to discretize the field at the beginning, which can lead to loss of information. Instead, the eddies are treated as movable individual entities in a continuous space and time. The field (or queried region) is only discretized into a meshgrid when queried.
 
-This allows the user to query the same field multiple times with different parameters, such as having an overall coarse grid and a fine grid for a specific region of interest, or when performing grid sensitivity analysis.
+This allows the user to query the same field multiple times with different parameters, such as varying resolution for specific region of interest, or when performing grid sensitivity analysis.
 When queried at any point in time, the program first finds the location of each eddy at such time analytically, without having to advance through prior time steps numerically.
 
 This opens up the possibility for "salami slicing" the field to obtain BC (as mentioned above) at any arbitrary feeding rate demanded by the user, without concerning grid resolution or time step size.
