@@ -6,7 +6,7 @@ This program requires Python 3.11 or later. Using a virtual environment manager 
 > Conda is a package manager that allows you to create isolated environments for each project. You only install the required version of python and libraries for that project and nothing more, keeping everything lean and clean!
 
 
-Download the latest version of Miniconda from its [official website](https://docs.anaconda.com/free/miniconda/index.html#latest-miniconda-installer-links) for your operating system.
+Download the latest version of Miniconda from its [official website](https://www.anaconda.com/docs/getting-started/miniconda/install) for your operating system.
 
 **If you are on Windows, and want to use VS Code with Conda**  
 In Start Menu, search "Anaconda Powershell Prompt". Then run the following commands:
@@ -31,14 +31,16 @@ You will likely see some red warnings at this point, but as long as it starts wi
 **If you are on Linux**  
 You can initialize conda with
 ```bash
-conda init bash  # or zsh if you are into that
+conda init --all
 conda config --set auto_activate_base False # Set to manual activation
 ```
-Please refer to [official documentation for Linux](https://docs.anaconda.com/anaconda/install/linux/).
+Please refer to [official documentation for Linux](https://www.anaconda.com/docs/getting-started/miniconda/install#linux-terminal-installer).
 
 **If you are on MacOS**  
 Then you are a lot richer than me, and I have no idea how conda works on your fancy machine.  
-Please refer to [official documentation for MacOS](https://docs.anaconda.com/anaconda/install/mac-os/).
+You make need to adjust the `SHELL` variable in the [`Makefile`](/Makefile) to use `zsh` instead of `bash` for newer MacOS versions.
+
+For details, please refer to [official documentation for MacOS](https://www.anaconda.com/docs/getting-started/miniconda/install#mac-os-graphical-installer).
 
 ### Creating a New Conda Environment
 Assuming you are using VS Code and you have done the steps above correctly...

@@ -33,8 +33,9 @@ The folders and files for this project are as follows:
 ```
 
 ## Quick Start
-If you have **Make** and **Conda** installed, and just want to quickly see this program in action, you can run the following commands.  
-Otherwise, see [Installation](#installation) and [Usage](#usage).
+If you have **Make** and [**Conda**](https://www.anaconda.com/docs/getting-started/miniconda/install) installed, and just want to quickly see this program in action, you can run the following commands.  
+Otherwise, see [Installation](#installation) and [Usage](#usage).  
+MacOS users may need to adjust the `SHELL` variable in the [`Makefile`](Makefile) first.
 ```bash
 make install # create a new conda environment named "eddy" and install dependencies
 
