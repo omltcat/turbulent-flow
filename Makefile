@@ -16,17 +16,29 @@ FIELD=quick_run
 QUERY=example_meshgrid
 DIM=20
 
-# Create the conda environment with Python 3.11 and install dependencies
+## Using default python and pip
 install:
+	pip install -r requirements.txt
+
+run:
+	python ./src/main.py new -p $(PROFILE) -n $(FIELD) -d $(DIM) $(DIM) $(DIM) && python ./src/main.py query -n $(FIELD) -q $(QUERY)
+
+test:
+	pytest --cov=src --cov-fail-under=95 -m "(unit or system) and not slow"
+
+## Using Conda
+
+# Create the conda environment with Python 3.11 and install dependencies
+conda-install:
 	conda create --name $(ENV_NAME) python=3.11 -y && $(CONDA_ACTIVATE) $(ENV_NAME) && pip install -r requirements.txt
 
 # Create new field and query
-run:
+conda-run:
 	$(CONDA_ACTIVATE) $(ENV_NAME) && python ./src/main.py new -p $(PROFILE) -n $(FIELD) -d $(DIM) $(DIM) $(DIM) && python ./src/main.py query -n $(FIELD) -q $(QUERY)
 
-test:
+conda-test:
 	$(CONDA_ACTIVATE) $(ENV_NAME) && pytest --cov=src --cov-fail-under=95 -m "(unit or system) and not slow"
 
 # Delete the conda environment
-clean:
+conda-clean:
 	conda env remove --name $(ENV_NAME) -y

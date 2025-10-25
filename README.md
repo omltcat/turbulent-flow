@@ -33,17 +33,25 @@ The folders and files for this project are as follows:
 ```
 
 ## Quick Start
-If you have **Make** and [**Conda**](https://www.anaconda.com/docs/getting-started/miniconda/install) installed, and just want to quickly see this program in action, you can run the following commands.  
+If you have **Make** and [**Conda**](https://www.anaconda.com/docs/getting-started/miniconda/install) (or regular python 3.11+) installed, and just want to quickly see this program in action, you can run the following commands.  
 Otherwise, see [Installation](#installation) and [Usage](#usage).  
 MacOS users may need to adjust the `SHELL` variable in the [`Makefile`](Makefile) first.
 ```bash
-make install # create a new conda environment named "eddy" and install dependencies
+## Using default python and pip
+make install # install dependencies
 
-make run # create a new flow field with example profile, query it and see a plot
+make run     # create a new flow field with example profile, query it and see a plot
 
-make test # run the unit and system test cases
+make test    # run the unit and system test cases
 
-make clean # remove the conda environment
+## Using conda
+make conda-install # create a new conda environment named "eddy" and install dependencies
+
+make conda-run # create a new flow field with example profile, query it and see a plot
+
+make conda-test # run the unit and system test cases
+
+make conda-clean # remove the conda environment
 ```
 
 
